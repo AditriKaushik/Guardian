@@ -1,0 +1,7 @@
+{
+  "members": [
+    {"id": "dad",  "name": "David", "role": "parent", "token": "CHANGE-ME-dad-9f2a",  "consents": ["locate"]},
+    {"id": "mom",  "name": "Maria", "role": "parent", "token": "CHANGE-ME-mom-7b1c",  "consents": ["locate"]},
+    {"id": "sam",  "name": "Sam",   "role": "child",  "token": "CHANGE-ME-sam-4d8e",  "consents": ["locate", "view"]}
+  ]
+}

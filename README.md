@@ -74,3 +74,21 @@ pytest
 ```
 
 CI runs this on every push and pull request across Python 3.9–3.12.
+
+## Practical use across your devices (hub + reporters)
+
+To actually locate family members across phones and computers, run the
+**Guardian hub** on one always-on machine and have each device report its own
+location to it (consent + a per-device token required):
+
+```bash
+pip install -e .
+cp examples/hub_config.example.json hub_config.json   # edit names + tokens
+python -m guardian.hub --config hub_config.json --port 8080
+# open http://<hub-ip>:8080/ to see everyone's last-known location
+```
+
+Each computer reports with `python -m guardian.reporter ...`; phones report with
+a no-code Apple Shortcut (iOS) or the HTTP Shortcuts app (Android). Full
+step-by-step for Windows, macOS, Android and iOS — plus why silent mic/camera
+capture is not supported — is in [docs/USAGE_DEVICES.md](docs/USAGE_DEVICES.md).
