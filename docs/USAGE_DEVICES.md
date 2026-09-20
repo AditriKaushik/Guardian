@@ -15,6 +15,11 @@ Guardian works as a **hub + reporters** system:
 
 ---
 
+> **Encryption note:** the one-click launcher runs the hub over **HTTPS**.
+> Use `https://` (not `http://`) in every URL below, and accept the one-time
+> "not trusted" prompt on each device (self-signed certificate on your home
+> network). If you run the hub manually without a certificate, use `http://`.
+
 ## 1. Start the hub (on your Windows desktop)
 
 ```bash
