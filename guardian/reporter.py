@@ -45,7 +45,13 @@ def send_report(hub: str, member: str, token: str, lat: float, lon: float,
         hub.rstrip("/") + "/report", data=payload,
         headers={"Content-Type": "application/json"}, method="POST",
     )
-    with urllib.request.urlopen(req, timeout=10) as resp:
+    # A hub on your own LAN uses a self-signed cert; skip verification for it
+    # (traffic is still encrypted, just not verified against a public CA).
+    context = None
+    if hub.lower().startswith("https"):
+        import ssl
+        context = ssl._create_unverified_context()
+    with urllib.request.urlopen(req, timeout=10, context=context) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
 

@@ -9,3 +9,5 @@ dist/
 # Guardian runtime data / secrets (do not commit)
 hub_config.json
 guardian_locations.json
+cert.pem
+key.pem

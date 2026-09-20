@@ -205,12 +205,24 @@ def make_handler(state: HubState):
 
 
 def run_hub(config_path: str, host: str = "0.0.0.0", port: int = 8080,
-            data_path: str = "guardian_locations.json") -> None:
+            data_path: str = "guardian_locations.json",
+            certfile: Optional[str] = None, keyfile: Optional[str] = None) -> None:
     config = json.loads(Path(config_path).read_text())
     state = HubState(config, Path(data_path) if data_path else None)
     server = ThreadingHTTPServer((host, port), make_handler(state))
+
+    scheme = "http"
+    if certfile and keyfile:
+        import ssl
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(certfile, keyfile)
+        server.socket = ctx.wrap_socket(server.socket, server_side=True)
+        scheme = "https"
+
     shown = host if host != "0.0.0.0" else "<this-machine-ip>"
-    print(f"Guardian hub running: http://{shown}:{port}/  (Ctrl+C to stop)")
+    print(f"Guardian hub running: {scheme}://{shown}:{port}/  (Ctrl+C to stop)")
+    if scheme == "https":
+        print("Encryption: ON (HTTPS). Devices trust this cert once, then it's secure.")
     print(f"Members loaded: {', '.join(state.members) or '(none)'}")
     try:
         server.serve_forever()
@@ -226,8 +238,11 @@ def main(argv=None) -> None:
     p.add_argument("--port", type=int, default=8080)
     p.add_argument("--data", default="guardian_locations.json",
                   help="where to persist last-known locations")
+    p.add_argument("--certfile", help="TLS certificate (enables HTTPS encryption)")
+    p.add_argument("--keyfile", help="TLS private key (enables HTTPS encryption)")
     args = p.parse_args(argv)
-    run_hub(args.config, args.host, args.port, args.data)
+    run_hub(args.config, args.host, args.port, args.data,
+            args.certfile, args.keyfile)
 
 
 if __name__ == "__main__":

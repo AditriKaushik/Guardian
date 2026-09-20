@@ -75,6 +75,26 @@ pytest
 
 CI runs this on every push and pull request across Python 3.9–3.12.
 
+
+## Easiest way on Windows (one-click, encrypted)
+
+No command line needed after the first setup:
+
+1. Install Python from https://www.python.org/downloads/ (tick **Add Python to PATH**).
+2. Download this project (green **Code** button -> **Download ZIP**) and extract it.
+3. Double-click **`Start Guardian.bat`**.
+
+On first run it automatically:
+- installs encryption support (`cryptography`),
+- creates `hub_config.json` with **strong random tokens** (shown once — note them for your phones),
+- makes a TLS certificate, and
+- starts the hub over **HTTPS (encrypted)** and opens `https://localhost:8080/`.
+
+Because the certificate is self-signed, your browser/phone shows a one-time
+"not private / not trusted" prompt on your home network — click **Advanced ->
+proceed** once. Traffic is encrypted regardless. Keep the window open while you
+want the hub running.
+
 ## Practical use across your devices (hub + reporters)
 
 To actually locate family members across phones and computers, run the
