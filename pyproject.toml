@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "guardian"
+version = "0.1.0"
+description = "A small, consent-first toolkit for listening to, viewing, and locating loved ones."
+requires-python = ">=3.8"
+readme = "README.md"
+
+[tool.setuptools]
+packages = ["guardian"]
