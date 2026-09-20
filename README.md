@@ -69,6 +69,8 @@ wire the hardware in later.
 ## Tests
 
 ```bash
-pip install pytest
-PYTHONPATH=. pytest
+pip install -e ".[test]"
+pytest
 ```
+
+CI runs this on every push and pull request across Python 3.9–3.12.

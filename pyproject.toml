@@ -9,5 +9,11 @@ description = "A small, consent-first toolkit for listening to, viewing, and loc
 requires-python = ">=3.8"
 readme = "README.md"
 
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
 [tool.setuptools]
 packages = ["guardian"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
