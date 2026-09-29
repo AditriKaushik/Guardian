@@ -20,6 +20,11 @@ jobs:
     defaults:
       run:
         working-directory: android
+    env:
+      # Only "true" or "false" — the secret itself is never put here. Secrets can't be used in a
+      # step's `if:`, so the steps below check this instead. It is "false" on pull requests from
+      # forks (they get no secrets), which then fall back to the debug build.
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -31,11 +36,39 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Test and build APK
-        run: ./gradlew --no-daemon testDebugUnitTest assembleDebug
+      - name: Unit tests
+        run: ./gradlew --no-daemon testDebugUnitTest
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk BaatBuddy.apk
+      # With the release keystore (see docs/SUBSCRIPTION_SETUP.md): a signed, non-debuggable,
+      # minified release APK. The secrets are only given to this one step.
+      - name: Build signed release APK
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Repository secret $name is missing (it is needed together with ANDROID_KEYSTORE_BASE64)."
+              exit 1
+            fi
+          done
+          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/release-keystore.jks"
+          trap 'rm -f "$ANDROID_KEYSTORE_FILE"' EXIT
+          (umask 077; printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > "$ANDROID_KEYSTORE_FILE")
+          ./gradlew --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk BaatBuddy.apk
+
+      # Without the keystore: the debug APK, exactly as before.
+      - name: Build debug APK (no release keystore)
+        if: env.HAS_KEYSTORE != 'true'
+        run: |
+          echo "::warning title=Debug-signed APK::ANDROID_KEYSTORE_BASE64 is not set, so BaatBuddy.apk is a debug build signed with a throwaway debug key. Set up release signing before launch (docs/SUBSCRIPTION_SETUP.md)."
+          ./gradlew --no-daemon assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk BaatBuddy.apk
 
       - uses: actions/upload-artifact@v4
         with:

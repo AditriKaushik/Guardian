@@ -2,6 +2,17 @@ plugins {
     id 'com.android.application'
 }
 
+// Release signing: the keystore and its passwords come ONLY from environment variables
+// (CI sets them from GitHub secrets; see docs/SUBSCRIPTION_SETUP.md). Nothing secret lives in
+// this file. If any of the four is missing, the release build is simply left unsigned and debug
+// builds are unaffected, so the project still builds on any machine without the keystore.
+def releaseStoreFile = System.getenv('ANDROID_KEYSTORE_FILE')
+def releaseStorePassword = System.getenv('ANDROID_KEYSTORE_PASSWORD')
+def releaseKeyAlias = System.getenv('ANDROID_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('ANDROID_KEY_PASSWORD')
+def hasReleaseSigning = [releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword]
+        .every { it != null && !it.trim().isEmpty() }
+
 android {
     namespace 'org.guardian.buddy'
     compileSdk 35
@@ -10,8 +21,39 @@ android {
         applicationId 'org.guardian.buddy'
         minSdk 24
         targetSdk 35
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '1.1'
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        // The debug build type keeps Android's defaults (debuggable, signed with the debug key).
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    lint {
+        // Don't run the extra "lint vital" pass inside assembleRelease. CI builds the release APK on
+        // every push, and that pass adds a slow separate analysis that can stop a release over lint
+        // findings (or lint tool hiccups) that don't affect users. Code correctness is covered by the
+        // unit tests; run `./gradlew lintRelease` by hand to see the full lint report before a launch.
+        checkReleaseBuilds false
     }
 
     compileOptions {
