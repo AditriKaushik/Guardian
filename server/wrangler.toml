@@ -1,0 +1,20 @@
+# Cloudflare Worker that checks Nanha School subscriptions with Razorpay.
+# Deploy:  npx wrangler deploy
+name = "nanha-school-api"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Where the web app is hosted (comma-separated). Only these sites may call the API.
+ALLOWED_ORIGINS = "https://aditrikaushik.github.io"
+# From the Razorpay dashboard (these two are not secret).
+RAZORPAY_KEY_ID = "rzp_live_REPLACE_ME"
+RAZORPAY_PLAN_ID = "plan_REPLACE_ME"
+# How many billing cycles a subscription can run for (120 monthly cycles = 10 years).
+TOTAL_COUNT = "120"
+# Free trial length; a parent who subscribes during it is first charged when it ends.
+TRIAL_DAYS = "7"
+
+# Secrets — never put these in this file. Set them once with:
+#   npx wrangler secret put RAZORPAY_KEY_SECRET
+#   npx wrangler secret put SIGNING_KEY_JWK      (the private key printed by `npm run genkeys`)
