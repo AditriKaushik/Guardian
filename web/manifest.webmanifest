@@ -1,0 +1,16 @@
+{
+  "name": "नन्हा स्कूल — Nanha School",
+  "short_name": "नन्हा स्कूल",
+  "description": "छोटे बच्चों के लिए तस्वीर और आवाज़ से सीखने वाला ऐप।",
+  "lang": "hi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8E7",
+  "theme_color": "#FF8A3D",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
