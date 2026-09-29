@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">बात बडी</string>
+    <string name="hint">यहाँ लिखो…</string>
+    <string name="send">भेजो</string>
+    <string name="speak">🎤 बोलो</string>
+    <string name="no_speech">इस फ़ोन में बोलकर लिखने की सुविधा नहीं मिली। लिखकर बात करो!</string>
+    <string name="sound_on">🔊</string>
+    <string name="sound_off">🔇</string>
+</resources>

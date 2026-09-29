@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#FFF8E7</color>
+    <color name="header">#FF8A3D</color>
+    <color name="buddy_bubble">#FFFFFF</color>
+    <color name="kid_bubble">#C8F0D8</color>
+    <color name="text">#2B2B2B</color>
+    <color name="mic">#4C8BF5</color>
+    <color name="send">#2EAD6B</color>
+</resources>
