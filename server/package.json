@@ -1,0 +1,9 @@
+{
+  "name": "nanha-school-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "genkeys": "node genkeys.mjs"
+  }
+}

@@ -1,7 +1,7 @@
 // Keeps the app working offline: the app shell is cached on install and
 // served cache-first, refreshing the cache in the background when online.
-const CACHE = 'nanha-school-v1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-maskable.svg'];
+const CACHE = 'nanha-school-v2';
+const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './icon.svg', './icon-maskable.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));

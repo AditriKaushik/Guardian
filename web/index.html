@@ -173,6 +173,49 @@
     padding: 12px 22px; font-size: 16px; font-weight: 700; font-family: var(--font);
     box-shadow: 0 6px 20px rgba(0,0,0,.2); cursor: pointer; z-index: 10;
   }
+
+  /* Subscription: locked tiles, the parents' banner, and the grown-ups' screens. */
+  .tile { position: relative; }
+  .tile.locked { filter: saturate(.35) brightness(.97); }
+  .tile .lock { position: absolute; top: 8px; right: 10px; font-size: 20px; }
+  .rbtn.locked { opacity: .6; }
+  .banner {
+    margin: 2px 12px 16px; padding: 12px 14px; border: none; border-radius: 16px;
+    background: var(--card); color: var(--ink); font-family: var(--font);
+    font-size: 15px; font-weight: 600; text-align: center; cursor: pointer;
+    box-shadow: 0 1px 0 rgba(0,0,0,.06);
+  }
+  .panel { padding: 18px 16px 28px; display: flex; flex-direction: column; gap: 12px; }
+  .ptitle { margin: 0; font-size: 22px; font-weight: 800; color: #E56A1C; text-wrap: balance; }
+  .plead { margin: 0; font-size: 17px; line-height: 1.5; }
+  .pq { margin: 4px 0; font-size: 42px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+  .pin {
+    width: 100%; border: 2px solid #E8DCC4; border-radius: 14px; padding: 14px;
+    font-size: 18px; font-family: var(--font); background: var(--card); color: var(--ink);
+  }
+  .pbtn {
+    border: none; border-radius: 14px; background: var(--send); color: #fff; padding: 15px;
+    font-size: 18px; font-weight: 700; font-family: var(--font); cursor: pointer;
+  }
+  .pbtn.secondary { background: #9E9E9E; }
+  .pbtn.danger { background: var(--stop); }
+  .pbtn:disabled { opacity: .6; cursor: default; }
+  .plink {
+    border: none; background: none; color: #C25A12; font-size: 15px; font-family: var(--font);
+    text-decoration: underline; cursor: pointer; padding: 4px;
+  }
+  .plist { margin: 0; padding: 0; list-style: none; font-size: 16px; line-height: 1.8; }
+  .price { margin: 0; font-size: 28px; font-weight: 800; }
+  .psmall { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .pmsg { margin: 0; min-height: 20px; font-size: 15px; color: #B3261E; }
+  .pmsg.ok { color: #1E7A48; }
+  .mono {
+    margin: 0; font-family: ui-monospace, Menlo, monospace; font-size: 14px; word-break: break-all;
+    background: var(--card); padding: 10px 12px; border-radius: 10px; user-select: all;
+  }
+  .pin:focus-visible, .pbtn:focus-visible, .plink:focus-visible, .banner:focus-visible, .tile:focus-visible {
+    outline: 3px solid var(--mic); outline-offset: 2px;
+  }
 </style>
 </head>
 <body>
@@ -186,6 +229,7 @@
   <div class="body" id="body"></div>
 </div>
 <button class="install" id="installBtn" hidden>📲 ऐप इंस्टॉल करें</button>
+<script src="config.js"></script>
 <script>
 /* ---------------- Syllabus data (mirrors the app) ---------------- */
 const PALETTE = ["#EF5350","#AB47BC","#5C6BC0","#29B6F6","#26A69A","#66BB6A","#9CCC65","#FFA726","#FF7043","#8D6E63","#EC407A","#7E57C2","#42A5F5"];
@@ -280,7 +324,8 @@ const prog = document.getElementById("prog");
 soundBtn.onclick = () => { soundOn = !soundOn; soundBtn.textContent = soundOn ? "🔊" : "🔇"; if(!soundOn) stopSpeak(); };
 backBtn.onclick = () => goHome();
 
-function setTop(title, showBack){ scrTitle.textContent = title; backBtn.hidden = !showBack; prog.textContent = ""; }
+let onHome = false;
+function setTop(title, showBack){ scrTitle.textContent = title; backBtn.hidden = !showBack; prog.textContent = ""; onHome = !showBack; }
 function el(tag, cls, html){ const e = document.createElement(tag); if(cls) e.className = cls; if(html!=null) e.innerHTML = html; return e; }
 
 function goHome(){
@@ -296,13 +341,17 @@ function goHome(){
   items.push({icon:"🎮", label:"खेल", color:PALETTE[11], act:openQuiz});
   items.push({icon:"💬", label:"बात करो", color:PALETTE[12], act:openChat});
   items.forEach(it=>{
-    const b = el("button","tile"); b.style.background = it.color;
+    const locked = isLocked(it.label);
+    const b = el("button","tile" + (locked ? " locked" : "")); b.style.background = it.color;
     b.appendChild(el("span","ic",it.icon));
     b.appendChild(el("span","lb",it.label));
-    b.onclick = () => { speak(it.label, "hi"); it.act(); };
+    if (locked) b.appendChild(el("span","lock","🔒"));
+    b.onclick = () => { if (locked) { askGrownUp(); return; } speak(it.label, "hi"); it.act(); };
     grid.appendChild(b);
   });
   body.appendChild(grid);
+  const banner = statusBanner();
+  if (banner) body.appendChild(banner);
 }
 
 function openLesson(lesson){
@@ -363,8 +412,10 @@ function openRhymes(){
   body.innerHTML = "";
   const list = el("div","rlist");
   RHYMES.forEach((r,i)=>{
-    const b = el("button","rbtn", r.title); b.style.background = PALETTE[i%PALETTE.length];
-    b.onclick = () => playRhyme(r);
+    const locked = rhymeLocked(i);
+    const b = el("button","rbtn" + (locked ? " locked" : ""), (locked ? "🔒 " : "") + r.title);
+    b.style.background = PALETTE[i%PALETTE.length];
+    b.onclick = () => locked ? askGrownUp() : playRhyme(r);
     list.appendChild(b);
   });
   body.appendChild(list);
@@ -484,7 +535,290 @@ function openChat(){
   buddySay("नमस्ते दोस्त! 👋 मैं बात बडी हूँ। मुझसे बात करो — चुटकुला, कहानी या जोड़-घटाना पूछो!");
 }
 
+/* ---------------- Subscription: 7-day free trial, then premium ----------------
+   Payments stay off (everything free) until config.js has API_BASE and PUBLIC_KEY_JWK.
+   The trial needs no signup or card. After it, a few lessons stay free forever and
+   the rest wait behind a grown-ups' question, so a child never sees a payment screen. */
+const CFG = Object.assign({
+  API_BASE: "", PUBLIC_KEY_JWK: null, TRIAL_DAYS: 7, PRICE_TEXT: "",
+  FREE: ["ABC", "गिनती"], FREE_RHYMES: 2,
+}, window.NS_CONFIG || {});
+const PAYMENTS_ON = !!(CFG.API_BASE && CFG.PUBLIC_KEY_JWK && window.crypto && window.crypto.subtle);
+const DAY = 86400000;
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k, v); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} },
+};
+let subscribed = false;
+
+/* The trial clock never runs backwards, so moving the phone's date back doesn't extend it. */
+function nowMs(){
+  const seen = Number(store.get("ns_seen")) || 0;
+  const t = Math.max(Date.now(), seen);
+  store.set("ns_seen", String(t));
+  return t;
+}
+function trialDaysLeft(){
+  let start = Number(store.get("ns_trial"));
+  if (!start) { start = nowMs(); store.set("ns_trial", String(start)); }
+  return Math.max(0, Math.ceil((start + CFG.TRIAL_DAYS * DAY - nowMs()) / DAY));
+}
+function hasAccess(){ return !PAYMENTS_ON || subscribed || trialDaysLeft() > 0; }
+function isLocked(label){ return label !== "कविताएँ" && !CFG.FREE.includes(label) && !hasAccess(); }
+function rhymeLocked(i){ return i >= CFG.FREE_RHYMES && !hasAccess(); }
+
+/* A pass is "payload.signature", signed by the server; checked here with the public key. */
+function fromB64url(s){
+  let t = s.replace(/-/g, "+").replace(/_/g, "/");
+  while (t.length % 4) t += "=";
+  const bin = atob(t);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function readPass(token){
+  try {
+    const [payload, sig] = String(token).split(".");
+    if (!payload || !sig) return null;
+    const key = await crypto.subtle.importKey("jwk", CFG.PUBLIC_KEY_JWK, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+    const ok = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, key, fromB64url(sig), new TextEncoder().encode(payload));
+    return ok ? JSON.parse(new TextDecoder().decode(fromB64url(payload))) : null;
+  } catch (e) { return null; }
+}
+async function savePass(token){
+  const pass = await readPass(token);
+  if (!pass) return false;
+  store.set("ns_pass", token);
+  subscribed = pass.exp > nowMs() / 1000;
+  return subscribed;
+}
+/* Re-checks the stored pass and quietly renews it near the end of the paid period.
+   Returns true when what the child can open has changed. */
+async function refreshEntitlement(){
+  if (!PAYMENTS_ON) return false;
+  const before = hasAccess() + "|" + subscribed;
+  const token = store.get("ns_pass");
+  const pass = token ? await readPass(token) : null;
+  if (token && !pass) store.del("ns_pass");
+  const t = nowMs() / 1000;
+  subscribed = !!(pass && pass.exp > t);
+  if (pass && pass.exp - t < 3 * 86400) {
+    try { const r = await api("/api/refresh", { token }); await savePass(r.token); } catch (e) {}
+  }
+  return before !== hasAccess() + "|" + subscribed;
+}
+
+async function api(path, data){
+  let res;
+  try {
+    res = await fetch(CFG.API_BASE.replace(/\/+$/, "") + path, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data),
+    });
+  } catch (e) { throw { code: "network" }; }
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw { code: out.error || "server_error" };
+  return out;
+}
+function errorText(e){
+  return ({
+    network: "इंटरनेट से जुड़ें और फिर कोशिश करें।",
+    bad_email: "ईमेल सही नहीं है।",
+    bad_request: "ईमेल और सब्सक्रिप्शन ID दोबारा जाँचें।",
+    not_found: "यह सब्सक्रिप्शन नहीं मिला। ईमेल और ID दोबारा जाँचें।",
+    not_active: "यह सब्सक्रिप्शन अभी चालू नहीं है।",
+    bad_signature: "भुगतान की जाँच नहीं हो पाई।",
+  })[e && e.code] || "कुछ गड़बड़ हुई। थोड़ी देर बाद फिर कोशिश करें।";
+}
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src; s.onload = resolve; s.onerror = () => reject({ code: "network" });
+    document.head.appendChild(s);
+  });
+}
+
+/* Small builders that only ever set text, never HTML. */
+function txt(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; e.textContent = text; return e; }
+function button(label, cls, onClick){ const b = txt("button", cls, label); b.type = "button"; b.onclick = onClick; return b; }
+function field(id, type, placeholder, value){
+  const i = document.createElement("input");
+  i.className = "pin"; i.id = id; i.type = type; i.placeholder = placeholder; i.value = value || "";
+  i.setAttribute("aria-label", placeholder);
+  if (type === "email") i.autocomplete = "email";
+  return i;
+}
+function panel(title){
+  stopSpeak();
+  body.innerHTML = "";
+  const box = el("div", "panel");
+  if (title) box.appendChild(txt("h3", "ptitle", title));
+  body.appendChild(box);
+  return box;
+}
+
+function statusBanner(){
+  if (!PAYMENTS_ON) return null;
+  let label = "⭐ प्रीमियम चालू है";
+  if (!subscribed) {
+    const left = trialDaysLeft();
+    label = left > 0 ? `🎁 मुफ़्त ट्रायल: ${left} दिन बाकी · बड़ों के लिए` : "🔒 कुछ पाठ बंद हैं · बड़ों के लिए: पूरा ऐप खोलें";
+  }
+  return button(label, "banner", () => parentGate(paywall));
+}
+
+function askGrownUp(){
+  parentGate(paywall);
+  speak("ये खोलने के लिए मम्मी या पापा को बुलाओ", "hi");
+}
+
+/* A question small children can't answer yet, so payments are only ever seen by grown-ups. */
+function parentGate(next){
+  setTop("👨‍👩‍👧 बड़ों के लिए", true);
+  const a = 6 + Math.floor(Math.random() * 4), b = 6 + Math.floor(Math.random() * 4);
+  const box = panel("यह हिस्सा माता-पिता के लिए है");
+  const answer = field("gateAnswer", "text", "जवाब", "");
+  answer.inputMode = "numeric"; answer.autocomplete = "off";
+  const msg = txt("p", "pmsg", "");
+  const check = () => {
+    const given = Number(answer.value.replace(/[०-९]/g, d => String(d.charCodeAt(0) - 0x0966)).trim());
+    if (given === a * b) { next(); return; }
+    msg.textContent = "जवाब सही नहीं है। नया सवाल…";
+    setTimeout(() => parentGate(next), 900);
+  };
+  answer.addEventListener("keydown", e => { if (e.key === "Enter") check(); });
+  box.append(txt("p", "plead", "आगे जाने के लिए इस सवाल का जवाब लिखें:"),
+             txt("p", "pq", `${a} × ${b} = ?`), answer, button("आगे", "pbtn", check), msg);
+}
+
+function paywall(){
+  if (subscribed) { account(); return; }
+  setTop("⭐ प्रीमियम", true);
+  const left = trialDaysLeft();
+  const box = panel("पूरा नन्हा स्कूल खोलें");
+  const list = document.createElement("ul"); list.className = "plist";
+  ["सारे 10 पाठ, सारी कविताएँ, खेल और बातचीत", "कोई विज्ञापन नहीं",
+   "बच्चे का कोई निजी डेटा नहीं लिया जाता", "कभी भी रद्द करें"]
+    .forEach(t => list.appendChild(txt("li", null, "✓ " + t)));
+  box.appendChild(list);
+  if (CFG.PRICE_TEXT) box.appendChild(txt("p", "price", CFG.PRICE_TEXT));
+  box.appendChild(txt("p", "psmall", left > 0
+    ? `आपके मुफ़्त ट्रायल के ${left} दिन बाकी हैं। अभी सब्सक्राइब करें — पहला भुगतान ट्रायल ख़त्म होने के बाद ही होगा। (कार्ड या UPI की पुष्टि के लिए बैंक एक छोटी राशि ले सकता है, जो अपने-आप वापस हो जाती है।)`
+    : "मुफ़्त ट्रायल पूरा हो गया। सब्सक्राइब करके सारे पाठ फिर से खोलें।"));
+  const email = field("payEmail", "email", "आपका ईमेल (रसीद इसी पर आएगी)", store.get("ns_email"));
+  const msg = txt("p", "pmsg", "");
+  const pay = button("सब्सक्राइब करें", "pbtn", () => startCheckout(email.value, msg, pay));
+  box.append(email, pay, msg,
+    txt("p", "psmall", "भुगतान Razorpay के सुरक्षित पेज पर होता है: UPI, कार्ड या नेटबैंकिंग। कार्ड की जानकारी इस ऐप तक कभी नहीं आती।"),
+    button("पहले से सब्सक्राइब किया है? यहाँ वापस पाएँ", "plink", restoreView));
+}
+
+async function startCheckout(emailValue, msg, pay){
+  const email = String(emailValue || "").trim();
+  msg.className = "pmsg";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = "कृपया सही ईमेल लिखें।"; return; }
+  pay.disabled = true;
+  msg.textContent = "एक पल…";
+  try {
+    const { subscription_id, key_id } = await api("/api/subscribe", { email, trial_days_left: trialDaysLeft() });
+    store.set("ns_email", email);
+    if (!window.Razorpay) await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    msg.textContent = "";
+    const checkout = new window.Razorpay({
+      key: key_id,
+      subscription_id,
+      name: "नन्हा स्कूल",
+      description: "प्रीमियम सब्सक्रिप्शन",
+      prefill: { email },
+      theme: { color: "#FF8A3D" },
+      handler: async resp => {
+        msg.textContent = "भुगतान की जाँच हो रही है…";
+        try {
+          const r = await api("/api/verify", {
+            razorpay_payment_id: resp.razorpay_payment_id,
+            razorpay_subscription_id: resp.razorpay_subscription_id,
+            razorpay_signature: resp.razorpay_signature,
+          });
+          store.set("ns_sub", subscription_id);
+          if (await savePass(r.token)) { thanks(subscription_id); return; }
+          throw { code: "not_active" };
+        } catch (e) {
+          pay.disabled = false;
+          msg.textContent = "भुगतान हो गया, पर जाँच पूरी नहीं हुई। थोड़ी देर बाद 'वापस पाएँ' से खोलें। ID: " + subscription_id;
+        }
+      },
+      modal: { ondismiss: () => { pay.disabled = false; msg.textContent = "भुगतान पूरा नहीं हुआ। आप फिर से कोशिश कर सकते हैं।"; } },
+    });
+    checkout.open();
+  } catch (e) {
+    pay.disabled = false;
+    msg.textContent = errorText(e);
+  }
+}
+
+function thanks(subId){
+  setTop("🎉 धन्यवाद!", true);
+  const box = panel("प्रीमियम चालू हो गया! 🎉");
+  box.append(
+    txt("p", "plead", "अब बच्चा सारे पाठ, कविताएँ, खेल और बातचीत इस्तेमाल कर सकता है।"),
+    txt("p", "psmall", "आपकी सब्सक्रिप्शन ID (रसीद वाले ईमेल में भी है)। दूसरे फ़ोन पर ऐप खोलने के लिए यही ID और आपका ईमेल चाहिए:"),
+    txt("p", "mono", subId),
+    button("ऐप पर चलें", "pbtn", goHome));
+}
+
+function restoreView(){
+  setTop("🔄 वापस पाएँ", true);
+  const box = panel("पहले से सब्सक्राइब किया है?");
+  const email = field("restoreEmail", "email", "ईमेल", store.get("ns_email"));
+  const sid = field("restoreSub", "text", "सब्सक्रिप्शन ID (sub_…)", store.get("ns_sub"));
+  sid.autocomplete = "off";
+  const msg = txt("p", "pmsg", "");
+  const go = button("वापस पाएँ", "pbtn", async () => {
+    go.disabled = true;
+    msg.className = "pmsg"; msg.textContent = "जाँच हो रही है…";
+    const e = email.value.trim(), s = sid.value.trim();
+    try {
+      const r = await api("/api/restore", { email: e, subscription_id: s });
+      if (!(await savePass(r.token))) throw { code: "not_active" };
+      store.set("ns_email", e); store.set("ns_sub", s);
+      thanks(s);
+    } catch (err) { go.disabled = false; msg.textContent = errorText(err); }
+  });
+  box.append(txt("p", "psmall", "वही ईमेल और सब्सक्रिप्शन ID लिखें जो रसीद में है (sub_ से शुरू होती है)।"),
+             email, sid, go, msg);
+}
+
+function account(){
+  setTop("⭐ प्रीमियम", true);
+  const box = panel("आपका प्रीमियम चालू है ⭐");
+  box.appendChild(txt("p", "plead", "यह अपने-आप नवीनीकृत होता है। रद्द करने पर, जितने दिनों के पैसे दिए हैं उतने दिन ऐप चलता रहेगा।"));
+  const sid = store.get("ns_sub");
+  if (sid) box.append(txt("p", "psmall", "सब्सक्रिप्शन ID:"), txt("p", "mono", sid));
+  const msg = txt("p", "pmsg", "");
+  const confirmRow = el("div", "panel"); confirmRow.style.padding = "0"; confirmRow.hidden = true;
+  const cancelBtn = button("सब्सक्रिप्शन रद्द करें", "pbtn danger", () => { cancelBtn.hidden = true; confirmRow.hidden = false; });
+  const yes = button("हाँ, रद्द करें", "pbtn danger", async () => {
+    yes.disabled = true;
+    try {
+      const r = await api("/api/cancel", { token: store.get("ns_pass") });
+      confirmRow.hidden = true;
+      msg.className = "pmsg ok";
+      msg.textContent = r.ends_at
+        ? `रद्द हो गया। ${new Date(r.ends_at * 1000).toLocaleDateString("hi-IN")} तक प्रीमियम चलेगा, उसके बाद पैसे नहीं कटेंगे।`
+        : "रद्द हो गया। आगे से पैसे नहीं कटेंगे।";
+    } catch (e) { yes.disabled = false; msg.className = "pmsg"; msg.textContent = errorText(e); }
+  });
+  const no = button("नहीं", "pbtn secondary", () => { confirmRow.hidden = true; cancelBtn.hidden = false; });
+  confirmRow.append(txt("p", "plead", "पक्का रद्द करना है?"), yes, no);
+  box.append(button("ऐप पर चलें", "pbtn", goHome), cancelBtn, confirmRow, msg);
+}
+
+/* ---------------- Start ---------------- */
 goHome();
+refreshEntitlement().then(changed => { if (changed && onHome) goHome(); });
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) refreshEntitlement().then(changed => { if (changed && onHome) goHome(); });
+});
 
 /* ---------------- PWA: offline + install ---------------- */
 if ('serviceWorker' in navigator) {
