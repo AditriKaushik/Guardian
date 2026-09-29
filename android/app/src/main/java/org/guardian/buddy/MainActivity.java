@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
         input = findViewById(R.id.input);
         soundButton = findViewById(R.id.sound);
 
+        findViewById(R.id.home).setOnClickListener(v -> finish());
         findViewById(R.id.send).setOnClickListener(v -> sendTyped());
         findViewById(R.id.mic).setOnClickListener(v -> listen());
         soundButton.setOnClickListener(v -> toggleSound());
