@@ -67,6 +67,8 @@ public class HomeActivity extends Activity {
                 v -> start(QuizActivity.class, "खेल खेलो", "hi")));
         grid.addView(tile(grid, "💬", "बात करो", tileColor(22),
                 v -> start(MainActivity.class, "बात करो", "hi")));
+
+        setContentView(scroll);
     }
 
     private void openLesson(Syllabus.Lesson lesson) {
