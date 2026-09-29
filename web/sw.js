@@ -1,7 +1,15 @@
 // Keeps the app working offline: the app shell is cached on install and
 // served cache-first, refreshing the cache in the background when online.
-const CACHE = 'nanha-school-v2';
-const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './icon.svg', './icon-maskable.svg'];
+//
+// Only same-origin GET requests for app files are ever cached. API calls (any /api/ path, and
+// every POST), Razorpay and anything else from another origin are left alone entirely.
+const CACHE = 'nanha-school-v3';
+const SHELL = [
+  './', './index.html', './app.css', './app.js', './config.js',
+  './pay.html', './pay.js',
+  './fonts/baloo2-devanagari.woff2', './fonts/baloo2-latin.woff2',
+  './manifest.webmanifest', './icon.svg', './icon-maskable.svg',
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
@@ -15,13 +23,20 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+function cacheable(url) {
+  return url.origin === location.origin && !url.pathname.includes('/api/');
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
-  if (req.method !== 'GET') return;
+  if (req.method !== 'GET') return;             // POSTs (all API calls) go straight to the network
+  const url = new URL(req.url);
+  if (!cacheable(url)) return;                  // Razorpay, the API, other origins: not touched
   event.respondWith(
     caches.match(req).then(cached => {
       const network = fetch(req).then(res => {
-        if (res && res.ok && (new URL(req.url).origin === location.origin || req.url.includes('fonts.g'))) {
+        const noStore = /no-store/i.test(res.headers.get('Cache-Control') || '');
+        if (res.ok && res.type === 'basic' && !noStore) {
           const copy = res.clone();
           caches.open(CACHE).then(cache => cache.put(req, copy));
         }
