@@ -14,7 +14,7 @@ public class Speaker {
 
     private static final Locale HINDI = new Locale("hi", "IN");
 
-    private final TextToSpeech tts;
+    private TextToSpeech tts;
     private boolean ready;
     private boolean enabled = true;
     private int counter;
