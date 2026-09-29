@@ -438,7 +438,8 @@ function panel(title){
 }
 function legalLinks(){
   const p = el("p", "psmall plegal");
-  p.append(link("legal/privacy.html", "गोपनीयता नीति"), " · ", link("legal/terms.html", "नियम और शर्तें"));
+  p.append(link("legal/privacy.html", "गोपनीयता नीति"), " · ", link("legal/terms.html", "नियम और शर्तें"),
+           " · ", link("legal/refund.html", "रद्द करना और रिफ़ंड"));
   return p;
 }
 /* The restore code is random and says nothing about the family; it is all that is needed to

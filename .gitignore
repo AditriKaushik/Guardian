@@ -11,3 +11,8 @@ hub_config.json
 guardian_locations.json
 cert.pem
 key.pem
+
+# Android signing keys — never commit
+*.jks
+*.keystore
+keystore.b64
