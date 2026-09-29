@@ -42,9 +42,9 @@ jobs:
           name: BaatBuddy-apk
           path: android/BaatBuddy.apk
 
-      # On main, also publish the APK as a release so it can be downloaded straight to a phone.
+      # Also publish the APK as a release so it can be downloaded straight to a phone.
       - name: Publish release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: baat-buddy-latest

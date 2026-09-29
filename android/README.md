@@ -15,9 +15,10 @@
 
 हर push पर GitHub Actions (`.github/workflows/android.yml`) APK बनाता है:
 
-1. रिपॉज़िटरी में **Actions → Baat Buddy APK** खोलें, सबसे नया रन चुनें
-2. नीचे **Artifacts** में `BaatBuddy-apk` डाउनलोड करें (zip खोलें → `BaatBuddy.apk`)
-3. `main` ब्रांच पर APK **Releases → Baat Buddy (latest)** में भी मिलता है
+सीधा डाउनलोड लिंक (फ़ोन में खोलें):
+https://github.com/AditriKaushik/Guardian/releases/download/baat-buddy-latest/BaatBuddy.apk
+
+या **Actions → Baat Buddy APK** के किसी रन में **Artifacts → BaatBuddy-apk** (zip) डाउनलोड करें।
 
 फ़ोन में इंस्टॉल करते समय "Unknown apps / अज्ञात स्रोत" की अनुमति देनी होगी।
 बोलकर बात करने के लिए फ़ोन में Google ऐप (वॉइस टाइपिंग) होना चाहिए; न हो तो लिखकर बात करें।
