@@ -123,6 +123,9 @@ public class MainActivity extends Activity {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN");
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "बोलो, मैं सुन रहा हूँ… 👂");
+        // Privacy: ask for on-device recognition, so where the phone supports it the child's
+        // voice is not sent to an online service. (Nothing the child says is logged or stored.)
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
         try {
             startActivityForResult(intent, REQ_SPEECH);
         } catch (ActivityNotFoundException e) {

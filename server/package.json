@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "genkeys": "node genkeys.mjs"
+    "genkeys": "node genkeys.mjs",
+    "restore-code": "node restore-code.mjs"
   }
 }

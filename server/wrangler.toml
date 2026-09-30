@@ -5,7 +5,8 @@ main = "worker.js"
 compatibility_date = "2025-01-01"
 
 [vars]
-# Where the web app is hosted (comma-separated). Only these sites may call the API.
+# Where the web app is hosted (comma-separated). Only these sites may call the API
+# from a browser; any other site gets 403. The Android app sends no Origin and is allowed.
 ALLOWED_ORIGINS = "https://aditrikaushik.github.io"
 # From the Razorpay dashboard (these two are not secret).
 RAZORPAY_KEY_ID = "rzp_live_REPLACE_ME"
@@ -18,3 +19,19 @@ TRIAL_DAYS = "7"
 # Secrets — never put these in this file. Set them once with:
 #   npx wrangler secret put RAZORPAY_KEY_SECRET
 #   npx wrangler secret put SIGNING_KEY_JWK      (the private key printed by `npm run genkeys`)
+#   npx wrangler secret put RESTORE_SECRET       (any long random text; set it once, never change it)
+# RESTORE_SECRET makes the parents' restore codes. Keeping it separate means you can rotate the
+# Razorpay secret after a leak without breaking every restore code. If it is not set, the
+# Razorpay secret is used instead (and changing that would then break every restore code).
+
+# Optional rate limiting (Workers Rate Limiting binding; needs Wrangler 4.36.0 or later).
+# The Worker skips it when this binding is missing. To turn it on, remove the leading "# "
+# from the six lines below and deploy. It allows `limit` requests per `period` seconds
+# (10 or 60) for each visitor IP on each route, counted per Cloudflare location.
+# namespace_id is any number you pick that no other Worker on the account uses.
+# [[ratelimits]]
+# name = "RATE_LIMITER"
+# namespace_id = "1001"
+# [ratelimits.simple]
+# limit = 30
+# period = 60

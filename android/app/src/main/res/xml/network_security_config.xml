@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HTTPS only (no plain http anywhere), and only the certificate authorities built into
+     the phone are trusted — certificates a user or another app installs are not, so the
+     payment traffic cannot be read or changed by an installed "proxy" certificate. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

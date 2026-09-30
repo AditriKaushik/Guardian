@@ -6,22 +6,47 @@
 // short, signed "pass" that says which subscription is active and until when.
 // The app checks the pass with a public key, so it keeps working offline.
 //
-// Routes (all POST, JSON):
-//   /api/subscribe  { email, trial_days_left }         -> { subscription_id, key_id }
+// Privacy: the Worker never asks for, sends to Razorpay, stores or logs an email,
+// phone number or any other personal data, and it never logs request bodies or tokens.
+// A parent gets back into their subscription with a "restore code": the subscription
+// ID plus a short MAC made with the server secret. It contains no personal data.
+//
+// Routes (all POST, Content-Type: application/json, body at most 4096 bytes):
+//   /api/subscribe  { trial_days_left }                 -> { subscription_id, key_id, restore_code }
 //   /api/verify     { razorpay_payment_id,
 //                     razorpay_subscription_id,
 //                     razorpay_signature }             -> { token, exp }
-//   /api/restore    { email, subscription_id }         -> { token, exp }
-//   /api/refresh    { token }                          -> { token, exp }
-//   /api/cancel     { token }                          -> { cancelled: true, ends_at }
+//   /api/restore    { restore_code }                    -> { token, exp }
+//   /api/refresh    { token }                           -> { token, exp }
+//   /api/cancel     { token }                           -> { cancelled: true, ends_at }
+//
+// Errors are { "error": code } and never echo the request back:
+//   400 bad_request | bad_signature    401 bad_token          402 not_active
+//   403 forbidden_origin               404 not_found          413 payload_too_large
+//   415 unsupported_media_type         429 too_many_requests  500 server_error
+//   502 payment_provider_error
 
 const RAZORPAY = 'https://api.razorpay.com/v1';
+const RAZORPAY_TIMEOUT_MS = 15_000;
 const ACTIVE = new Set(['active', 'authenticated']);
 const GRACE_SECONDS = 2 * 24 * 3600;           // keep working 2 days past renewal while payment retries
 const FALLBACK_SECONDS = 3 * 24 * 3600;        // when Razorpay has no period end yet
+const MAX_BODY_BYTES = 4096;
 const SUB_ID = /^sub_[A-Za-z0-9]{6,40}$/;
 const PAY_ID = /^pay_[A-Za-z0-9]{6,40}$/;
-const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,24}$/;
+const RESTORE_CODE = /^(sub_[A-Za-z0-9]{6,40})\.([A-Za-z0-9_-]{16})$/;
+const RESTORE_PREFIX = 'nanha-restore|';
+// A pass is exactly "<payload>.<sig>": base64url without padding, and a P-256
+// P1363 signature is always 64 bytes = 86 characters.
+const PASS = /^([A-Za-z0-9_-]{1,400})\.([A-Za-z0-9_-]{86})$/;
+
+const SECURITY_HEADERS = {
+  'Cache-Control': 'no-store',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+  'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
+  Vary: 'Origin',
+};
 
 class HttpError extends Error {
   constructor(status, code) {
@@ -33,34 +58,15 @@ class HttpError extends Error {
 
 export default {
   async fetch(request, env) {
-    const cors = corsHeaders(request, env);
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: cors });
-    }
-    if (request.method !== 'POST') {
-      return json({ error: 'not_found' }, 404, cors);
-    }
-    let body;
+    const headers = responseHeaders(request, env);
     try {
-      body = await request.json();
-    } catch {
-      return json({ error: 'bad_request' }, 400, cors);
-    }
-    if (!body || typeof body !== 'object') {
-      return json({ error: 'bad_request' }, 400, cors);
-    }
-    try {
-      const path = new URL(request.url).pathname;
-      const route = ROUTES[path];
-      if (!route) {
-        return json({ error: 'not_found' }, 404, cors);
-      }
-      return json(await route(body, env), 200, cors);
+      return await handle(request, env, headers);
     } catch (e) {
+      // Only fixed codes go back to the caller; nothing from the request or the error is echoed or logged.
       if (e instanceof HttpError) {
-        return json({ error: e.code }, e.status, cors);
+        return json({ error: e.code }, e.status, headers);
       }
-      return json({ error: 'server_error' }, 500, cors);
+      return json({ error: 'server_error' }, 500, headers);
     }
   },
 };
@@ -73,15 +79,43 @@ const ROUTES = {
   '/api/cancel': cancel,
 };
 
+async function handle(request, env, headers) {
+  // Browsers always send Origin on these requests; the Android app sends none.
+  // A browser page from any other site is refused outright, preflight included.
+  if (request.headers.has('Origin') && !headers['Access-Control-Allow-Origin']) {
+    throw new HttpError(403, 'forbidden_origin');
+  }
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers });
+  }
+  if (request.method !== 'POST') {
+    throw new HttpError(404, 'not_found');
+  }
+  const path = new URL(request.url).pathname;
+  const route = Object.hasOwn(ROUTES, path) ? ROUTES[path] : null;
+  if (!route) {
+    throw new HttpError(404, 'not_found');
+  }
+  if (await rateLimited(request, env, path)) {
+    return json({ error: 'too_many_requests' }, 429, { ...headers, 'Retry-After': '60' });
+  }
+  // application/json is not a CORS "simple" content type, so a browser must
+  // preflight first — which only the allowed origins pass.
+  if (!isJsonContentType(request.headers.get('Content-Type'))) {
+    throw new HttpError(415, 'unsupported_media_type');
+  }
+  const body = await readJsonBody(request);
+  return json(await route(body, env), 200, headers);
+}
+
 // ---- Routes ---------------------------------------------------------------
 
 async function subscribe(body, env) {
-  const email = cleanEmail(body.email);
   const request = {
     plan_id: env.RAZORPAY_PLAN_ID,
     total_count: Number(env.TOTAL_COUNT || 120),
     customer_notify: 1,
-    notes: { email },
+    notes: { app: 'nanha-school' },            // no personal data, ever
   };
   // A parent who subscribes during the free trial keeps the rest of it: the first
   // charge happens when the trial ends. Capped here so the app can't ask for more.
@@ -91,14 +125,21 @@ async function subscribe(body, env) {
     request.start_at = Math.floor(Date.now() / 1000) + daysLeft * 86400;
   }
   const sub = await razorpay(env, 'POST', '/subscriptions', request);
-  return { subscription_id: sub.id, key_id: env.RAZORPAY_KEY_ID };
+  if (!sub || typeof sub.id !== 'string' || !SUB_ID.test(sub.id)) {
+    throw new HttpError(502, 'payment_provider_error');
+  }
+  return {
+    subscription_id: sub.id,
+    key_id: env.RAZORPAY_KEY_ID,
+    restore_code: `${sub.id}.${await restoreMac(env, sub.id)}`,
+  };
 }
 
 async function verify(body, env) {
   const paymentId = str(body.razorpay_payment_id, PAY_ID);
   const subId = str(body.razorpay_subscription_id, SUB_ID);
   const signature = str(body.razorpay_signature, /^[a-f0-9]{64}$/);
-  const expected = await hmacHex(env.RAZORPAY_KEY_SECRET, `${paymentId}|${subId}`);
+  const expected = hex(await hmac(secret(env), `${paymentId}|${subId}`));
   if (!timingSafeEqual(expected, signature)) {
     throw new HttpError(400, 'bad_signature');
   }
@@ -107,13 +148,15 @@ async function verify(body, env) {
 }
 
 async function restore(body, env) {
-  const email = cleanEmail(body.email);
-  const subId = str(body.subscription_id, SUB_ID);
-  const sub = await fetchSubscription(env, subId);
-  const owner = String((sub.notes && sub.notes.email) || '').toLowerCase();
-  if (owner !== email) {
-    throw new HttpError(404, 'not_found');   // same answer as a wrong ID, so IDs can't be probed
+  if (typeof body.restore_code !== 'string') {
+    throw new HttpError(400, 'bad_request');
   }
+  // Every kind of wrong code gets the same answer as an unknown subscription.
+  const match = RESTORE_CODE.exec(body.restore_code);
+  if (!match || !timingSafeEqual(await restoreMac(env, match[1]), match[2])) {
+    throw new HttpError(404, 'not_found');
+  }
+  const sub = await fetchSubscription(env, match[1]);
   return issue(sub, env);
 }
 
@@ -126,21 +169,26 @@ async function refresh(body, env) {
 async function cancel(body, env) {
   const pass = await readPass(body.token, env);
   const sub = await razorpay(env, 'POST', `/subscriptions/${pass.sid}/cancel`, { cancel_at_cycle_end: 1 });
-  return { cancelled: true, ends_at: sub.current_end || null };
+  return { cancelled: true, ends_at: unixTime(sub && sub.current_end) || null };
 }
 
 // ---- Passes (signed tokens) -----------------------------------------------
 
 async function issue(sub, env) {
-  if (!ACTIVE.has(sub.status)) {
+  if (!sub || !ACTIVE.has(sub.status)) {
     throw new HttpError(402, 'not_active');
   }
+  if (typeof sub.id !== 'string' || !SUB_ID.test(sub.id)) {
+    throw new HttpError(502, 'payment_provider_error');
+  }
   const now = Math.floor(Date.now() / 1000);
+  const currentEnd = unixTime(sub.current_end);
+  const startAt = unixTime(sub.start_at);
   let end = now + FALLBACK_SECONDS;
-  if (sub.current_end && sub.current_end > now) {
-    end = sub.current_end;
-  } else if (sub.start_at && sub.start_at > now) {
-    end = sub.start_at;                        // subscribed during the trial; billing starts later
+  if (currentEnd > now) {
+    end = currentEnd;
+  } else if (startAt > now) {
+    end = startAt;                             // subscribed during the trial; billing starts later
   }
   const exp = end + GRACE_SECONDS;
   const payload = b64url(new TextEncoder().encode(JSON.stringify({ sid: sub.id, exp })));
@@ -152,13 +200,11 @@ async function issue(sub, env) {
 
 /** Checks a pass's signature. An expired pass is still accepted here, so it can be renewed. */
 async function readPass(token, env) {
-  if (typeof token !== 'string' || token.length > 600) {
+  const match = typeof token === 'string' ? PASS.exec(token) : null;
+  if (!match) {
     throw new HttpError(401, 'bad_token');
   }
-  const [payload, sig] = token.split('.');
-  if (!payload || !sig) {
-    throw new HttpError(401, 'bad_token');
-  }
+  const [, payload, sig] = match;
   const priv = JSON.parse(env.SIGNING_KEY_JWK);
   const pubJwk = { kty: priv.kty, crv: priv.crv, x: priv.x, y: priv.y };
   const key = await crypto.subtle.importKey(
@@ -173,44 +219,64 @@ async function readPass(token, env) {
   if (!ok) {
     throw new HttpError(401, 'bad_token');
   }
-  const data = JSON.parse(new TextDecoder().decode(fromB64url(payload)));
-  if (!data || !SUB_ID.test(data.sid)) {
+  let data;
+  try {
+    data = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(fromB64url(payload)));
+  } catch {
     throw new HttpError(401, 'bad_token');
   }
-  return data;
+  if (!data || typeof data !== 'object' || typeof data.sid !== 'string' || !SUB_ID.test(data.sid) ||
+      !Number.isSafeInteger(data.exp)) {
+    throw new HttpError(401, 'bad_token');
+  }
+  return { sid: data.sid, exp: data.exp };
 }
 
 // ---- Razorpay -------------------------------------------------------------
 
 async function fetchSubscription(env, subId) {
-  return razorpay(env, 'GET', `/subscriptions/${subId}`);
+  const sub = await razorpay(env, 'GET', `/subscriptions/${subId}`);
+  if (!sub || sub.id !== subId) {
+    throw new HttpError(502, 'payment_provider_error');
+  }
+  return sub;
 }
 
 async function razorpay(env, method, path, body) {
-  const res = await fetch(RAZORPAY + path, {
-    method,
-    headers: {
-      Authorization: 'Basic ' + btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`),
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const auth = 'Basic ' + btoa(`${env.RAZORPAY_KEY_ID}:${secret(env)}`);
+  let res;
+  try {
+    res = await fetch(RAZORPAY + path, {
+      method,
+      headers: { Authorization: auth, 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(RAZORPAY_TIMEOUT_MS),
+    });
+  } catch {
+    throw new HttpError(502, 'payment_provider_error');   // network failure or timeout
+  }
   if (method === 'GET' && (res.status === 404 || res.status === 400)) {
     throw new HttpError(404, 'not_found');
   }
   if (!res.ok) {
     throw new HttpError(502, 'payment_provider_error');
   }
-  return res.json();
+  try {
+    return await res.json();
+  } catch {
+    throw new HttpError(502, 'payment_provider_error');
+  }
 }
 
-// ---- Helpers --------------------------------------------------------------
+// ---- Request handling -----------------------------------------------------
 
-function corsHeaders(request, env) {
-  const origin = request.headers.get('Origin') || '';
-  const allowed = String(env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-  const headers = { Vary: 'Origin' };
-  if (allowed.includes(origin)) {
+/** Security headers for every response, plus CORS headers when the Origin is allowed. */
+function responseHeaders(request, env) {
+  const headers = { ...SECURITY_HEADERS };
+  const origin = request.headers.get('Origin');
+  const allowed = String(env.ALLOWED_ORIGINS || '').split(',')
+      .map(s => s.trim().replace(/\/+$/, '').toLowerCase()).filter(Boolean);
+  if (origin !== null && allowed.includes(origin)) {
     headers['Access-Control-Allow-Origin'] = origin;
     headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS';
     headers['Access-Control-Allow-Headers'] = 'Content-Type';
@@ -219,20 +285,72 @@ function corsHeaders(request, env) {
   return headers;
 }
 
+/** Uses the optional Workers Rate Limiting binding (see wrangler.toml); skipped when it isn't set up. */
+async function rateLimited(request, env, path) {
+  if (!env.RATE_LIMITER || typeof env.RATE_LIMITER.limit !== 'function') {
+    return false;
+  }
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  try {
+    const result = await env.RATE_LIMITER.limit({ key: `${ip}|${path}` });
+    return result.success === false;
+  } catch {
+    return false;   // fail open: a limiter outage must not stop parents from paying
+  }
+}
+
+function isJsonContentType(value) {
+  return typeof value === 'string' && value.split(';')[0].trim().toLowerCase() === 'application/json';
+}
+
+/** Reads at most MAX_BODY_BYTES without buffering anything larger, then parses a JSON object. */
+async function readJsonBody(request) {
+  if (Number(request.headers.get('Content-Length')) > MAX_BODY_BYTES) {
+    throw new HttpError(413, 'payload_too_large');
+  }
+  const chunks = [];
+  let size = 0;
+  if (request.body) {
+    const reader = request.body.getReader();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) {
+        reader.cancel().catch(() => {});
+        throw new HttpError(413, 'payload_too_large');
+      }
+      chunks.push(value);
+    }
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  let body;
+  try {
+    body = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+  } catch {
+    throw new HttpError(400, 'bad_request');
+  }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new HttpError(400, 'bad_request');
+  }
+  return body;
+}
+
 function json(data, status, headers) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...headers, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    headers: { ...headers, 'Content-Type': 'application/json' },
   });
 }
 
-function cleanEmail(value) {
-  const email = String(value || '').trim().toLowerCase();
-  if (!EMAIL.test(email)) {
-    throw new HttpError(400, 'bad_email');
-  }
-  return email;
-}
+// ---- Helpers --------------------------------------------------------------
 
 function str(value, pattern) {
   if (typeof value !== 'string' || !pattern.test(value)) {
@@ -241,11 +359,38 @@ function str(value, pattern) {
   return value;
 }
 
-async function hmacHex(secret, message) {
+/** A whole number of seconds from Razorpay, or 0 if it isn't one (never string-concatenated). */
+function unixTime(value) {
+  const n = typeof value === 'string' && /^\d{1,12}$/.test(value) ? Number(value) : value;
+  return Number.isSafeInteger(n) && n > 0 ? n : 0;
+}
+
+function secret(env) {
+  if (!env.RAZORPAY_KEY_SECRET) {
+    throw new Error('RAZORPAY_KEY_SECRET is not set');   // -> 500; never HMAC with an empty key
+  }
+  return env.RAZORPAY_KEY_SECRET;
+}
+
+/** Key for restore codes: its own secret when set, so rotating the Razorpay key after a leak
+ *  doesn't break every parent's restore code. Falls back to the Razorpay secret. */
+function restoreSecret(env) {
+  return env.RESTORE_SECRET || secret(env);
+}
+
+async function hmac(keyText, message) {
   const key = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const mac = new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message)));
-  return [...mac].map(b => b.toString(16).padStart(2, '0')).join('');
+      'raw', new TextEncoder().encode(keyText), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message)));
+}
+
+/** The MAC part of a restore code. restore-code.mjs computes the same thing for the owner. */
+async function restoreMac(env, subId) {
+  return b64url(await hmac(restoreSecret(env), RESTORE_PREFIX + subId)).slice(0, 16);
+}
+
+function hex(bytes) {
+  return [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function timingSafeEqual(a, b) {
