@@ -26,8 +26,17 @@
    3. Web Speech API: the most natural voice for the language and gender (on-device first, then
       names known to sound natural); if no voice of the wanted gender exists, the best voice is
       used with a gentle pitch shift (male 0.85, female 1.1).
-   Delivery: short phrases with natural pauses (works around Chrome's long-utterance cutoff),
-   a slower rate for 2–3 year olds, never reads emoji.
+   Delivery (expressive, so the voice does not sound like a machine reading a list):
+   - Whole sentences go to the engine (commas stay inside, so the engine keeps its own melody);
+     very long sentences are cut at a phrase boundary (Chrome stops utterances after ~15 s).
+   - Each sentence gets a shape: questions rise a little (pitch ×1.07, a touch slower), praise is
+     warmer and a touch faster (pitch ×1.07, rate ×1.05), instructions are calmer (rate ×0.94),
+     plus a small random variation (±3 %) so a repeated line never sounds identical. An explicit
+     rate (songs, the lullaby, "say it with me") is kept steady.
+   - Natural, slightly varied pauses between sentences (longer after "?" and "।").
+   - Never reads emoji or symbols (✓ ▶ ★ ♪ …); "2–3" becomes "2 से 3" / "2 to 3"; in Hindi,
+     numbers are spoken as Hindi words (4 → चार, 26 → छब्बीस).
+   - A slower base rate for 2–3 year olds; the grown-ups' "slow" setting slows everything.
 
    SPEECH IN (only after a grown-up turns the mic on in settings; off by default):
    Android shell → NanhaNative.listen (on-device). Browser → Web Speech recognition with
@@ -35,7 +44,10 @@
 
    API: NS.voice.say(text, {lang, rate, onStart}) → Promise, sayLines(lines, lang, {onLine}),
         stop(), listen({lang}) → Promise<string|null>, canListen(), voiceList(lang),
-        pick(lang, gender, voices) (web voice choice; exposed for tests), clipKey(lang, text). */
+        pick(lang, gender, voices) (web voice choice; exposed for tests), clipKey(lang, text),
+        speaking() → true while something is being said,
+        prosody(text, opt?) → {kind, rate, pitch} for one sentence,
+        speakable(text, lang) → the exact text handed to the engine. */
 (function () {
   "use strict";
   const NS = window.NS;
@@ -99,8 +111,68 @@
     });
     return out;
   }
-  const pauseAfter = p => (/[।॥.!?]$/.test(p) ? 260 : /[,;:]$/.test(p) ? 90 : 120);
+  const vary = (x, amt) => x * (1 + (Math.random() * 2 - 1) * amt);
+  /* A breath between sentences: a little longer after a question or a full stop, never the same. */
+  function pauseAfter(p) {
+    const t = String(p).trim();
+    const base = /\?$/.test(t) ? 400 : /[।॥.]$/.test(t) ? 330 : /!$/.test(t) ? 300 : /[,;:]$/.test(t) ? 150 : 170;
+    return Math.round(vary(base, 0.15));
+  }
   const wait = (ms, myGen) => new Promise(r => setTimeout(r, myGen === gen ? ms : 0));
+
+  /* ---------------- Expression ---------------- */
+  const PRAISE = /शाबाश|बढ़िया|बहुत अच्छा|वाह|एकदम सही|सही जवाब|कमाल|well done|great|wow|super|yay|hooray|amazing|awesome|excellent|good job|shabash|badhiya|waah|kamaal|ekdum sahi/i;
+  const INSTRUCT = /दबाओ|बोलो|सुनो|देखो|छुओ|चुनो|गिनो|ढूँढो|ढूंढो|लगाओ|बताओ|खींचो|बनाओ|\b(?:tap|touch|say|listen|look|find|press|count|choose|pick|drag|draw|dabao|bolo|suno|dekho|chuno|gino|batao)\b/i;
+  function kindOf(text) {
+    const t = String(text || "").trim();
+    if (/[?？]$/.test(t)) return "question";
+    if (/!$/.test(t) && PRAISE.test(t)) return "praise";
+    if (/!$/.test(t)) return "excited";
+    if (INSTRUCT.test(t)) return "instruction";
+    return "statement";
+  }
+  const SHAPE = { question: [0.97, 1.07], praise: [1.05, 1.07], excited: [1.02, 1.04], instruction: [0.94, 0.99], statement: [1, 1] };
+  /* rate and pitch for one sentence (base = the child's delivery for this voice) */
+  function prosody(text, opt, base) {
+    opt = opt || {};
+    base = base || delivery(opt.gender || ((NS.store && NS.store.current()) || {}).voice || "female");
+    const kind = kindOf(text);
+    if (opt.rate) return { kind, rate: vary(opt.rate, 0.01), pitch: base.pitch };
+    const [r, p] = SHAPE[kind];
+    return { kind, rate: vary(base.rate * r, 0.03), pitch: vary(base.pitch * p, 0.03) };
+  }
+
+  /* Hindi number words 0–99; larger numbers are composed (सौ, हज़ार, लाख). */
+  const HI_NUM = ("शून्य एक दो तीन चार पाँच छह सात आठ नौ दस ग्यारह बारह तेरह चौदह पंद्रह सोलह सत्रह अठारह उन्नीस बीस " +
+    "इक्कीस बाईस तेईस चौबीस पच्चीस छब्बीस सत्ताईस अट्ठाईस उनतीस तीस इकतीस बत्तीस तैंतीस चौंतीस पैंतीस छत्तीस सैंतीस अड़तीस उनतालीस चालीस " +
+    "इकतालीस बयालीस तैंतालीस चवालीस पैंतालीस छियालीस सैंतालीस अड़तालीस उनचास पचास इक्यावन बावन तिरपन चौवन पचपन छप्पन सत्तावन अट्ठावन उनसठ साठ " +
+    "इकसठ बासठ तिरसठ चौंसठ पैंसठ छियासठ सड़सठ अड़सठ उनहत्तर सत्तर इकहत्तर बहत्तर तिहत्तर चौहत्तर पचहत्तर छिहत्तर सतहत्तर अठहत्तर उनासी अस्सी " +
+    "इक्यासी बयासी तिरासी चौरासी पचासी छियासी सत्तासी अट्ठासी नवासी नब्बे इक्यानबे बानबे तिरानबे चौरानबे पंचानबे छियानबे सत्तानबे अट्ठानबे निन्यानबे").split(" ");
+  function hindiNumber(n) {
+    n = Number(n);
+    if (!Number.isInteger(n) || n < 0 || n >= 10000000) return null;
+    if (n < 100) return HI_NUM[n];
+    const parts = [];
+    const lakh = Math.floor(n / 100000); n %= 100000;
+    const thousand = Math.floor(n / 1000); n %= 1000;
+    const hundred = Math.floor(n / 100); n %= 100;
+    if (lakh) parts.push(HI_NUM[lakh] + " लाख");
+    if (thousand) parts.push(HI_NUM[thousand] + " हज़ार");
+    if (hundred) parts.push((hundred === 1 && !lakh && !thousand ? "एक" : HI_NUM[hundred]) + " सौ");
+    if (n) parts.push(HI_NUM[n]);
+    return parts.join(" ");
+  }
+  /* The text an engine actually reads: no symbols, ranges and numbers said the way people say them. */
+  function speakable(text, lang) {
+    const l = NS.speechLang(lang || NS.lang());
+    let s = String(text == null ? "" : text).replace(/[०-९]/g, d => String(d.charCodeAt(0) - 0x0966));
+    s = s.replace(/(\d)\s*[–—-]\s*(?=\d)/g, l === "hi" ? "$1 से " : "$1 to ");
+    s = s.replace(/(\d)\s*\+(?!\d)/g, l === "hi" ? "$1 से ज़्यादा" : "$1 plus");
+    s = s.replace(/×\s*(\d+)/g, l === "hi" ? "$1 बार" : "$1 times");
+    s = NS.stripEmoji(s).replace(/[\p{So}\p{Sk}|#*_~^<>{}\[\]\\=@`•·]/gu, " ");
+    if (l === "hi") s = s.replace(/\d+(?![.,]\d)/g, m => hindiNumber(m) || m);
+    return s.replace(/\s+([,।.!?])/g, "$1").replace(/\s+/g, " ").trim();
+  }
 
   /* ---------------- Voice choice ---------------- */
   const FEMALE = /female|\bwoman\b|swara|kalpana|lekha|heera|aditi|neerja|veena|kajal|ananya|aarohi|zira|\baria\b|jenny|samantha|karen|moira|tessa|fiona|victoria|susan|hazel|libby|sonia|natasha|salli|joanna|kendra|kimberly|ivy|raveena|isha|priya|shruti|sapna|pallavi|google हिन्दी|google us english|x-hia|x-hic/i;
@@ -209,12 +281,14 @@
   function speakNative(text, lang, gender, opt, myGen) {
     return new Promise(resolve => {
       const { voice, pitchShift } = pickNative(lang, gender);
-      const d = delivery(gender);
+      const pr = prosody(text, opt, delivery(gender));
       const id = "s" + (++nativeSeq);
       let done = false;
       const finish = () => { if (done) return; done = true; off(); resolve(); };
       const off = NS.on("native:speak-done", ev => { if (ev.id === id) finish(); });
-      NS.native.call("speak", id, text, langTag(lang), voice ? voice.id : "", (opt.rate || d.rate).toFixed(2), (d.pitch * pitchShift).toFixed(2));
+      const say = speakable(text, lang);
+      if (!say) return finish();
+      NS.native.call("speak", id, say, langTag(lang), voice ? voice.id : "", pr.rate.toFixed(2), Math.min(2, pr.pitch * pitchShift).toFixed(2));
       setTimeout(finish, 4000 + text.length * 200);
       const check = setInterval(() => { if (myGen !== gen) { clearInterval(check); finish(); } else if (done) clearInterval(check); }, 250);
     });
@@ -222,17 +296,19 @@
   function speakWeb(text, lang, gender, opt, myGen) {
     return new Promise(resolve => {
       if (!synth) return resolve();
-      const d = delivery(gender);
+      const pr = prosody(text, opt, delivery(gender));
       const choice = pick(lang, gender);
       let done = false;
       const finish = () => { if (done) return; done = true; clearTimeout(guard); resolve(); };
       let guard;
+      const say = speakable(text, lang);
+      if (!say) return finish();
       try {
-        const u = new SpeechSynthesisUtterance(text);
+        const u = new SpeechSynthesisUtterance(say);
         u.lang = choice && choice.voice.lang ? choice.voice.lang : langTag(lang);
         if (choice) u.voice = choice.voice;
-        u.rate = opt.rate || d.rate;
-        u.pitch = Math.min(2, d.pitch * (choice ? choice.pitchShift : (gender === "male" ? 0.85 : 1)));
+        u.rate = pr.rate;
+        u.pitch = Math.min(2, pr.pitch * (choice ? choice.pitchShift : (gender === "male" ? 0.85 : 1)));
         u.onend = finish;
         u.onerror = finish;
         currentUtter = u;
@@ -258,8 +334,12 @@
     return active.then(() => (gen === g ? say(text, opt) : undefined));
   }
 
+  let talking = 0;
   function say(text, opt) {
     const p = sayNow(text, opt);
+    talking++;
+    const end = () => { talking = Math.max(0, talking - 1); };
+    p.then(end, end);
     active = p.catch(() => {});
     return p;
   }
@@ -280,15 +360,33 @@
     const whole = clipFor(gender, lang, text);
     if (whole) { await playClip(whole, myGen); return; }
     if (!NS.native.available) await whenVoices();
+    // Phrases with a recorded clip play as clips; the others are joined back into whole
+    // sentences for the engine, so it can give each sentence its own melody.
+    let buf = [];
+    const flush = async () => {
+      if (!buf.length || myGen !== gen) return;
+      const chunk = buf.join(" ");
+      buf = [];
+      if (NS.native.available) await speakNative(chunk, lang, gender, opt, myGen);
+      else await speakWeb(chunk, lang, gender, opt, myGen);
+      if (myGen === gen) await wait(pauseAfter(chunk), myGen);
+    };
     for (const ph of phrases(spoken)) {
       if (myGen !== gen) return;
       const c = clipFor(gender, lang, ph);
-      if (c) await playClip(c, myGen);
-      else if (NS.native.available) await speakNative(ph, lang, gender, opt, myGen);
-      else await speakWeb(ph, lang, gender, opt, myGen);
-      if (myGen !== gen) return;
-      await wait(pauseAfter(ph), myGen);
+      if (c) {
+        await flush();
+        if (myGen !== gen) return;
+        await playClip(c, myGen);
+        if (myGen !== gen) return;
+        await wait(pauseAfter(ph), myGen);
+        continue;
+      }
+      if (buf.length && (buf.join(" ") + " " + ph).length > 170) await flush();
+      buf.push(ph);
+      if (/[।॥.!?]$/.test(ph)) await flush();
     }
+    await flush();
   }
 
   /* Lines in order; onLine(i) fires as each line starts (used to highlight rhyme lines). */
@@ -373,6 +471,7 @@
     say: (text, opt) => say(text, typeof opt === "string" ? { lang: opt } : opt),
     sayAfter: (text, opt) => sayAfter(text, typeof opt === "string" ? { lang: opt } : opt),
     sayLines, stop, listen, canListen, voiceList, pick, genderOf, clipKey, phrases, cleanForSpeech,
+    prosody: (text, opt) => prosody(text, opt), speakable, hindiNumber, speaking: () => talking > 0,
     whenVoices, hasEngine: () => !!(synth || NS.native.available),
     loadClips,
   };

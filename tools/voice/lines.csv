@@ -1,4 +1,146 @@
 ﻿id,lang,text
+hi-0765,hi,"नमस्ते! मैं चिंटू हूँ — एक रोबो। मैं मशीन हूँ, पर तुमसे नई चीज़ें सीख सकता हूँ! क्या खेलें — रोबो को सिखाओ, रास्ता बताओ, या रोबो से पूछो?"
+en-0702,en,"Hello! I'm Chintu — a robot. I'm a machine, but I can learn new things from you! What shall we play — teach the robot, show the way, or ask the robot?"
+hi-0766,hi,"फिर से नमस्ते, दोस्त! आज क्या खेलें — रोबो को सिखाओ, रास्ता बताओ, या रोबो से पूछो?"
+en-0703,en,"Hello again, friend! What shall we play today — teach the robot, show the way, or ask the robot?"
+hi-0767,hi,मुझे अभी कुछ नहीं पता! तुम मुझे सिखाओगे? हर चीज़ को सही टोकरी में डालो — मैं देखकर सीखूँगा।
+en-0704,en,I don't know anything yet! Will you teach me? Put each thing in the right basket — I'll learn by watching.
+hi-0768,hi,किस टोकरी में?
+en-0705,en,Which basket?
+hi-0769,hi,बीप! याद कर लिया।
+en-0706,en,Beep! Got it.
+hi-0770,hi,हम्म… पक्का? ध्यान से देखो और फिर से सोचो!
+en-0707,en,Hmm… are you sure? Look carefully and think again!
+hi-0771,hi,अब मैं सीख रहा हूँ… बीप बूप बीप!
+en-0708,en,Now I'm learning… beep boop beep!
+hi-0772,hi,सीख लिया! अब मैं नई चीज़ों का अंदाज़ा लगाऊँगा। तुम जाँचना — मैं सही हूँ या नहीं!
+en-0709,en,I learned! Now I'll guess new things. You check if I'm right!
+hi-0773,hi,हम्म… सोच रहा हूँ…
+en-0710,en,Hmm… thinking…
+hi-0774,hi,"हम्म… मुझे पक्का नहीं पता! तुम बताओ, ये किस टोकरी में जाएगा?"
+en-0711,en,Hmm… I'm not sure! You tell me — which basket does it go in?
+hi-0775,hi,धन्यवाद! अब मुझे पता चल गया।
+en-0712,en,Thank you! Now I know.
+hi-0776,hi,क्या रोबो ने सही किया?
+en-0713,en,Did the robot get it right?
+hi-0777,hi,हाँ! रोबो ने सही पहचाना।
+en-0714,en,Yes! The robot got it right.
+hi-0778,hi,ध्यान से देखो — इस बार रोबो सही है! टोकरी ठीक है।
+en-0715,en,Look carefully — this time the robot is right! The basket is correct.
+hi-0779,hi,हाँ! रोबो ने गलती की! चलो उसे सही करें — सही टोकरी दबाओ।
+en-0716,en,Yes! The robot made a mistake! Let's fix it — tap the right basket.
+hi-0780,hi,ध्यान से देखो… ये उस टोकरी का नहीं है। रोबो ने गलती की! चलो उसे सही करें — सही टोकरी दबाओ।
+en-0717,en,Look carefully… it doesn't belong in that basket. The robot made a mistake! Let's fix it — tap the right basket.
+hi-0781,hi,धन्यवाद! गलती ठीक करने से मैं और अच्छा सीखता हूँ।
+en-0718,en,"Thank you! When you fix my mistakes, I learn better."
+hi-0782,hi,"मुझे और चीज़ें दिखाओगे? ज़्यादा देखूँगा, तो ज़्यादा सीखूँगा!"
+en-0719,en,"Will you show me more things? The more I see, the more I learn!"
+hi-0783,hi,"देखा? तुमने ज़्यादा चीज़ें दिखाईं, तो रोबो ने ज़्यादा सही पहचाना!"
+en-0720,en,"See? You showed more things, so the robot guessed better!"
+hi-0784,hi,याद रखो: रोबो चीज़ें देखकर सीखता है — पर वो गलती भी कर सकता है। इसलिए हम हमेशा जाँचते हैं!
+en-0721,en,Remember: a robot learns by looking at examples — but it can make mistakes too. That's why we always check!
+hi-0785,hi,"चलो, एक शरारत करें! इस बार रोबो को उल्टा सिखाओ — हर चीज़ को दूसरी टोकरी में डालो!"
+en-0722,en,Let's play a trick! This time teach the robot backwards — put each thing in the other basket!
+hi-0786,hi,उल्टी टोकरी में डालो!
+en-0723,en,Put it in the wrong basket!
+hi-0787,hi,"अरे, आज तो उल्टा खेल है! दूसरी टोकरी दबाओ!"
+en-0724,en,"Oh, today is mix-up day! Tap the other basket!"
+hi-0788,hi,"देखा? रोबो ने वही सीखा जो हमने सिखाया — उल्टा! गलत सिखाओगे, तो रोबो भी गलत सीखेगा। इसलिए रोबो को सही-सही सिखाना ज़रूरी है।"
+en-0725,en,"See? The robot learned exactly what we taught it — backwards! Teach it wrong, and it learns wrong. That's why we must teach robots carefully."
+hi-0789,hi,"तीर वाले कार्ड चुनो, फिर हरा बटन दबाओ। रोबो वही करेगा जो तुम बताओगे!"
+en-0726,en,"Pick arrow cards, then press the green button. The robot will do exactly what you say!"
+hi-0790,hi,"रोबो जिधर देख रहा है, आगे उधर ही जाता है। मुड़ने वाले कार्ड से वो घूमता है।"
+en-0727,en,Forward means the way the robot is facing. The turn cards make it turn.
+hi-0791,hi,आखिरी कार्ड अब ज़्यादा बार चलेगा!
+en-0728,en,The last card will now repeat!
+hi-0792,hi,पहले कोई तीर वाला कार्ड चुनो!
+en-0729,en,First pick an arrow card!
+hi-0793,hi,बस! इतने कार्ड काफ़ी हैं। अब चलाकर देखो।
+en-0730,en,That's enough cards! Now press go and see.
+hi-0794,hi,कार्ड हटा दिया।
+en-0731,en,Card removed.
+hi-0795,hi,ओह! रोबो पेड़ से टकरा गया! कोई बात नहीं — लाल कार्ड को छूकर हटाओ और फिर से चलाओ।
+en-0732,en,"Oops! The robot bumped into a tree! No problem — tap the red card to remove it, then try again."
+hi-0796,hi,ओह! आगे रास्ता ही नहीं है! लाल कार्ड को छूकर हटाओ और फिर से चलाओ।
+en-0733,en,"Oops! There's no path that way! Tap the red card to remove it, then try again."
+hi-0797,hi,"रोबो रुक गया — पर अभी पहुँचा नहीं! और कार्ड जोड़ो, फिर चलाओ।"
+en-0734,en,"The robot stopped — but it isn't there yet! Add more cards, then press go."
+hi-0798,hi,पहुँच गया! शाबाश! तुमने रोबो को एक-एक करके सही रास्ता बताया।
+en-0735,en,"It got there! Well done! You told the robot the way, step by step."
+hi-0799,hi,ये कार्ड रोबो को गलत ले जाता है। इसे छूकर हटाओ!
+en-0736,en,This card takes the robot the wrong way. Tap it to remove it!
+hi-0800,hi,वाह! तुमने सारे रास्ते बता दिए! गलती ढूँढकर ठीक करना — ये बहुत बड़ा काम है।
+en-0737,en,Wow! You solved every path! Finding and fixing mistakes is a very big skill.
+hi-0801,hi,"धन्यवाद! तुमने साफ़-साफ़ बताया, तो मैंने सही चीज़ दी।"
+en-0738,en,"Thank you! You asked clearly, so I gave you the right thing."
+hi-0802,hi,"उफ़! मैं समझ नहीं पाया, तो मैंने गलत चीज़ दे दी। साफ़-साफ़ बोलो — कौन-सी चीज़, कैसी चीज़!"
+en-0739,en,"Oops! I didn't understand, so I gave the wrong thing. Say it clearly — which thing, what kind!"
+hi-0803,hi,मैंने कुछ बना दिया… पर क्या ये तुम्हें चाहिए था? साफ़ बताओ क्या बनाना है!
+en-0740,en,I drew something… but is it what you wanted? Tell me clearly what to draw!
+hi-0804,hi,"ये लो! तुमने साफ़ बताया, तो सही चित्र बना!"
+en-0741,en,"Here you go! You said it clearly, so the picture came out right!"
+hi-0805,hi,कैसे बोलोगे? दबाओ!
+en-0742,en,How will you say it? Tap!
+hi-0806,hi,"मैं तो मशीन हूँ! चोट, डर या उदासी की बात बड़ों से कहो — वो सच में मदद करते हैं।"
+en-0743,en,"I'm just a machine! Tell a grown-up when you're hurt, scared or sad — they can really help."
+hi-0807,hi,"नहीं-नहीं! मुझे खाना नहीं चाहिए। मैं मशीन हूँ, बिजली से चलता हूँ!"
+en-0744,en,"No, no! I don't eat food. I'm a machine — I run on electricity!"
+hi-0808,hi,"आज तुमने सीखा: साफ़-साफ़ पूछो, रोबो की बात जाँचो, और दिल की बात बड़ों से कहो!"
+en-0745,en,"Today you learned: ask clearly, check what the robot says, and share your feelings with grown-ups!"
+hi-0809,hi,या
+en-0746,en,or
+hi-0810,hi,"चलो, आने वाले कल की सैर करें! किसी भी तस्वीर पर दबाओ।"
+en-0747,en,Let's take a trip into tomorrow! Tap any picture.
+hi-0811,hi,तस्वीर में चीज़ों को छूकर देखो!
+en-0748,en,Tap the things in the picture!
+hi-0812,hi,फिर से सोचो!
+en-0749,en,Think again!
+hi-0813,hi,"चलो, एक छोटा सा सवाल!"
+en-0750,en,"Now, a little question!"
+hi-0814,hi,आज का मिशन
+en-0751,en,Today's mission
+hi-0815,hi,"शाबाश, खोजी! आने वाला कल तुम जैसे बच्चों से ही बनेगा।"
+en-0752,en,"Well done, explorer! Tomorrow will be made by children like you."
+hi-0816,hi,आज बहुत सैर हो गई! अब स्क्रीन को आराम दो — बाहर खेलो और दूर तक देखो। आँखों को भी खुली हवा चाहिए!
+en-0753,en,That's a lot of trips today! Now let the screen rest — play outside and look far away. Eyes need fresh air too!
+hi-0817,hi,हम्म… ये उस डिब्बे का नहीं। फिर से सोचो!
+en-0754,en,Hmm… that's not its bin. Think again!
+hi-0818,hi,ये जादुई खिड़की है! इसमें से एक दूसरी दुनिया दिखती है। कौन-सी दुनिया देखें?
+en-0755,en,This is a magic window! It shows another world. Which world shall we look at?
+hi-0819,hi,खिड़की में देखो! कुछ जानवर छिपे हैं। इधर-उधर देखकर उन्हें ढूँढो!
+en-0756,en,Look through the window! Some animals are hiding. Look around to find them!
+hi-0820,hi,फ़ोन को धीरे-धीरे घुमाओ — खिड़की भी घूमेगी!
+en-0757,en,Turn the phone slowly — the window turns too!
+hi-0821,hi,उँगली से खिड़की को इधर-उधर खिसकाओ!
+en-0758,en,Slide the window around with your finger!
+hi-0822,hi,फ़ोन घुमाकर देखना है? ये बटन दबाओ!
+en-0759,en,Want to look by turning the phone? Press this button!
+hi-0823,hi,अरे! कोई झाँक रहा है! उसे छुओ!
+en-0760,en,Oh! Someone is peeking! Tap it!
+hi-0824,hi,शाबाश! तुमने सबको ढूँढ लिया!
+en-0761,en,Well done! You found everyone!
+hi-0825,hi,अब आँखों को आराम दो — बाहर खेलो और दूर तक देखो!
+en-0762,en,Now rest your eyes — play outside and look far away!
+hi-0826,hi,जादू देखो! फ़ोन के कैमरे से तुम्हारे असली कमरे में एक जादुई तितली आएगी। पहले किसी बड़े को बुलाओ — वो कैमरा चालू करेंगे।
+en-0763,en,"Watch some magic! Through the phone's camera, a magic butterfly will fly into your real room. First call a grown-up — they will turn the camera on."
+hi-0827,hi,यह हिस्सा बड़ों के लिए है।
+en-0764,en,This part is for grown-ups.
+hi-0828,hi,जवाब सही नहीं है। नया सवाल…
+en-0765,en,That's not right. A new question…
+hi-0829,hi,"देखो! तितली तुम्हारे कमरे में आ गई! स्क्रीन पर कहीं भी छुओ — वहाँ एक फूल उगेगा, और तितली उस पर बैठेगी।"
+en-0766,en,"Look! The butterfly is in your room! Tap anywhere on the screen — a flower will grow there, and the butterfly will sit on it."
+hi-0830,hi,तितली फूल पर बैठ गई!
+en-0767,en,The butterfly sat on the flower!
+hi-0831,hi,हीही! गुदगुदी हुई!
+en-0768,en,Hee hee! That tickles!
+hi-0832,hi,ये तितली जादू की थी — असली नहीं! अब असली दुनिया में ढूँढो — किसी बड़े के साथ बाहर जाकर असली तितली या फूल ढूँढो!
+en-0769,en,That butterfly was magic — not real! Now look in the real world — go outside with a grown-up and find a real butterfly or flower!
+hi-0833,hi,"कैमरा चालू नहीं हुआ — कोई बात नहीं! चलो, तितली के जादुई बगीचे में चलें। नीचे बटन दबाओ।"
+en-0770,en,The camera didn't turn on — that's OK! Let's visit the butterfly's magic garden instead. Press the button below.
+hi-0834,hi,"इस फ़ोन में कैमरा नहीं मिला — कोई बात नहीं! चलो, तितली के जादुई बगीचे में चलें। नीचे बटन दबाओ।"
+en-0771,en,There's no camera here — that's OK! Let's visit the butterfly's magic garden instead. Press the button below.
+hi-0835,hi,कैमरा बंद हो गया।
+en-0772,en,The camera is off.
 hi-0399,hi,ABC
 en-0352,en,ABC
 hi-0400,hi,अक्षर
@@ -37,6 +179,27 @@ hi-0419,hi,Dhyaan
 hi-0420,hi,बात बडी
 en-0363,en,Talk Buddy
 hi-0421,hi,Baat Buddy
+hi-0836,hi,रोबो दोस्त
+en-0773,en,Robot Friend
+hi-0837,hi,Robo Dost
+hi-0838,hi,भविष्य की सैर
+en-0774,en,Future Trip
+hi-0839,hi,Bhavishya ki sair
+hi-0840,hi,जादुई खिड़की
+en-0775,en,Magic Window
+hi-0841,hi,Jaadui khidki
+hi-0842,hi,लिखना सीखो
+en-0776,en,Let's write
+hi-0843,hi,Likhna seekho
+hi-0844,hi,रंग भरो और चित्र बनाओ
+en-0777,en,Colour and draw
+hi-0845,hi,Rang bharo aur chitra banao
+hi-0846,hi,संगीत
+en-0778,en,Music
+hi-0847,hi,Sangeet
+hi-0848,hi,पहेली जोड़ो
+en-0779,en,Jigsaw puzzles
+hi-0849,hi,Paheli jodo
 hi-0422,hi,अंग्रेज़ी अक्षर! A B C
 en-0364,en,The English alphabet! A B C
 hi-0423,hi,Apple
@@ -177,16 +340,16 @@ hi-0490,hi,W for Watch
 en-0432,en,W for Watch
 hi-0491,hi,W
 en-0433,en,W
-hi-0492,hi,Xylophone
-en-0434,en,Xylophone
-hi-0493,hi,X for Xylophone
-en-0435,en,X for Xylophone
+hi-0850,hi,X-mas tree
+en-0780,en,X-mas tree
+hi-0851,hi,X for X-mas tree
+en-0781,en,X for X-mas tree
 hi-0494,hi,X
 en-0436,en,X
-hi-0495,hi,Yak
-en-0437,en,Yak
-hi-0496,hi,Y for Yak
-en-0438,en,Y for Yak
+hi-0852,hi,Yo-yo
+en-0782,en,Yo-yo
+hi-0853,hi,Y for Yo-yo
+en-0783,en,Y for Yo-yo
 hi-0497,hi,Y
 en-0439,en,Y
 hi-0498,hi,Zebra
@@ -197,10 +360,10 @@ hi-0500,hi,Z
 en-0442,en,Z
 hi-0501,hi,हिंदी वर्णमाला! अ आ इ ई
 en-0443,en,हिंदी वर्णमाला! अ आ इ ई
-hi-0502,hi,अनार
-en-0444,en,अनार
-hi-0503,hi,अ से अनार
-en-0445,en,अ से अनार
+hi-0854,hi,अनानास
+en-0784,en,अनानास
+hi-0855,hi,अ से अनानास
+en-0785,en,अ से अनानास
 hi-0504,hi,अ
 en-0446,en,अ
 hi-0092,hi,आम
@@ -209,16 +372,16 @@ hi-0505,hi,आ से आम
 en-0448,en,आ से आम
 hi-0506,hi,आ
 en-0449,en,आ
-hi-0507,hi,इमली
-en-0450,en,इमली
-hi-0508,hi,इ से इमली
-en-0451,en,इ से इमली
+hi-0856,hi,इंजन
+en-0786,en,इंजन
+hi-0857,hi,इ से इंजन
+en-0787,en,इ से इंजन
 hi-0509,hi,इ
 en-0452,en,इ
-hi-0510,hi,ईख
-en-0453,en,ईख
-hi-0511,hi,ई से ईख
-en-0454,en,ई से ईख
+hi-0858,hi,ईंट
+en-0788,en,ईंट
+hi-0859,hi,ई से ईंट
+en-0789,en,ई से ईंट
 hi-0512,hi,ई
 en-0455,en,ई
 hi-0221,hi,उल्लू
@@ -233,10 +396,10 @@ hi-0516,hi,ऊ से ऊन
 en-0460,en,ऊ से ऊन
 hi-0517,hi,ऊ
 en-0461,en,ऊ
-hi-0518,hi,एड़ी
-en-0462,en,एड़ी
-hi-0519,hi,ए से एड़ी
-en-0463,en,ए से एड़ी
+hi-0702,hi,एम्बुलेंस
+en-0790,en,एम्बुलेंस
+hi-0860,hi,ए से एम्बुलेंस
+en-0791,en,ए से एम्बुलेंस
 hi-0520,hi,ए
 en-0464,en,ए
 hi-0521,hi,ऐनक
@@ -245,10 +408,10 @@ hi-0522,hi,ऐ से ऐनक
 en-0466,en,ऐ से ऐनक
 hi-0523,hi,ऐ
 en-0467,en,ऐ
-hi-0524,hi,ओखली
-en-0468,en,ओखली
-hi-0525,hi,ओ से ओखली
-en-0469,en,ओ से ओखली
+hi-0861,hi,ओस
+en-0792,en,ओस
+hi-0862,hi,ओ से ओस
+en-0793,en,ओ से ओस
 hi-0526,hi,ओ
 en-0470,en,ओ
 hi-0527,hi,औरत
@@ -317,16 +480,16 @@ hi-0558,hi,ट से टमाटर
 en-0502,en,ट से टमाटर
 hi-0559,hi,ट
 en-0503,en,ट
-hi-0560,hi,ठठेरा
-en-0504,en,ठठेरा
-hi-0561,hi,ठ से ठठेरा
-en-0505,en,ठ से ठठेरा
+hi-0863,hi,ठेला
+en-0794,en,ठेला
+hi-0864,hi,ठ से ठेला
+en-0795,en,ठ से ठेला
 hi-0562,hi,ठ
 en-0506,en,ठ
-hi-0563,hi,डमरू
-en-0507,en,डमरू
-hi-0564,hi,ड से डमरू
-en-0508,en,ड से डमरू
+hi-0865,hi,डिब्बा
+en-0796,en,डिब्बा
+hi-0866,hi,ड से डिब्बा
+en-0797,en,ड से डिब्बा
 hi-0565,hi,ड
 en-0509,en,ड
 hi-0566,hi,ढोल
@@ -347,10 +510,10 @@ hi-0573,hi,थ से थाली
 en-0517,en,थ से थाली
 hi-0574,hi,थ
 en-0518,en,थ
-hi-0575,hi,दवात
-en-0519,en,दवात
-hi-0576,hi,द से दवात
-en-0520,en,द से दवात
+hi-0867,hi,दूध
+en-0798,en,दूध
+hi-0868,hi,द से दूध
+en-0799,en,द से दूध
 hi-0577,hi,द
 en-0521,en,द
 hi-0578,hi,धनुष
@@ -359,10 +522,10 @@ hi-0579,hi,ध से धनुष
 en-0523,en,ध से धनुष
 hi-0580,hi,ध
 en-0524,en,ध
-hi-0581,hi,नल
-en-0525,en,नल
-hi-0582,hi,न से नल
-en-0526,en,न से नल
+hi-0701,hi,नाव
+en-0800,en,नाव
+hi-0869,hi,न से नाव
+en-0801,en,न से नाव
 hi-0583,hi,न
 en-0527,en,न
 hi-0584,hi,पतंग
@@ -371,10 +534,10 @@ hi-0585,hi,प से पतंग
 en-0529,en,प से पतंग
 hi-0586,hi,प
 en-0530,en,प
-hi-0587,hi,फल
-en-0531,en,फल
-hi-0588,hi,फ से फल
-en-0532,en,फ से फल
+hi-0870,hi,फूल
+en-0802,en,फूल
+hi-0871,hi,फ से फूल
+en-0803,en,फ से फूल
 hi-0589,hi,फ
 en-0533,en,फ
 hi-0590,hi,बकरी
@@ -395,22 +558,22 @@ hi-0596,hi,म से मछली
 en-0541,en,म से मछली
 hi-0597,hi,म
 en-0542,en,म
-hi-0598,hi,यंत्र
-en-0543,en,यंत्र
-hi-0599,hi,य से यंत्र
-en-0544,en,य से यंत्र
+hi-0872,hi,योग
+en-0804,en,योग
+hi-0873,hi,य से योग
+en-0805,en,य से योग
 hi-0600,hi,य
 en-0545,en,य
-hi-0601,hi,रथ
-en-0546,en,रथ
-hi-0602,hi,र से रथ
-en-0547,en,र से रथ
+hi-0874,hi,रोटी
+en-0806,en,रोटी
+hi-0875,hi,र से रोटी
+en-0807,en,र से रोटी
 hi-0603,hi,र
 en-0548,en,र
-hi-0604,hi,लट्टू
-en-0549,en,लट्टू
-hi-0605,hi,ल से लट्टू
-en-0550,en,ल से लट्टू
+hi-0876,hi,लकड़ी
+en-0808,en,लकड़ी
+hi-0877,hi,ल से लकड़ी
+en-0809,en,ल से लकड़ी
 hi-0606,hi,ल
 en-0551,en,ल
 hi-0607,hi,वन
@@ -437,10 +600,10 @@ hi-0615,hi,ह से हाथी
 en-0562,en,ह से हाथी
 hi-0616,hi,ह
 en-0563,en,ह
-hi-0617,hi,क्षत्रिय
-en-0564,en,क्षत्रिय
-hi-0618,hi,क्ष से क्षत्रिय
-en-0565,en,क्ष से क्षत्रिय
+hi-0878,hi,क्षितिज
+en-0810,en,क्षितिज
+hi-0879,hi,क्ष से क्षितिज
+en-0811,en,क्ष से क्षितिज
 hi-0619,hi,क्ष
 en-0566,en,क्ष
 hi-0620,hi,त्रिशूल
@@ -612,9 +775,7 @@ hi-0699,hi,ऑटो
 en-0643,en,Auto
 hi-0700,hi,ऑटो रिक्शा
 en-0644,en,Auto rickshaw
-hi-0701,hi,नाव
 en-0645,en,Boat
-hi-0702,hi,एम्बुलेंस
 en-0646,en,Ambulance
 hi-0703,hi,शरीर
 en-0647,en,My body
@@ -1464,3 +1625,853 @@ hi-0102,hi,"कोई बात नहीं, एक बार फिर ध्�
 en-0101,en,"That's okay — look once more, carefully."
 hi-0103,hi,"अरे, लगभग! फिर से कोशिश करो।"
 en-0102,en,"Oh, almost! Try again."
+hi-0880,hi,सूरज की बिजली
+en-0812,en,Power from the Sun
+hi-0881,hi,Sooraj ki bijli
+en-0813,en,the Sun
+hi-0882,hi,घर
+en-0814,en,a house
+hi-0883,hi,पेड़
+en-0815,en,a tree
+hi-0884,hi,"देखो, सूरज चमक रहा है! सूरज हमें रोशनी और गर्मी देता है।"
+en-0816,en,"Look, the Sun is shining! The Sun gives us light and warmth."
+hi-0885,hi,सोलर पैनल
+en-0817,en,a solar panel
+hi-0886,hi,घर की छत पर नीली चमकती प्लेटें हैं। इन्हें सोलर पैनल कहते हैं — ये धूप पकड़ते हैं!
+en-0818,en,On the roof are shiny blue plates. They're called solar panels — they catch sunshine!
+hi-0887,hi,बैटरी
+en-0819,en,the battery
+hi-0888,hi,"सोलर पैनल धूप से बिजली बनाता है, और बिजली बैटरी में जमा होती है।"
+en-0820,en,"The solar panel turns sunshine into electricity, and the battery stores it."
+hi-0889,hi,सूरज को तीन बार छुओ और धूप भेजो!
+en-0821,en,Tap the Sun three times to send sunshine!
+hi-0890,hi,धूप से बिजली बन गई! बैटरी भर गई।
+en-0822,en,Sunshine made electricity! The battery is full.
+hi-0891,hi,बल्ब
+en-0823,en,a light bulb
+hi-0892,hi,टीवी
+en-0824,en,a TV
+hi-0893,hi,अब इसी बिजली से बल्ब जलता है और टीवी चलता है — बिना धुएँ के!
+en-0825,en,Now this electricity lights the bulb and runs the TV — with no smoke!
+en-0826,en,a farmer
+hi-0894,hi,"खेत में सोलर पंप ज़मीन से पानी निकालता है। किसान ख़ुश, पौधे ख़ुश!"
+en-0827,en,"On the farm, a solar pump brings up water. Happy farmer, happy plants!"
+en-0828,en,the Moon
+hi-0895,hi,रात को सूरज नहीं होता। तो घर में बिजली कहाँ से आती है?
+en-0829,en,There's no Sun at night. So where does the electricity come from?
+hi-0896,hi,"बताओ — बैटरी से, या चाँद से?"
+en-0830,en,"Tell me — from the battery, or from the Moon?"
+hi-0897,hi,बैटरी से
+en-0831,en,From the battery
+hi-0898,hi,चाँद से
+en-0832,en,From the Moon
+hi-0899,hi,हाँ! दिन में भरी बैटरी रात को बिजली देती है।
+en-0833,en,Yes! The battery filled in the day gives power at night.
+hi-0900,hi,चाँद बिजली नहीं देता! दिन में भरी बैटरी देती है।
+en-0834,en,The Moon doesn't give electricity! The battery filled in the day does.
+hi-0901,hi,सूरज हर दिन आता है और कभी ख़त्म नहीं होता। आने वाले कल में और भी ज़्यादा घर सूरज की बिजली से चलेंगे!
+en-0835,en,"The Sun comes every day and never runs out. Tomorrow, more and more homes will run on sunshine!"
+hi-0902,hi,सोलर पैनल किससे बिजली बनाता है?
+en-0836,en,What does a solar panel make electricity from?
+hi-0903,hi,धूप से
+en-0837,en,Sunshine
+hi-0904,hi,बारिश से
+en-0838,en,Rain
+hi-0905,hi,आइसक्रीम से
+hi-0906,hi,"हाँ, धूप से! सोलर पैनल धूप पकड़ता है।"
+en-0839,en,"Yes, sunshine! A solar panel catches the sunlight."
+hi-0907,hi,आज धूप में खड़े होकर अपनी परछाई देखो। सूरज को सीधे कभी मत देखना! फिर किसी बड़े के साथ ढूँढो — आस-पास कहीं सोलर पैनल है?
+en-0840,en,"Today, stand in the sunshine and look at your shadow. Never look straight at the Sun! Then, with a grown-up, look for solar panels nearby."
+hi-0908,hi,बिजली वाली गाड़ी
+en-0841,en,The Electric Car
+hi-0909,hi,Bijli wali gaadi
+hi-0910,hi,पुरानी बस
+en-0842,en,an old bus
+hi-0911,hi,पुरानी गाड़ियाँ पेट्रोल-डीज़ल पीती हैं और धुआँ छोड़ती हैं। खाँसी! खाँसी!
+en-0843,en,"Old cars and buses drink petrol and puff out smoke. Cough, cough!"
+en-0844,en,an electric car
+hi-0912,hi,"ये है बिजली वाली गाड़ी! इसमें पेट्रोल की टंकी नहीं, एक बड़ी बैटरी है।"
+en-0845,en,This is an electric car! It has a big battery instead of a petrol tank.
+hi-0913,hi,"गाड़ी की बैटरी ख़ाली है। चलो, सूरज की बिजली से इसे चार्ज करें!"
+en-0846,en,The car's battery is empty. Let's charge it with sunshine power!
+hi-0914,hi,सूरज को छूकर गाड़ी चार्ज करो!
+en-0847,en,Tap the Sun to charge the car!
+hi-0915,hi,"गाड़ी चार्ज हो गई! चलो, घूमने चलें — बिना धुएँ के।"
+en-0848,en,The car is charged! Let's go for a ride — with no smoke.
+hi-0916,hi,"बिजली वाली गाड़ी चुपचाप चलती है — ना धुआँ, ना शोर। हवा साफ़ रहती है, चिड़िया भी ख़ुश!"
+en-0849,en,"The electric car goes quietly — no smoke, no noise. The air stays clean, and the birds are happy too!"
+hi-0917,hi,बिजली वाला ऑटो
+en-0850,en,an electric auto-rickshaw
+hi-0918,hi,बिजली वाली बस
+en-0851,en,an electric bus
+hi-0919,hi,बिजली वाला स्कूटर
+en-0852,en,an electric scooter
+hi-0920,hi,"अब बिजली से ऑटो, बस और स्कूटर भी चलते हैं। इन्हें छूकर देखो!"
+en-0853,en,"Now autos, buses and scooters run on electricity too. Tap them!"
+hi-0921,hi,चार्जर
+en-0854,en,the charger
+hi-0922,hi,रात को गाड़ी चार्जिंग पर आराम करती है — जैसे तुम सोकर फिर से ताज़ा हो जाते हो!
+en-0855,en,At night the car rests on its charger — just like you sleep and wake up fresh!
+hi-0923,hi,चार्जर को छूकर गाड़ी को सुला दो!
+en-0856,en,Tap the charger to put the car to bed!
+hi-0924,hi,"गाड़ी चार्ज हो रही है और आराम कर रही है। शुभ रात्रि, गाड़ी!"
+en-0857,en,"The car is charging and resting. Good night, car!"
+en-0858,en,a bicycle
+hi-0925,hi,पैदल चलना
+en-0859,en,walking
+hi-0926,hi,आने वाले कल में सड़कें शांत होंगी और हवा साफ़। और सबसे साफ़ सवारी? साइकिल और पैदल चलना!
+en-0860,en,"Tomorrow, roads will be quieter and the air cleaner. And the cleanest ride of all? Cycling and walking!"
+hi-0927,hi,किस गाड़ी से धुआँ नहीं निकलता?
+en-0861,en,Which one makes no smoke?
+en-0862,en,The electric car
+hi-0928,hi,धुएँ वाला ट्रक
+en-0863,en,The smoky truck
+hi-0929,hi,सही! बिजली वाली गाड़ी धुआँ नहीं छोड़ती।
+en-0864,en,Right! An electric car makes no smoke.
+hi-0930,hi,"आज किसी बड़े के साथ थोड़ा पैदल चलो, और गिनो — रास्ते में कितनी साइकिलें दिखीं?"
+en-0865,en,"Today, take a little walk with a grown-up and count how many bicycles you see!"
+hi-0931,hi,ड्रोन डाकिया
+en-0866,en,The Drone Postman
+hi-0932,hi,Drone daakiya
+hi-0933,hi,ड्रोन
+en-0867,en,a drone
+en-0868,en,a bird
+en-0869,en,an aeroplane
+hi-0934,hi,"ऊपर क्या उड़ रहा है? ना चिड़िया, ना हवाई जहाज़ — ये ड्रोन है!"
+en-0870,en,"What's flying up there? Not a bird, not a plane — it's a drone!"
+hi-0935,hi,ड्रोन के चार छोटे पंखे बहुत तेज़ घूमते हैं — फ़र्र फ़र्र! और वह ऊपर उठ जाता है।
+en-0871,en,A drone has four little fans that spin very fast — whirr whirr! — and up it goes.
+hi-0936,hi,ड्रोन को तीन बार छुओ — पंखे घुमाओ!
+en-0872,en,Tap the drone three times to spin its fans!
+hi-0937,hi,ड्रोन उड़ गया! फ़र्र फ़र्र!
+en-0873,en,The drone is flying! Whirr whirr!
+hi-0938,hi,दादी को दवा चाहिए। ड्रोन डाकिया दवा का डिब्बा लेकर आया है।
+en-0874,en,Grandma needs her medicine. The drone postman has brought the parcel.
+hi-0939,hi,दादी का घर कौन-सा है? वो जिसके आगे बगीचा है!
+en-0875,en,Which is Grandma's house? The one with a garden!
+hi-0940,hi,स्कूल
+en-0876,en,School
+hi-0941,hi,अस्पताल
+en-0877,en,Hospital
+hi-0942,hi,बगीचे वाला घर
+en-0878,en,House with a garden
+hi-0943,hi,"ड्रोन ने दवा पहुँचा दी! धन्यवाद, ड्रोन!"
+en-0879,en,"The drone delivered the medicine! Thank you, drone!"
+hi-0944,hi,ये दादी का घर नहीं है। बगीचे वाला घर ढूँढो!
+en-0880,en,That's not Grandma's house. Find the house with a garden!
+hi-0945,hi,"ड्रोन पहाड़ों और दूर के गाँवों तक दवाइयाँ ले जाते हैं, जहाँ सड़क बहुत लंबी है।"
+en-0881,en,Drones carry medicines to mountains and faraway villages where the road is very long.
+hi-0946,hi,खेत का ड्रोन
+en-0882,en,the farm drone
+hi-0947,hi,खेत में ड्रोन ऊपर से देखता है कि कौन-से पौधे प्यासे हैं।
+en-0883,en,"On the farm, a drone looks from the sky to see which plants are thirsty."
+hi-0948,hi,ड्रोन को छूकर पौधों को पानी दो!
+en-0884,en,Tap the drone to water the plants!
+hi-0949,hi,पौधे हरे-भरे हो गए! शाबाश!
+en-0885,en,The plants are green and happy! Well done!
+hi-0950,hi,ड्रोन चलाने वाले
+en-0886,en,the drone pilot
+hi-0951,hi,ड्रोन को कोई इंसान चलाता है और नियम मानता है — किसी के घर में झाँकना नहीं!
+en-0887,en,A person controls the drone and follows the rules — no peeking into anyone's home!
+hi-0952,hi,तोहफ़ा
+en-0888,en,a present
+hi-0953,hi,आने वाले कल में आसमान में मददगार ड्रोन होंगे। तुम ड्रोन से किसे क्या भेजोगे?
+en-0889,en,"Tomorrow, helpful drones will fly in the sky. What would you send with a drone, and to whom?"
+hi-0954,hi,ड्रोन कैसे उड़ता है?
+en-0890,en,How does a drone fly?
+hi-0955,hi,घूमते पंखों से
+en-0891,en,With spinning fans
+hi-0956,hi,पैरों से कूदकर
+en-0892,en,By jumping on its feet
+hi-0957,hi,"हाँ! उसके पंखे घूमते हैं, फ़र्र फ़र्र!"
+en-0893,en,Yes! Its fans spin — whirr whirr!
+hi-0958,hi,किसी बड़े के साथ काग़ज़ का हवाई जहाज़ बनाओ और देखो वो कितनी दूर उड़ता है!
+en-0894,en,Make a paper plane with a grown-up and see how far it flies!
+hi-0959,hi,अंतरिक्ष यात्रा
+en-0895,en,Trip to Space
+hi-0960,hi,Antariksh yatra
+hi-0961,hi,रात को आसमान में चाँद और तारे दिखते हैं। क्या हम वहाँ जा सकते हैं?
+en-0896,en,At night we see the Moon and stars. Can we go there?
+hi-0962,hi,रॉकेट
+en-0897,en,the rocket
+hi-0963,hi,हाँ! रॉकेट में बैठकर। रॉकेट बहुत तेज़ ऊपर जाता है।
+en-0898,en,Yes! In a rocket. A rocket zooms up very fast.
+hi-0964,hi,रॉकेट को तीन बार छुओ — गिनती करो!
+en-0899,en,Tap the rocket three times — count down!
+hi-0965,hi,3… 2… 1… उड़ान! रॉकेट अंतरिक्ष की ओर!
+en-0900,en,3… 2… 1… lift off! The rocket is off to space!
+hi-0966,hi,चंद्रयान
+en-0901,en,Chandrayaan
+hi-0967,hi,"भारत के वैज्ञानिकों ने चंद्रयान भेजा। वह चाँद पर धीरे से उतरा — एक ऐसी जगह के पास, जहाँ पहले कोई नहीं उतरा था!"
+en-0902,en,Scientists in India sent Chandrayaan. It landed gently on the Moon — near a place where nobody had landed before!
+hi-0968,hi,प्रज्ञान रोवर
+en-0903,en,the Pragyan rover
+hi-0969,hi,उसमें से एक छोटी गाड़ी निकली — प्रज्ञान रोवर। वह छह पहियों पर धीरे-धीरे चली और चाँद की मिट्टी को जाँचा।
+en-0904,en,Out came a little rover named Pragyan. It rolled slowly on six wheels and studied the Moon's soil.
+hi-0970,hi,रोवर को छूकर आगे चलाओ!
+en-0905,en,Tap the rover to drive it forward!
+hi-0971,hi,शाबाश! रोवर ने चाँद पर नए निशान बना दिए।
+en-0906,en,Well done! The rover made new tracks on the Moon.
+en-0907,en,an astronaut
+hi-0972,hi,"अंतरिक्ष में साँस लेने वाली हवा नहीं है, इसलिए अंतरिक्ष यात्री ख़ास सूट पहनते हैं।"
+en-0908,en,"There is no air to breathe in space, so astronauts wear special suits."
+hi-0973,hi,अंतरिक्ष में क्या पहनोगे — ख़ास सूट या टी-शर्ट?
+en-0909,en,What will you wear in space — a special suit or a T-shirt?
+hi-0974,hi,ख़ास सूट
+en-0910,en,A special suit
+hi-0975,hi,टी-शर्ट
+en-0911,en,A T-shirt
+hi-0976,hi,सही! सूट में हवा भी है और गर्मी भी।
+en-0912,en,Right! The suit has air inside and keeps you warm.
+hi-0977,hi,टी-शर्ट में अंतरिक्ष में साँस नहीं ले पाओगे! ख़ास सूट चाहिए।
+en-0913,en,You couldn't breathe in space in a T-shirt! You need a special suit.
+hi-0978,hi,मंगल ग्रह
+en-0914,en,planet Mars
+hi-0979,hi,ये है मंगल ग्रह — लाल ग्रह! एक दिन इंसान वहाँ भी जाएँगे — शायद तुम भी!
+en-0915,en,This is Mars — the red planet! One day people will go there too — maybe even you!
+hi-0980,hi,हमारी धरती
+en-0916,en,our Earth
+hi-0981,hi,अंतरिक्ष से हमारी धरती नीली-हरी गेंद जैसी दिखती है। यही हमारा प्यारा घर है!
+en-0917,en,"From space, our Earth looks like a blue-green ball. It's our lovely home!"
+hi-0982,hi,चाँद पर जाने के लिए किसमें बैठेंगे?
+en-0918,en,What will we ride to go to the Moon?
+en-0919,en,A rocket
+en-0920,en,A bicycle
+hi-0983,hi,"हाँ, रॉकेट! 3… 2… 1… उड़ान!"
+en-0921,en,"Yes, a rocket! 3… 2… 1… lift off!"
+hi-0984,hi,अंतरिक्ष यात्री ख़ास सूट क्यों पहनते हैं?
+en-0922,en,Why do astronauts wear special suits?
+hi-0985,hi,वहाँ हवा नहीं है
+en-0923,en,There's no air there
+hi-0986,hi,पार्टी के लिए
+en-0924,en,For a party
+hi-0987,hi,सही! अंतरिक्ष में साँस लेने वाली हवा नहीं है।
+en-0925,en,Right! There's no air to breathe in space.
+hi-0988,hi,"आज रात किसी बड़े के साथ चाँद को देखो। वो कैसा दिखा — गोल, आधा या पतला? कल फिर देखना — क्या बदला?"
+en-0926,en,"Tonight, look at the Moon with a grown-up. Was it round, half or thin? Look again tomorrow — what changed?"
+hi-0989,hi,डॉक्टर के रोबो मददगार
+en-0927,en,Robot Helpers
+hi-0990,hi,Doctor ke robo madadgaar
+en-0928,en,a doctor
+en-0929,en,a nurse
+hi-0991,hi,ये है अस्पताल। यहाँ डॉक्टर और नर्स सबका ख़याल रखते हैं।
+en-0930,en,This is a hospital. Doctors and nurses take care of everyone here.
+hi-0992,hi,रोबो मददगार
+en-0931,en,the robot helper
+hi-0993,hi,आज अस्पताल में एक रोबो मददगार भी है! वह दवा और खाना एक कमरे से दूसरे कमरे तक ले जाता है।
+en-0932,en,Today the hospital has a robot helper too! It carries medicine and food from room to room.
+hi-0994,hi,रोबो को बताओ — दवा किसे चाहिए? जिसे बुख़ार है!
+en-0933,en,Tell the robot — who needs the medicine? The one with a fever!
+hi-0995,hi,बुख़ार वाला
+en-0934,en,The one with a fever
+hi-0996,hi,हँसता हुआ
+en-0935,en,The smiling one
+hi-0997,hi,सोता हुआ
+en-0936,en,The sleeping one
+hi-0998,hi,हाँ! रोबो ने बुख़ार वाले को दवा दे दी। जल्दी ठीक हो जाओ!
+en-0937,en,Yes! The robot gave the medicine to the one with a fever. Get well soon!
+hi-0999,hi,"इसे दवा नहीं चाहिए। जिसे बुख़ार है, उसे ढूँढो — थर्मामीटर वाला!"
+en-0938,en,This one doesn't need medicine. Find the one with a fever — with the thermometer!
+hi-1000,hi,रोबो हाथ
+en-0939,en,a robot arm
+hi-1001,hi,"कुछ रोबो हाथ बहुत स्थिर रहते हैं, ताकि डॉक्टर बहुत बारीक काम आराम से कर सकें।"
+en-0940,en,"Some robot arms stay very steady, so doctors can do tiny, careful work."
+en-0941,en,the doctor
+hi-1002,hi,पर रोबो अपने-आप फ़ैसला नहीं करता। डॉक्टर सोचते हैं और तय करते हैं — रोबो बस मदद करता है।
+en-0942,en,But the robot doesn't decide on its own. The doctor thinks and decides — the robot just helps.
+hi-1003,hi,दादाजी
+en-0943,en,Grandpa
+hi-1004,hi,घर पर एक छोटा रोबो दादाजी को याद दिलाता है: 'दवा का समय!' और पानी भी लाता है।
+en-0944,en,"At home, a little robot reminds Grandpa, 'Time for medicine!' and brings water too."
+hi-1005,hi,रोबो को छुओ — दादाजी के लिए पानी लाओ!
+en-0945,en,Tap the robot to bring Grandpa some water!
+hi-1006,hi,"दादाजी ने पानी पिया और दवा ली। धन्यवाद, रोबो!"
+en-0946,en,"Grandpa drank the water and took his medicine. Thank you, robot!"
+hi-1007,hi,"रोबो मदद कर सकता है। पर गले लगाना, प्यार करना और सच में ख़याल रखना — ये हम इंसान करते हैं!"
+en-0947,en,"Robots can help. But hugging, loving and truly caring — that's what we people do!"
+hi-1008,hi,दादाजी को प्यार की झप्पी कौन देगा?
+en-0948,en,Who will give Grandpa a loving hug?
+hi-1009,hi,मैं
+en-0949,en,Me
+hi-1010,hi,रोबो
+en-0950,en,The robot
+hi-1011,hi,"हाँ, तुम! रोबो मदद करता है, पर प्यार की झप्पी तुम देते हो।"
+en-0951,en,"Yes, you! A robot helps, but the hugs come from you."
+hi-1012,hi,आज घर में किसी बड़े की एक मदद करो — पानी लाओ या चप्पलें सजाओ — और उन्हें एक प्यारी झप्पी दो!
+en-0952,en,"Today, help a grown-up at home — bring water or tidy the shoes — and give them a big hug!"
+hi-1013,hi,बात करने वाले कंप्यूटर
+en-0953,en,Talking Computers
+hi-1014,hi,Baat karne wale computer
+hi-1015,hi,फ़ोन
+en-0954,en,a phone
+hi-1016,hi,बोलने वाला स्पीकर
+en-0955,en,a talking speaker
+hi-1017,hi,कुछ फ़ोन और स्पीकर हमारी बात सुन सकते हैं और जवाब भी दे सकते हैं।
+en-0956,en,Some phones and speakers can listen to us and even answer back.
+hi-1018,hi,कंप्यूटर
+en-0957,en,the computer
+hi-1019,hi,"ये कंप्यूटर बहुत, बहुत सारी बातें पढ़कर सीखते हैं — किताबें, कहानियाँ, गाने!"
+en-0958,en,"These computers learn by reading lots and lots of words — books, stories and songs!"
+hi-1020,hi,"उससे साफ़-साफ़ पूछो, तभी वो ठीक से समझता है।"
+en-0959,en,Ask it clearly — that's how it understands you best.
+hi-1021,hi,कौन-सा सवाल साफ़ है? “वो क्या है?” या “आज बारिश होगी?”
+en-0960,en,Which question is clear? “What's that?” or “Will it rain today?”
+hi-1022,hi,वो क्या है?
+en-0961,en,What's that?
+hi-1023,hi,आज बारिश होगी?
+en-0962,en,Will it rain today?
+hi-1024,hi,"हाँ! साफ़ सवाल पूछा, तो साफ़ जवाब मिलेगा।"
+en-0963,en,Yes! A clear question gets a clear answer.
+hi-1025,hi,'वो' मतलब क्या? कंप्यूटर समझ नहीं पाएगा। साफ़ सवाल चुनो!
+en-0964,en,What is 'that'? The computer won't understand. Pick the clear question!
+en-0965,en,a cat
+hi-1026,hi,"कंप्यूटर बहुत सी बातें पढ़कर सीखता है, पर वह भी गलती कर सकता है!"
+en-0966,en,"The computer learns by reading lots of things, but it can make mistakes too!"
+hi-1027,hi,स्पीकर ने कहा: “बिल्ली भौं-भौं करती है!” — सही या गलत?
+en-0967,en,The speaker said: “Cats say woof woof!” — right or wrong?
+hi-1028,hi,सही
+en-0968,en,Right
+hi-1029,hi,गलत
+en-0969,en,Wrong
+hi-1030,hi,"हाँ, गलत! बिल्ली तो म्याऊँ करती है। कंप्यूटर ने गलती की — तुमने पकड़ ली!"
+en-0970,en,"Yes, wrong! Cats say meow. The computer made a mistake — and you caught it!"
+hi-1031,hi,सोचो — बिल्ली कैसे बोलती है? म्याऊँ! तो कंप्यूटर ने गलती की।
+en-0971,en,Think — what does a cat say? Meow! So the computer made a mistake.
+hi-1032,hi,मम्मी
+en-0972,en,Mummy
+hi-1033,hi,"इसलिए वो जो भी कहे, उस पर सोचो — और किसी बड़े से भी पूछ लो।"
+en-0973,en,So think about whatever it says — and check with a grown-up too.
+hi-1034,hi,"कंप्यूटर इंसान नहीं है। उसे भूख नहीं लगती, नींद नहीं आती — वो एक मशीन है, एक औज़ार, जैसे पेंसिल या कैंची।"
+en-0974,en,"A computer isn't a person. It doesn't get hungry or sleepy — it's a machine, a tool, like a pencil or scissors."
+hi-1035,hi,"अपना पूरा नाम, घर का पता या फ़ोटो किसी मशीन को मत बताओ — पहले बड़ों से पूछो।"
+en-0975,en,"Don't tell a machine your full name, address or photos — ask a grown-up first."
+hi-1036,hi,क्या कंप्यूटर भी गलती कर सकता है?
+en-0976,en,Can a computer make mistakes?
+hi-1037,hi,हाँ
+en-0977,en,Yes
+hi-1038,hi,नहीं
+en-0978,en,No
+hi-1039,hi,हाँ! इसलिए हम सोचते हैं और बड़ों से पूछते हैं।
+en-0979,en,Yes! That's why we think and ask grown-ups.
+hi-1040,hi,कंप्यूटर क्या है?
+en-0980,en,What is a computer?
+hi-1041,hi,"एक मशीन, एक औज़ार"
+en-0981,en,"A machine, a tool"
+hi-1042,hi,एक इंसान
+en-0982,en,A person
+hi-1043,hi,सही! कंप्यूटर एक मशीन है — इंसान नहीं।
+en-0983,en,Right! A computer is a machine — not a person.
+hi-1044,hi,आज किसी बड़े से एक ऐसा सवाल पूछो जिसका जवाब तुम्हें नहीं पता — और साथ में जवाब ढूँढो!
+en-0984,en,"Today, ask a grown-up a question you don't know the answer to — and find the answer together!"
+hi-1045,hi,"पानी बचाओ, पेड़ लगाओ"
+en-0985,en,"Save Water, Plant Trees"
+hi-1046,hi,"Paani bachao, ped lagao"
+hi-1047,hi,धरती
+en-0986,en,the Earth
+hi-1048,hi,हमारी धरती हमारा घर है। उसे साफ़ और हरा रखना हम सबका काम है!
+en-0987,en,The Earth is our home. Keeping it clean and green is everyone's job!
+hi-0581,hi,नल
+en-0988,en,the tap
+hi-1049,hi,"अरे! नल खुला छूट गया। टप-टप-टप, पानी बह रहा है!"
+en-0989,en,"Oh no! The tap was left open. Drip, drip, drip — water is running away!"
+hi-1050,hi,नल को छूकर बंद करो!
+en-0990,en,Tap the tap to turn it off!
+hi-1051,hi,शाबाश! तुमने पानी बचाया।
+en-0991,en,Well done! You saved water.
+hi-1052,hi,टूथब्रश
+en-0992,en,a toothbrush
+hi-1053,hi,दाँत साफ़ करते समय नल बंद रखो। एक बार में बाल्टी भर पानी बचता है!
+en-0993,en,Keep the tap off while you brush. You can save a whole bucket of water!
+hi-1054,hi,"कचरा भी सही डिब्बे में जाता है। गीला कचरा हरे डिब्बे में, सूखा कचरा नीले डिब्बे में।"
+en-0994,en,"Rubbish goes in the right bin too. Wet waste in the green bin, dry waste in the blue bin."
+hi-1055,hi,हर चीज़ को सही डिब्बे में डालो — हरा या नीला?
+en-0995,en,Put each thing in the right bin — green or blue?
+hi-1056,hi,गीला कचरा
+en-0996,en,Wet waste
+hi-1057,hi,सूखा कचरा
+en-0997,en,Dry waste
+hi-1058,hi,केले का छिलका
+en-0998,en,banana peel
+hi-1059,hi,पुराना अख़बार
+en-0999,en,old newspaper
+hi-1060,hi,सेब का बचा टुकड़ा
+en-1000,en,apple core
+hi-1061,hi,प्लास्टिक की बोतल
+en-1001,en,plastic bottle
+hi-1062,hi,वाह! सारा कचरा सही डिब्बे में!
+en-1002,en,Wow! All the rubbish is in the right bin!
+hi-1063,hi,रीसायकल
+en-1003,en,recycling
+hi-1064,hi,"पुरानी प्लास्टिक की बोतलें फिर से नई चीज़ें बन सकती हैं — कुर्सी, थैला, खिलौना! इसे रीसायकल कहते हैं।"
+en-1004,en,"Old plastic bottles can become new things — a chair, a bag, a toy! That's called recycling."
+hi-1065,hi,बीज
+en-1005,en,a seed
+hi-1066,hi,"चलो, एक पेड़ लगाएँ! बीज को पानी चाहिए।"
+en-1006,en,Let's plant a tree! The seed needs water.
+hi-1067,hi,पानी को तीन बार छुओ और बीज को सींचो!
+en-1007,en,Tap the water three times to water the seed!
+hi-1068,hi,"देखो! बीज से पौधा, और पौधे से पेड़ बन गया!"
+en-1008,en,"Look! The seed became a plant, and the plant became a tree!"
+hi-1069,hi,"पेड़ हमें छाया, फल और साफ़ हवा देते हैं। आओ, आने वाले कल को हरा-भरा बनाएँ!"
+en-1009,en,"Trees give us shade, fruit and clean air. Let's make tomorrow green!"
+hi-1070,hi,केले का छिलका किस डिब्बे में जाएगा?
+en-1010,en,Which bin does a banana peel go in?
+hi-1071,hi,हरा — गीला कचरा
+en-1011,en,Green — wet waste
+hi-1072,hi,नीला — सूखा कचरा
+en-1012,en,Blue — dry waste
+hi-1073,hi,सही! छिलका गीला कचरा है — हरे डिब्बे में।
+en-1013,en,Right! A peel is wet waste — the green bin.
+hi-1074,hi,"आज किसी पौधे को पानी दो, और दाँत साफ़ करते समय नल बंद रखना!"
+en-1014,en,"Today, water a plant — and keep the tap off while you brush!"
+hi-1075,hi,3D प्रिंटर
+en-1015,en,The 3D Printer
+hi-1076,hi,3D printer
+en-1016,en,a 3D printer
+hi-1077,hi,"ये है एक कमाल की मशीन — 3D प्रिंटर! ये चीज़ें बनाता है, परत पर परत।"
+en-1017,en,"This is an amazing machine — a 3D printer! It builds things, layer on layer."
+hi-1078,hi,"चलो, प्रिंटर से एक खिलौना बनाएँ!"
+en-1018,en,Let's make a toy with the printer!
+hi-1079,hi,प्रिंटर को चार बार छुओ — हर बार एक परत जुड़ेगी!
+en-1019,en,Tap the printer four times — each tap adds a layer!
+hi-1080,hi,"देखो, परत पर परत से एक मीनार बन गई!"
+en-1020,en,"Look — layer on layer, a tower is ready!"
+hi-1081,hi,चित्र
+en-1021,en,a design
+hi-1082,hi,पहले कोई चित्र बनाता है — क्या बनाना है। फिर प्रिंटर उसे सच में बना देता है।
+en-1022,en,First someone draws a design — what to make. Then the printer makes it for real.
+hi-1083,hi,खिलौने का हिस्सा
+en-1023,en,a toy part
+hi-1084,hi,मदद वाला हाथ
+en-1024,en,a helper hand
+hi-1085,hi,छोटा घर
+en-1025,en,a small house
+hi-1086,hi,"3D प्रिंटर से टूटे खिलौने का हिस्सा, किसी के लिए मदद वाला हाथ, यहाँ तक कि छोटे घर भी बन सकते हैं!"
+en-1026,en,"3D printers can make a missing toy piece, a helper hand for someone, even small houses!"
+hi-1087,hi,"अगर तुम्हारे पास 3D प्रिंटर होता, तो तुम क्या बनाते?"
+en-1027,en,"If you had a 3D printer, what would you make?"
+hi-1088,hi,"चुनो — गाड़ी, डायनासोर या घर?"
+en-1028,en,"Choose — a car, a dinosaur or a house?"
+hi-1089,hi,डायनासोर
+en-1029,en,A dinosaur
+en-1030,en,A house
+hi-1090,hi,वाह! बढ़िया चुना। अब प्रिंटर परत पर परत उसे बनाएगा!
+en-1031,en,Wow! Great choice. Now the printer will build it layer by layer!
+hi-1091,hi,पर पहले सोचना पड़ता है। बनाने वाले तुम हो — मशीन बस मदद करती है!
+en-1032,en,But first you have to think. You are the maker — the machine just helps!
+hi-1092,hi,3D प्रिंटर चीज़ें कैसे बनाता है?
+en-1033,en,How does a 3D printer make things?
+hi-1093,hi,परत पर परत
+en-1034,en,Layer on layer
+hi-1094,hi,जादू से
+en-1035,en,By magic
+hi-1095,hi,"हाँ! परत पर परत, जैसे पराठे की परतें।"
+en-1036,en,"Yes! Layer on layer, like a stack of pancakes."
+hi-1096,hi,"आज ब्लॉक, मिट्टी या आटे से परत-पर-परत एक मीनार बनाओ। कितनी ऊँची बनी?"
+en-1037,en,"Today, build a tower layer by layer with blocks, clay or dough. How tall did it get?"
+hi-1097,hi,इंटरनेट पर सुरक्षा
+en-1038,en,Safe on the Internet
+hi-1098,hi,Internet par suraksha
+hi-1099,hi,इंटरनेट
+en-1039,en,the internet
+hi-1100,hi,"इंटरनेट एक बहुत बड़े शहर जैसा है — उसमें कहानियाँ, गाने और खेल हैं।"
+en-1040,en,"The internet is like a giant city — full of stories, songs and games."
+hi-1101,hi,अनजान
+en-1041,en,a stranger
+hi-1102,hi,उस शहर में अनजान लोग भी होते हैं। सड़क की तरह इंटरनेट पर भी — अनजान लोगों को अपनी बातें नहीं बताते।
+en-1042,en,"That city has strangers too. Just like on the street, we don't tell strangers about ourselves online."
+hi-1103,hi,फ़ोन पर कोई अनजान पूछता है: “तुम्हारा घर कहाँ है?”
+en-1043,en,Someone you don't know asks on the phone: “Where do you live?”
+hi-1104,hi,"तुम क्या करोगे? पता बताओगे, या बड़ों को बुलाओगे?"
+en-1044,en,"What will you do? Tell them, or call a grown-up?"
+hi-1105,hi,पता बता दूँ
+en-1045,en,Tell my address
+hi-1106,hi,बड़ों को बुलाऊँ
+en-1046,en,Call a grown-up
+hi-1107,hi,बिल्कुल सही! पहले बड़ों को बताओ।
+en-1047,en,Exactly right! Tell a grown-up first.
+hi-1108,hi,रुको! घर का पता किसी अनजान को नहीं बताते। बड़ों को बुलाओ।
+en-1048,en,Stop! We never tell a stranger where we live. Call a grown-up.
+hi-1109,hi,"अगर स्क्रीन पर अचानक चमकता डिब्बा आए — “दबाओ, इनाम जीतो!” — तो उसे मत दबाओ।"
+en-1049,en,If a shiny box suddenly pops up — “Tap here to win a prize!” — don't tap it.
+hi-1110,hi,"तुम क्या दबाओगे? चमकता इनाम, या बड़ों से पूछोगे?"
+en-1050,en,"What will you tap? The shiny prize, or ask a grown-up?"
+hi-1111,hi,इनाम जीतो!
+en-1051,en,Win a prize!
+hi-1112,hi,बड़ों से पूछूँ
+en-1052,en,Ask a grown-up
+hi-1113,hi,शाबाश! अनजान चीज़ दबाने से पहले बड़ों से पूछते हैं।
+en-1053,en,Well done! Ask a grown-up before tapping something you don't know.
+hi-1114,hi,ओह! अनजान चमकते बटन धोखा भी हो सकते हैं। पहले बड़ों से पूछो।
+en-1054,en,Oops! Strange shiny buttons can be tricks. Ask a grown-up first.
+hi-1115,hi,ख़ज़ाने का बक्सा
+en-1055,en,the treasure box
+hi-1116,hi,"तुम्हारा नाम, स्कूल, फ़ोटो और पासवर्ड — ये सब तुम्हारा ख़ज़ाना हैं। ख़ज़ाना छुपाकर रखते हैं!"
+en-1056,en,"Your name, school, photos and passwords are your treasure. We keep treasure safe!"
+hi-1117,hi,बक्से को छूकर ताला लगाओ!
+en-1057,en,Tap the box to lock it!
+hi-1118,hi,ख़ज़ाना सुरक्षित! शाबाश!
+en-1058,en,Treasure locked and safe! Well done!
+hi-1119,hi,घर के बड़े
+en-1059,en,grown-ups at home
+hi-1120,hi,"अगर कुछ भी अजीब लगे, डर लगे या समझ न आए — तुरंत किसी बड़े को बताओ। तुम्हें कोई डाँट नहीं पड़ेगी। मुसीबत हो तो बड़े 1098 या 112 पर फ़ोन करके मदद ले सकते हैं।"
+en-1060,en,"If anything feels strange, scary or confusing — tell a grown-up right away. You won't be in trouble. In an emergency, grown-ups can call 1098 or 112 for help."
+hi-1121,hi,"और याद रखो: स्क्रीन को भी आराम चाहिए! बाहर खेलो, दौड़ो और दूर तक देखो।"
+en-1061,en,"And remember: screens need rest too! Play outside, run around and look far away."
+hi-1122,hi,"कोई अनजान तुम्हारा पता पूछे, तो?"
+en-1062,en,If a stranger asks where you live?
+hi-1123,hi,बड़ों को बताओ
+en-1063,en,Tell a grown-up
+hi-1124,hi,पता बता दो
+en-1064,en,Tell them
+hi-1125,hi,हाँ! पहले बड़ों को बताओ।
+en-1065,en,Yes! Tell a grown-up first.
+hi-1126,hi,"आज किसी बड़े के साथ अपना सुरक्षा नियम ज़ोर से बोलो: “कुछ भी अनजान हो, तो पहले बड़ों से पूछूँगा!”"
+en-1066,en,"Today, say your safety rule out loud with a grown-up: “If it's something I don't know, I'll ask a grown-up first!”"
+hi-1127,hi,जंगल
+en-1067,en,Jungle
+hi-1128,hi,Jungle
+en-1068,en,a monkey
+hi-1129,hi,बंदर पेड़ों पर झूलता है!
+en-1069,en,Monkeys swing from the trees!
+hi-1130,hi,मोर
+en-1070,en,a peacock
+hi-1131,hi,मोर अपने रंग-बिरंगे पंख फैलाता है!
+en-1071,en,A peacock spreads its colourful feathers!
+en-1072,en,an elephant
+hi-1132,hi,हाथी अपनी सूँड से पानी पीता है!
+en-1073,en,An elephant drinks with its trunk!
+hi-1133,hi,बाघ
+en-1074,en,a tiger
+hi-1134,hi,बाघ की धारियाँ उसे छिपने में मदद करती हैं!
+en-1075,en,A tiger's stripes help it hide!
+hi-1135,hi,तोता
+en-1076,en,a parrot
+hi-1136,hi,तोता बातें दोहरा सकता है!
+en-1077,en,A parrot can copy words!
+hi-1137,hi,तुमने सारे जानवर ढूँढ लिए! ये जादुई जंगल था। अब असली दुनिया में ढूँढो — खिड़की से बाहर कौन-सा पक्षी या पेड़ दिखता है?
+en-1078,en,You found all the animals! That was a magic jungle. Now look in the real world — which bird or tree can you see outside the window?
+hi-1138,hi,समुद्र के अंदर
+en-1079,en,Under the Sea
+hi-1139,hi,Samudra ke andar
+hi-1140,hi,रंगीन मछली
+en-1080,en,a colourful fish
+hi-1141,hi,मछली पानी में साँस लेती है!
+en-1081,en,Fish breathe under water!
+hi-1142,hi,ऑक्टोपस
+en-1082,en,an octopus
+hi-1143,hi,ऑक्टोपस की आठ भुजाएँ होती हैं!
+en-1083,en,An octopus has eight arms!
+hi-1144,hi,समुद्री कछुआ
+en-1084,en,a sea turtle
+hi-1145,hi,समुद्री कछुआ बहुत दूर तक तैरता है!
+en-1085,en,Sea turtles swim very far!
+hi-1146,hi,केकड़ा
+en-1086,en,a crab
+hi-1147,hi,केकड़ा टेढ़ा-टेढ़ा चलता है!
+en-1087,en,A crab walks sideways!
+hi-1148,hi,व्हेल
+en-1088,en,a whale
+hi-1149,hi,व्हेल सबसे बड़ा जानवर है!
+en-1089,en,The blue whale is the biggest animal of all!
+hi-1150,hi,तुमने सारे समुद्री दोस्त ढूँढ लिए! ये जादुई समुद्र था। नहाते समय सोचो — मछली की तरह तैरना कैसा लगता होगा?
+en-1090,en,"You found all the sea friends! That was a magic sea. At bath time, imagine — how would it feel to swim like a fish?"
+hi-1151,hi,अंतरिक्ष
+en-1091,en,Space
+hi-1152,hi,Antariksh
+en-1092,en,a rocket
+hi-1153,hi,रॉकेट बहुत तेज़ ऊपर जाता है!
+en-1093,en,A rocket zooms up very fast!
+hi-1154,hi,अंतरिक्ष यात्री ख़ास सूट पहनते हैं!
+en-1094,en,Astronauts wear special suits!
+hi-1155,hi,उपग्रह
+en-1095,en,a satellite
+hi-1156,hi,उपग्रह धरती के चारों ओर घूमता है!
+en-1096,en,A satellite goes round and round the Earth!
+hi-1157,hi,शनि ग्रह
+en-1097,en,planet Saturn
+hi-1158,hi,शनि ग्रह के चारों ओर छल्ले हैं!
+en-1098,en,Saturn has rings all around it!
+hi-1159,hi,उड़न तश्तरी
+en-1099,en,a flying saucer
+hi-1160,hi,ये तो कहानी वाली उड़न तश्तरी है — मज़े के लिए!
+en-1100,en,This flying saucer is from stories — just for fun!
+hi-1161,hi,तुमने अंतरिक्ष की सारी चीज़ें ढूँढ लीं! आज रात किसी बड़े के साथ असली आसमान देखो — कितने तारे दिखे?
+en-1101,en,"You found everything in space! Tonight, look at the real sky with a grown-up — how many stars can you see?"
+hi-1162,hi,तितली का बगीचा
+en-1102,en,Butterfly Garden
+hi-1163,hi,Titli ka bagicha
+en-1103,en,a butterfly
+hi-1164,hi,तितली फूलों का रस पीती है!
+en-1104,en,Butterflies sip nectar from flowers!
+hi-1165,hi,मधुमक्खी
+en-1105,en,a bee
+hi-1166,hi,मधुमक्खी शहद बनाती है!
+en-1106,en,Bees make honey!
+hi-1167,hi,लाल कीड़ा
+en-1107,en,a ladybird
+hi-1168,hi,इस कीड़े की पीठ पर काले धब्बे हैं!
+en-1108,en,This ladybird has black spots on its back!
+hi-1169,hi,गिलहरी
+en-1109,en,a squirrel
+hi-1170,hi,गिलहरी की पीठ पर धारियाँ होती हैं!
+en-1110,en,Indian squirrels have stripes on their backs!
+hi-1171,hi,तुमने बगीचे के सारे दोस्त ढूँढ लिए! अब किसी बड़े के साथ बाहर जाओ — असली तितली या मधुमक्खी ढूँढो!
+en-1111,en,You found all the garden friends! Now go outside with a grown-up — look for a real butterfly or bee!
+hi-1172,hi,चिंटू रोबो
+en-1112,en,Chintu the robot
+hi-1173,hi,Chintu Robo
+en-1113,en,red
+hi-1174,hi,ये लाल है
+en-1114,en,it is red
+en-1115,en,green
+hi-1175,hi,ये हरा है
+en-1116,en,it is green
+en-1117,en,yellow
+hi-1176,hi,ये पीला है
+en-1118,en,it is yellow
+en-1119,en,orange
+hi-1177,hi,ये नारंगी है
+en-1120,en,it is orange
+en-1121,en,purple
+hi-1178,hi,ये बैंगनी है
+en-1122,en,it is purple
+en-1123,en,blue
+hi-1179,hi,ये नीला है
+en-1124,en,it is blue
+en-1125,en,brown
+hi-1180,hi,ये भूरा है
+en-1126,en,it is brown
+en-1127,en,white
+hi-1181,hi,ये सफ़ेद है
+en-1128,en,it is white
+hi-1182,hi,स्लेटी
+en-1129,en,grey
+hi-1183,hi,ये स्लेटी है
+en-1130,en,it is grey
+en-1131,en,pink
+hi-1184,hi,ये गुलाबी है
+en-1132,en,it is pink
+hi-1185,hi,गोल
+en-1133,en,round
+hi-1186,hi,ये गोल है
+en-1134,en,it is round
+hi-1187,hi,लंबा
+en-1135,en,long
+hi-1188,hi,ये लंबा है
+en-1136,en,it is long
+hi-1189,hi,छोटा
+en-1137,en,small
+hi-1190,hi,ये छोटा है
+en-1138,en,it is small
+hi-1191,hi,खाने की चीज़
+en-1139,en,food
+hi-1192,hi,ये खाने की चीज़ है
+en-1140,en,it is food
+en-1141,en,animal
+hi-1193,hi,ये जानवर है
+en-1142,en,it is an animal
+hi-1194,hi,पौधा
+en-1143,en,plant
+hi-1195,hi,ये पौधा है
+en-1144,en,it is a plant
+en-1145,en,vehicle
+hi-1196,hi,ये गाड़ी है
+en-1146,en,it is a vehicle
+hi-1197,hi,मीठा
+en-1147,en,sweet
+hi-1198,hi,ये मीठा है
+en-1148,en,it is sweet
+hi-1199,hi,पकाकर खाते हैं
+en-1149,en,cooked
+hi-1200,hi,इसे पकाकर खाते हैं
+en-1150,en,we cook it
+hi-1201,hi,तैरता है
+en-1151,en,swims
+hi-1202,hi,ये तैरता है
+en-1152,en,it swims
+hi-1203,hi,चलता है
+en-1153,en,walks
+hi-1204,hi,ये पैरों से चलता है
+en-1154,en,it walks on legs
+hi-1205,hi,धारियाँ
+en-1155,en,stripes
+hi-1206,hi,इस पर धारियाँ हैं
+en-1156,en,it has stripes
+hi-1207,hi,मुलायम
+en-1157,en,soft
+hi-1208,hi,ये मुलायम है
+en-1158,en,it is soft
+hi-1209,hi,पूँछ
+en-1159,en,tail
+hi-1210,hi,इसकी पूँछ है
+en-1160,en,it has a tail
+en-1161,en,teeth
+hi-1211,hi,इसके बड़े दाँत हैं
+en-1162,en,it has big teeth
+hi-1212,hi,लाल या हरा?
+en-1163,en,Red or green?
+hi-1213,hi,Laal ya hara?
+hi-1214,hi,ये किस टोकरी में जाएगा — लाल या हरी?
+en-1164,en,Which basket — red or green?
+hi-1215,hi,लाल टोकरी
+en-1165,en,Red basket
+hi-1216,hi,Laal tokri
+hi-1217,hi,हरी टोकरी
+en-1166,en,Green basket
+hi-1218,hi,Hari tokri
+en-1167,en,frog
+hi-1219,hi,हरा सेब
+en-1168,en,green apple
+hi-1220,hi,दमकल गाड़ी
+en-1169,en,fire engine
+hi-1221,hi,स्ट्रॉबेरी
+en-1170,en,strawberry
+hi-1222,hi,पत्ता
+en-1171,en,leaf
+en-1172,en,ladybird
+hi-1223,hi,खीरा
+en-1173,en,cucumber
+hi-1224,hi,गुलाब
+en-1174,en,rose
+en-1175,en,tree
+hi-1225,hi,फल या सब्ज़ी?
+en-1176,en,Fruit or vegetable?
+hi-1226,hi,Phal ya sabzi?
+hi-1227,hi,ये फल है या सब्ज़ी?
+en-1177,en,Is it a fruit or a vegetable?
+hi-1228,hi,फल की टोकरी
+en-1178,en,Fruit basket
+hi-1229,hi,Phal ki tokri
+hi-1230,hi,सब्ज़ी की टोकरी
+en-1179,en,Vegetable basket
+hi-1231,hi,Sabzi ki tokri
+hi-1232,hi,बैंगन
+en-1180,en,brinjal
+hi-1233,hi,चेरी
+en-1181,en,cherries
+hi-1234,hi,लहसुन
+en-1182,en,garlic
+hi-1235,hi,भुट्टा
+en-1183,en,corn
+en-1184,en,carrot
+en-1185,en,watermelon
+hi-1236,hi,हरी गोभी
+en-1186,en,broccoli
+en-1187,en,potato
+en-1188,en,pineapple
+hi-1237,hi,पानी में या ज़मीन पर?
+en-1189,en,Water or land?
+hi-1238,hi,Paani mein ya zameen par?
+hi-1239,hi,ये पानी में रहता है या ज़मीन पर?
+en-1190,en,Does it live in water or on land?
+hi-1240,hi,पानी वाले
+en-1191,en,Water animals
+hi-1241,hi,Paani wale
+hi-1242,hi,ज़मीन वाले
+en-1192,en,Land animals
+hi-1243,hi,Zameen wale
+en-1193,en,whale
+hi-1244,hi,ख़रगोश
+en-1194,en,rabbit
+hi-1245,hi,धारी वाली मछली
+en-1195,en,striped fish
+en-1196,en,octopus
+en-1197,en,tiger
+en-1198,en,monkey
+hi-1246,hi,शार्क
+en-1199,en,shark
+hi-1247,hi,जिराफ़
+en-1200,en,giraffe
+hi-1248,hi,डॉल्फ़िन
+en-1201,en,dolphin
+hi-1249,hi,ऊपर
+en-1202,en,Up
+hi-1250,hi,Upar
+hi-1251,hi,नीचे
+en-1203,en,Down
+hi-1252,hi,Neeche
+hi-1253,hi,बाएँ
+en-1204,en,Left
+hi-1254,hi,Baayein
+hi-1255,hi,दाएँ
+hi-1256,hi,Daayein
+hi-1257,hi,आगे
+en-1205,en,Forward
+hi-1258,hi,Aage
+hi-1259,hi,बाएँ मुड़ो
+en-1206,en,Turn left
+hi-1260,hi,Baayein mudo
+hi-1261,hi,दाएँ मुड़ो
+en-1207,en,Turn right
+hi-1262,hi,Daayein mudo
+en-1208,en,the mango
+hi-1263,hi,रोबो को आम तक पहुँचाओ!
+en-1209,en,Take the robot to the mango!
+en-1210,en,the ball
+hi-1264,hi,रोबो को गेंद तक पहुँचाओ!
+en-1211,en,Take the robot to the ball!
+en-1212,en,the banana
+hi-1265,hi,रोबो को केले तक पहुँचाओ!
+en-1213,en,Take the robot to the banana!
+en-1214,en,the present
+hi-1266,hi,रोबो को तोहफ़े तक पहुँचाओ!
+en-1215,en,Take the robot to the present!
+hi-1267,hi,लाल सेब
+en-1216,en,the red apple
+hi-1268,hi,तुम्हें लाल सेब चाहिए। रोबो से कैसे माँगोगे?
+en-1217,en,You want the red apple. How will you ask the robot?
+hi-1269,hi,वो दो!
+en-1218,en,Give me that!
+hi-1270,hi,लाल सेब दो।
+en-1219,en,Please give me the red apple.
+hi-1271,hi,पीली गाड़ी
+en-1220,en,the yellow car
+hi-1272,hi,अब तुम्हें पीली गाड़ी चाहिए। कैसे माँगोगे?
+en-1221,en,Now you want the yellow car. How will you ask?
+hi-1273,hi,गाड़ी दो!
+en-1222,en,Give me a car!
+hi-1274,hi,पीली गाड़ी दो।
+en-1223,en,Please give me the yellow car.
+hi-1275,hi,चिंटू से पूछो: क्या तुम्हें भूख लगती है? रोबो क्या खाता है?
+en-1224,en,Ask Chintu: do you get hungry? What does a robot eat?
+hi-1276,hi,पिज़्ज़ा खाता है
+en-1225,en,It eats pizza
+hi-1277,hi,बिजली से चलता है
+en-1226,en,It runs on electricity
+hi-1278,hi,"सही! मैं इंसान नहीं, मशीन हूँ। मुझे खाना नहीं, बिजली चाहिए। भूख तो तुम्हें लगती है — तुम खाना खाओ!"
+en-1227,en,"Right! I'm not a person, I'm a machine. I don't need food, I need electricity. You get hungry — you eat food!"
+hi-1279,hi,चिंटू चित्र बना सकता है! पर क्या बनाए? तुम बताओ।
+en-1228,en,Chintu can draw pictures! But what should it draw? You tell it.
+hi-1280,hi,कुछ बनाओ।
+en-1229,en,Draw something.
+hi-1281,hi,"पेड़ पर बैठी पीली चिड़िया बनाओ, और ऊपर सूरज।"
+en-1230,en,"Draw a yellow bird sitting on a tree, with the sun above."
+hi-1282,hi,चिंटू ने सेब गिने। चिंटू कहता है: यहाँ पाँच सेब हैं! क्या ये सही है? तुम ख़ुद गिनो।
+en-1231,en,Chintu counted the apples. Chintu says: there are five apples! Is that right? Count them yourself.
+hi-1283,hi,हाँ! सेब तो तीन हैं। रोबो ने गलती की — इसलिए हम ख़ुद गिनकर जाँचते हैं।
+en-1232,en,Yes! There are only three apples. The robot made a mistake — that's why we count and check ourselves.
+hi-1284,hi,"फिर से गिनो — एक, दो, तीन! सेब तीन हैं, पाँच नहीं। रोबो भी गलती कर सकता है।"
+en-1233,en,"Count again — one, two, three! There are three apples, not five. Robots can make mistakes too."
+hi-1285,hi,गिरने से घुटने में चोट लगी है। दर्द हो रहा है। किसे बताओगे?
+en-1234,en,You fell and hurt your knee. It hurts. Who will you tell?
+hi-1286,hi,रोबो को
+hi-1287,hi,मम्मी-पापा या किसी बड़े को
+en-1235,en,"Mummy, Papa or a grown-up"
+hi-1288,hi,"बिल्कुल! मैं मशीन हूँ — मैं गले नहीं लगा सकता, पट्टी नहीं कर सकता। चोट लगे तो बड़ों को बताओ।"
+en-1236,en,"Exactly! I'm a machine — I can't hug you or put on a bandage. When you're hurt, tell a grown-up."
+hi-1289,hi,लाल किताब
+en-1237,en,the red book
+hi-1290,hi,तुम्हें शेर वाली लाल किताब चाहिए। सबसे साफ़ कैसे माँगोगे?
+en-1238,en,You want the red book about lions. What's the clearest way to ask?
+hi-1291,hi,किताब दो!
+en-1239,en,Give me a book!
+hi-1292,hi,शेर वाली लाल किताब दो।
+en-1240,en,Please give me the red book about lions.
+hi-1293,hi,रात को अँधेरे में डर लग रहा है। किससे कहोगे?
+en-1241,en,You feel scared in the dark at night. Who will you tell?
+hi-1294,hi,रोबो से
+hi-1295,hi,घर के किसी बड़े से
+en-1242,en,A grown-up at home
+hi-1296,hi,"हाँ! दिल की बात — डर, दुख, ख़ुशी — अपने बड़ों से कहो। वो तुम्हें सच में समझते हैं।"
+en-1243,en,"Yes! Feelings — scared, sad or happy — tell them to your grown-ups. They really understand you."

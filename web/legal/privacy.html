@@ -35,7 +35,9 @@
   <ul>
     <li>नन्हा स्कूल छोटे बच्चों के लिए तस्वीर और आवाज़ से सीखने वाला ऐप है (वेब ऐप और Android ऐप)।
         इसे <span class="ph">[मालिक का नाम / Owner name]</span> चलाते हैं (इस पेज में "हम")।</li>
-    <li><strong>बच्चे का कोई खाता नहीं बनता।</strong> बच्चे का नाम, आवाज़ या बातचीत हम न कहीं जमा करते हैं, न कहीं भेजते हैं।</li>
+    <li><strong>बच्चे का कोई खाता नहीं बनता।</strong> बच्चे का नाम, आवाज़ या बातचीत हम न कहीं जमा करते हैं, न कहीं भेजते हैं।
+        एक वैकल्पिक अपवाद: अगर माता-पिता "मिट्ठू से खुली बातचीत (AI)" चालू करें, तो बातचीत की कुछ लाइनें — नाम और नंबर
+        हटाकर — एक AI सेवा तक जाती हैं (<a href="#ai">भाग 2क</a>)। यह शुरू में हर फ़ोन पर बंद रहता है।</li>
     <li>हमारे ग्राहक माता-पिता/अभिभावक हैं, बच्चे नहीं। भुगतान वाला हिस्सा सिर्फ़ बड़ों के लिए है।</li>
     <li><strong>ऐप और हमारा सर्वर कभी कोई ईमेल पता या फ़ोन नंबर नहीं माँगते, न भेजते, न रखते।</strong>
         संपर्क और भुगतान की जानकारी आप सिर्फ़ Razorpay (हमारा भुगतान प्रोसेसर) के पेज पर भरते हैं।</li>
@@ -66,6 +68,29 @@
       इस्तेमाल कर सकता है — तब बोला जाने वाला टेक्स्ट (जिसमें बातचीत में बताया गया नाम भी हो सकता है) उस speech सेवा को जाता है।</li>
   <li><strong>भुगतान से दूरी:</strong> "बड़ों के लिए" वाले हिस्से से पहले एक ऐसा सवाल आता है जो छोटे बच्चे आम तौर पर हल नहीं कर पाते,
       ताकि बच्चा भुगतान वाली स्क्रीन तक न पहुँचे।</li>
+</ul>
+
+<h2 id="ai">2क. मिट्ठू से खुली बातचीत (AI) — वैकल्पिक, माता-पिता की सहमति से</h2>
+<ul>
+  <li><strong>शुरू में बंद।</strong> यह सिर्फ़ तब चलता है जब माता-पिता "बड़ों के लिए" वाले सवाल के बाद सहमति स्क्रीन पर इसे चालू करें।
+      वहीं से कभी भी बंद कर सकते हैं। 2–3 साल के बच्चों के लिए यह कभी नहीं चलता।</li>
+  <li><strong>कब:</strong> सिर्फ़ जब ऐप में लिखे जवाबों (मिट्ठू का offline दिमाग़ और ज्ञान-कोश) में बच्चे की बात का जवाब न हो।
+      सुरक्षा, आदतें, गिनती और खेल पहले की तरह फ़ोन पर ही चलते हैं।</li>
+  <li><strong>क्या भेजा जाता है:</strong> मिट्ठू से हुई बातचीत की आख़िरी ज़्यादा से ज़्यादा 8 लाइनें, भाषा, उम्र-समूह (जैसे 4–5),
+      दिन का समय, और रोज़ की सीमा गिनने के लिए इस फ़ोन का एक random नंबर (प्रोफ़ाइल से जुड़ा नहीं, हर बार चालू/बंद करने पर नया)।
+      भेजने से पहले फ़ोन पर ही 6 या ज़्यादा अंकों वाले नंबर, ईमेल, "मेरा नाम …" और बच्चे का प्रोफ़ाइल नाम हटा दिए जाते हैं, और
+      निजी, डराने वाली या गलत बातों वाली लाइनें भेजी ही नहीं जातीं। बच्चे का नाम, आवाज़ की रिकॉर्डिंग, फ़ोटो, प्रोफ़ाइल या प्रगति
+      कभी नहीं भेजी जाती।</li>
+  <li><strong>किसे:</strong> हमारे सर्वर (Cloudflare Worker) को, जो इसे ऐप चलाने वाले की चुनी AI सेवा को भेजता है:
+      <span class="ph">[Cloudflare Workers AI / Anthropic (Claude) — जो इस्तेमाल करें]</span>। हमारा सर्वर बातचीत न सेव करता है, न log;
+      random नंबर सिर्फ़ उस दिन की गिनती के लिए memory में रहता है और AI सेवा को नहीं भेजा जाता।</li>
+  <li><strong>AI सेवाएँ इसका क्या करती हैं:</strong> सिर्फ़ जवाब बनाती हैं और इससे अपने AI को ट्रेन नहीं करतीं।
+      Cloudflare Workers AI इसे सेव नहीं करता (<a href="https://developers.cloudflare.com/workers-ai/platform/data-usage/">Cloudflare: Your Data and Workers AI</a>)।
+      Anthropic API का डेटा 30 दिन के भीतर अपने-आप मिटाता है, पर नियम-उल्लंघन के लिए जाँच में चिह्नित बातचीत 2 साल तक रख सकता है
+      (<a href="https://platform.claude.com/docs/en/manage-claude/api-and-data-retention">Anthropic: API and data retention</a>)।</li>
+  <li><strong>सुरक्षा:</strong> हर संदेश फ़ोन पर और हमारे सर्वर पर जाँचा जाता है; चोट, आत्म-हानि या बुरे राज़ की बात पर AI की जगह तय
+      जवाब आता है (भरोसेमंद बड़े को बताओ, 1098 या 112)। AI के हर जवाब की भी जाँच होती है। मिट्ठू पूछने पर बताता है कि वह कंप्यूटर
+      प्रोग्राम है, इंसान नहीं। हर बैठक में कुछ जवाबों के बाद वह ब्रेक का सुझाव देता है, और रोज़ की सीमा है। फिर भी AI गलती कर सकता है।</li>
 </ul>
 
 <h2>3. माता-पिता की जानकारी</h2>
@@ -118,7 +143,8 @@
    इसमें निजी डेटा का कोई लॉग नहीं रखते। यह सिर्फ़ सब्सक्रिप्शन ID, रिस्टोर कोड और हस्ताक्षर वाले पास से काम करता है, और Razorpay
    से पूछकर पक्का करता है कि सब्सक्रिप्शन चालू है या नहीं। इंटरनेट की हर सेवा की तरह Cloudflare अपनी नीति के अनुसार तकनीकी
    जानकारी (जैसे IP पता) प्रोसेस करता है। अगर हम बहुत ज़्यादा अनुरोध रोकने वाली सुविधा (rate limiting) चालू करें, तो IP पता थोड़ी देर
-   सिर्फ़ गिनती के लिए इस्तेमाल होता है; हम उसे सेव नहीं करते।</p>
+   सिर्फ़ गिनती के लिए इस्तेमाल होता है; हम उसे सेव नहीं करते। अगर AI बातचीत चालू हो (<a href="#ai">भाग 2क</a>), तो यही सर्वर बातचीत की
+   लाइनें जाँचकर AI सेवा तक पहुँचाता है — वह भी बिना सेव या log किए।</p>
 
 <h2>7. दूसरी कंपनियाँ जिनकी सेवाएँ हम इस्तेमाल करते हैं</h2>
 <ul>
@@ -130,12 +156,16 @@
   <li><strong>Google Fonts</strong> — सिर्फ़ तब, जब कोई फ़ॉन्ट हमारी अपनी साइट की बजाय Google से लोड हो; तब Google आपका IP पता देख
       सकता है। अभी वेब ऐप अपने फ़ॉन्ट ख़ुद होस्ट करता है।</li>
   <li><strong>फ़ोन/ब्राउज़र की speech और text-to-speech सेवाएँ</strong> — ऊपर भाग 2 में बताए अनुसार।</li>
+  <li><strong>AI सेवा (सिर्फ़ अगर माता-पिता AI बातचीत चालू करें)</strong> — <span class="ph">[Cloudflare Workers AI और/या Anthropic (Claude)]</span>,
+      भाग 2क में बताए अनुसार। <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare privacy नीति</a> ·
+      <a href="https://www.anthropic.com/legal/privacy">Anthropic privacy नीति</a></li>
 </ul>
 
 <h2>8. जानकारी कितने समय तक रहती है</h2>
 <ul>
   <li>आपके फ़ोन/ब्राउज़र की जानकारी: जब तक आप उसे न मिटाएँ या ऐप न हटाएँ।</li>
-  <li>हमारा सर्वर: कुछ भी जमा नहीं करता।</li>
+  <li>हमारा सर्वर: कुछ भी जमा नहीं करता (AI बातचीत की लाइनें भी नहीं)।</li>
+  <li>AI सेवा (अगर AI बातचीत चालू हो): भाग 2क में बताए अनुसार।</li>
   <li>Razorpay: उनकी नीति और क़ानून (जैसे भुगतान रिकॉर्ड रखने के नियम) के अनुसार।</li>
   <li>सहायता के ईमेल/संदेश: आपकी मदद पूरी होने तक, और क़ानून जितना ज़रूरी बताए उतना।</li>
 </ul>
@@ -149,11 +179,13 @@
 <h2>10. क़ानून और आपके अधिकार</h2>
 <h3>भारत — डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम, 2023 (DPDP Act)</h3>
 <p>हम ऐप को इस तरह बनाते हैं कि बच्चे का कोई व्यक्तिगत डेटा लिया ही न जाए, बच्चों की ट्रैकिंग या व्यवहार की निगरानी न हो, और उन्हें
-   कोई लक्षित विज्ञापन न दिखे। जो थोड़ा-सा व्यक्तिगत डेटा हमारे पास आ सकता है (जैसे सहायता के ईमेल), उसके बारे में आप जानकारी,
+   कोई लक्षित विज्ञापन न दिखे। AI बातचीत (भाग 2क) सिर्फ़ माता-पिता की सहमति से चालू होती है और उसमें भी नाम व संपर्क जानकारी भेजने से
+   पहले हटा दी जाती है। जो थोड़ा-सा व्यक्तिगत डेटा हमारे पास आ सकता है (जैसे सहायता के ईमेल), उसके बारे में आप जानकारी,
    सुधार या मिटाने के लिए कह सकते हैं और शिकायत कर सकते हैं। हमसे समाधान न मिले तो आप भारत के Data Protection Board से
    शिकायत कर सकते हैं।</p>
 <h3>अमेरिका — COPPA</h3>
-<p>हम ऐप को इस तरह बनाते हैं कि 13 साल से कम उम्र के बच्चों से कोई व्यक्तिगत जानकारी इकट्ठा न हो। अगर आपको लगे कि किसी बच्चे की
+<p>हम ऐप को इस तरह बनाते हैं कि 13 साल से कम उम्र के बच्चों से कोई व्यक्तिगत जानकारी इकट्ठा न हो। वैकल्पिक AI बातचीत सिर्फ़ माता-पिता की
+   सहमति से चालू होती है और उसकी लाइनें AI सेवा तक (भाग 2क) जाती हैं; हम उन्हें न रखते हैं, न किसी और काम में लेते हैं। अगर आपको लगे कि किसी बच्चे की
    जानकारी हम तक पहुँची है, तो हमें बताएँ — हम उसे मिटा देंगे।</p>
 <h3>यूरोप/UK — GDPR</h3>
 <p>हम ऐप को इस तरह बनाते हैं कि कम से कम डेटा लिया जाए (data minimisation)। जो डेटा हम ख़ुद प्रोसेस करते हैं (सब्सक्रिप्शन ID, सहायता
@@ -179,9 +211,20 @@
   <ul>
     <li>Nanha School is a picture-and-voice learning app for young children (web app and Android app), run by
         <span class="ph">[मालिक का नाम / Owner name]</span>, <span class="ph">[पता / Address]</span>, <span class="ph">[शहर / City]</span>, India.</li>
-    <li><strong>Children have no account.</strong> We do not store or send a child's name, voice or conversations. If a child
+    <li><strong>Children have no account.</strong> We do not store or send a child's name, voice or conversations (the one
+        exception is the optional, parent-enabled AI chat below, which sends a few lines of the chat without names). If a child
         tells the chat buddy their name, it is kept only in the device's memory for that session and is gone when the app
         or page closes.</li>
+    <li><strong>Optional AI chat with मिट्ठू, off by default.</strong> Only if a parent turns it on (behind the grown-ups' question and a
+        consent screen; never for 2–3 year olds), and only when the app has no answer of its own, the last few lines of the chat
+        (at most 8, with numbers, e-mail addresses, "my name is …" and the child's profile name removed on the phone), the
+        language, age band, time of day and a random per-install number (for the daily limit; never sent to the AI service) go
+        to our server, which checks them and passes the lines to the AI service chosen by the operator
+        (<span class="ph">[Cloudflare Workers AI / Anthropic (Claude)]</span>). Our server stores and logs nothing. Neither service trains
+        on this data; Workers AI does not store it; Anthropic deletes API data within 30 days but may keep conversations flagged for
+        policy violations for up to 2 years. मिट्ठू says it is a computer program, not a person; it suggests breaks and has a
+        daily limit; unsafe topics get a fixed answer pointing to a trusted adult or 1098 / 112. Parents can turn it off at any
+        time. <a href="#ai">Details (Hindi)</a>.</li>
     <li>Voice input on Android uses the phone's own speech-recognition service; the app asks it to work on the device
         where possible, otherwise that service may process audio under its own policy. Read-aloud uses the phone's or
         browser's text-to-speech; the web app prefers on-device voices, but if none exists for a language an online voice

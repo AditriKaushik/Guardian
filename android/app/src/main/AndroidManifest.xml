@@ -9,6 +9,29 @@
          allows only after a grown-up turns the microphone on. Nothing heard is stored. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- The "जादुई खिड़की" (magic window) activity shows the back camera's live picture. Asked
+         for only the first time that activity starts the camera, which the web app allows only
+         after a grown-up turns the camera on. Video only (no sound), shown on the screen and
+         never recorded, stored or sent anywhere. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- The camera is optional: phones and tablets without one (or with only a front camera)
+         can still install the app; the magic window then just doesn't open. The CAMERA
+         permission would otherwise imply a required back camera with autofocus. -->
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <!-- Short buzzes on taps and rewards (NanhaNative.vibrate: a few fixed patterns, at most a
+         few tens of milliseconds). A normal permission: nothing is asked. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!-- Android 11+ package visibility: the phone's speech-recognition and text-to-speech
          services, and a browser for the payment page. -->
     <queries>

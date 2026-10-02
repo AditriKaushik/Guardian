@@ -1,0 +1,101 @@
+﻿slug,keys,commons_file,approved_by,approved_hash,notes
+red-apple,🍎,,,,fruits: सेब / Apple
+banana,🍌,,,,fruits: केला / Banana
+mango,🥭,,,,fruits: आम / Mango
+grapes,🍇,,,,fruits: अंगूर / Grapes
+tangerine,🍊,,,,fruits: संतरा / Orange
+watermelon,🍉,,,,fruits: तरबूज़ / Watermelon
+carrot,🥕,,,,fruits: गाजर / Carrot
+tomato,🍅,,,,fruits: टमाटर / Tomato
+potato,🥔,,,,fruits: आलू / Potato
+onion,🧅,,,,fruits: प्याज़ / Onion
+cow,🐮 🐄,,,,animals: गाय / Cow
+dog,🐶 🐕,,,,animals: कुत्ता / Dog
+cat,🐱 🐈,,,,animals: बिल्ली / Cat
+lion,🦁,,,,animals: शेर / Lion
+goat,🐐,,,,animals: बकरी / Goat
+rooster,🐓,,,,animals: मुर्गा / Rooster
+elephant,🐘,,,,animals: हाथी / Elephant
+monkey,🐵 🐒,,,,animals: बंदर / Monkey
+frog,🐸,,,,animals: मेंढक / Frog
+bird,🐦,,,,animals: चिड़िया / Bird
+automobile,🚗,,,,vehicles: कार / Car
+bus,🚌,,,,vehicles: बस / Bus
+locomotive,🚂,,,,vehicles: रेलगाड़ी / Train
+airplane,✈,,,,vehicles: हवाई जहाज़ / Aeroplane
+bicycle,🚲,,,,vehicles: साइकिल / Cycle
+auto-rickshaw,🛺,,,,vehicles: ऑटो / Auto
+sailboat,⛵,,,,vehicles: नाव / Boat
+ambulance,🚑,,,,vehicles: एम्बुलेंस / Ambulance
+eye,👁,,,,body: आँख / Eye
+ear,👂,,,,body: कान / Ear
+nose,👃,,,,body: नाक / Nose
+mouth,👄,,,,body: मुँह / Mouth
+raised-hand,✋,,,,body: हाथ / Hand
+foot,🦶,,,,body: पैर / Foot
+tooth,🦷,,,,body: दाँत / Teeth
+person-getting-haircut,💇,,,,body: बाल / Hair
+pineapple,🍍,,,,varn: अनानास
+brick,🧱,,,,varn: ईंट
+owl,🦉,,,,varn: उल्लू
+yarn,🧶,,,,varn: ऊन
+glasses,👓,,,,varn: ऐनक
+droplet,💧,,,,varn: ओस
+woman-medium,👩🏽 👩,,,,varn: औरत
+lotus,🪷,,,,varn: कमल
+rabbit,🐰 🐇,,,,varn: खरगोश
+potted-plant,🪴,,,,varn: गमला
+watch,⌚,,,,varn: घड़ी
+spoon,🥄,,,,varn: चम्मच
+umbrella,☂,,,,varn: छाता
+ship,🚢,,,,varn: जहाज़
+triangular-flag,🚩,,,,varn: झंडा
+shopping-cart,🛒,,,,varn: ठेला
+package,📦,,,,varn: डिब्बा
+drum,🥁,,,,varn: ढोल
+butterfly,🦋,,,,varn: तितली
+fork-and-knife-with-plate,🍽,,,,varn: थाली
+glass-of-milk,🥛,,,,varn: दूध
+bow-and-arrow,🏹,,,,varn: धनुष
+kite,🪁,,,,varn: पतंग
+hibiscus,🌺,,,,varn: फूल
+bear,🐻,,,,varn: भालू
+fish,🐟,,,,varn: मछली
+person-in-lotus-position,🧘,,,,varn: योग
+flatbread,🫓,,,,varn: रोटी
+wood,🪵,,,,varn: लकड़ी
+deciduous-tree,🌳,,,,varn: वन
+sunrise,🌅,,,,varn: क्षितिज
+trident-emblem,🔱,,,,varn: त्रिशूल
+old-man,👴,,,,varn: ज्ञानी
+soccer-ball,⚽,,,,abc: Ball
+top-hat,🎩,,,,abc: Hat
+soft-ice-cream,🍦,,,,abc: Ice cream
+beverage-box,🧃,,,,abc: Juice
+nest-with-eggs,🪺,,,,abc: Nest
+parrot,🦜,,,,abc: Parrot
+princess,👸,,,,abc: Queen
+sun,☀,,,,abc: Sun
+tiger,🐯 🐅,,,,abc: Tiger
+minibus,🚐,,,,abc: Van
+christmas-tree,🎄,,,,abc: X-mas tree
+yo-yo,🪀,,,,abc: Yo-yo
+zebra,🦓,,,,abc: Zebra
+front-facing-baby-chick,🐥,,,,count: तीन / Three
+balloon,🎈,,,,count: चार / Four
+strawberry,🍓,,,,count: छह / Six
+cherry-blossom,🌸,,,,count: आठ / Eight
+pea-pod,🫛,,,,colors: हरा / Green
+billed-cap,🧢,,,,colors: नीला / Blue
+eggplant,🍆,,,,colors: बैंगनी / Purple
+ant,🐜,,,,colors: काला / Black
+wheel,🛞,,,,shapes: वृत्त / Circle
+framed-picture,🖼,,,,shapes: वर्ग / Square
+tent,⛺,,,,shapes: त्रिकोण / Triangle
+folded-hands,🙏,,,,manners: नमस्ते / Namaste
+wrapped-gift,🎁,,,,manners: धन्यवाद / Thank you
+person-raising-hand,🙋,,,,manners: कृपया / Please
+person-bowing,🙇,,,,manners: माफ़ करना / Sorry
+toothbrush,🪥,,,,manners: ब्रश करो / Brush
+soap,🧼,,,,manners: हाथ धोओ / Wash hands
+person-in-bed,🛌,,,,manners: जल्दी सोओ / Sleep early

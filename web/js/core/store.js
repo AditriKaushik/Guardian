@@ -5,7 +5,11 @@
                             profile = {id, name, avatar, ageBand: "2-3"|"4-5"|"6+",
                                        voice: "female"|"male", lang: "hi"|"en"|"hinglish", created}
      ns_settings            device settings set by grown-ups: {sessionMin, bedtimeHour, mic,
-                            speed: "normal"|"slow", sound, voicePick: {"hi|female": voiceId…}}
+                            speed: "normal"|"slow", sound, sfx (sound effects on/off),
+                            installHide (the home "install" card was dismissed),
+                            aiChat: {on, v, at} (the AI chat consent, js/core/ai.js),
+                            voicePick: {"hi|female": voiceId…}}
+     ns_ai                  AI chat counters for this device (ai.js): a random id, today's count
      ns_p_<pid>_core        per-profile core data (stickers, minutes used per day, habits)
      ns_p_<pid>_a_<id>      per-profile data of activity <id>  (ctx.data)
      ns_trial, ns_seen, ns_pass, ns_sub, ns_restore, ns_pending   subscription (billing.js,
@@ -32,7 +36,7 @@
   const AGE = ["2-3", "4-5", "6+"];
   const AVATARS = ["🐯", "🐼", "🦁", "🐰", "🐶", "🐱", "🦊", "🐵", "🐨", "🦄", "🐸", "🐧", "🦋", "🐢", "🐘", "🦚"];
   const SETTINGS_DEFAULT = {
-    sessionMin: 0, bedtimeHour: 0, mic: false, speed: "normal", sound: true, voicePick: {},
+    sessionMin: 0, bedtimeHour: 0, mic: false, speed: "normal", sound: true, sfx: true, installHide: false, voicePick: {},
   };
 
   function sanitizeProfile(p) {
@@ -118,7 +122,7 @@
     /* Deletes every child's data and the settings. The family's subscription (pass and restore
        code) stays, so a parent does not lose what they paid for. */
     deleteAll() {
-      raw.keys().filter(k => k.startsWith("ns_p_") || k === "ns_profiles" || k === "ns_settings").forEach(k => raw.del(k));
+      raw.keys().filter(k => k.startsWith("ns_p_") || k === "ns_profiles" || k === "ns_settings" || k === "ns_ai").forEach(k => raw.del(k));
       buckets.clear();
       P = { v: 1, list: [], current: null };
       NS.emit("profile:changed", { id: null });
@@ -129,6 +133,8 @@
       if (!(s.bedtimeHour >= 18 && s.bedtimeHour <= 23)) s.bedtimeHour = Number(NS.config.BEDTIME_HOUR) || 20;
       s.mic = s.mic === true;
       s.sound = s.sound !== false;
+      s.sfx = s.sfx !== false;
+      s.installHide = s.installHide === true;
       s.speed = s.speed === "slow" ? "slow" : "normal";
       if (!s.voicePick || typeof s.voicePick !== "object") s.voicePick = {};
       return s;

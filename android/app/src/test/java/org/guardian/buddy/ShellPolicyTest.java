@@ -206,6 +206,126 @@ public class ShellPolicyTest {
         assertEquals(9, ShellPolicy.clip(s, 10).length());
     }
 
+    // ---- web permissions (the camera) ----
+
+    // android.webkit.PermissionRequest.RESOURCE_* values
+    private static final String VIDEO = "android.webkit.resource.VIDEO_CAPTURE";
+    private static final String AUDIO = "android.webkit.resource.AUDIO_CAPTURE";
+    private static final String DRM = "android.webkit.resource.PROTECTED_MEDIA_ID";
+    private static final String MIDI = "android.webkit.resource.MIDI_SYSEX";
+
+    private static String[] res(String... resources) {
+        return resources;
+    }
+
+    @Test
+    public void appOrigin() {
+        assertTrue(ShellPolicy.isAppOrigin(O));
+        assertTrue(ShellPolicy.isAppOrigin(O + "/"));                 // as WebView reports it
+        assertTrue(ShellPolicy.isAppOrigin("https://APPASSETS.androidplatform.net/"));
+        assertFalse(ShellPolicy.isAppOrigin(O + "/index.html"));
+        assertFalse(ShellPolicy.isAppOrigin(O + "/?x"));
+        assertFalse(ShellPolicy.isAppOrigin(O + "/#x"));
+        assertFalse(ShellPolicy.isAppOrigin("http://appassets.androidplatform.net/"));
+        assertFalse(ShellPolicy.isAppOrigin("https://appassets.androidplatform.net:8443/"));
+        assertFalse(ShellPolicy.isAppOrigin("https://appassets.androidplatform.net.evil.com/"));
+        assertFalse(ShellPolicy.isAppOrigin("https://evil.appassets.androidplatform.net/"));
+        assertFalse(ShellPolicy.isAppOrigin("https://appassets.androidplatform.net./"));
+        assertFalse(ShellPolicy.isAppOrigin("https://x@appassets.androidplatform.net/"));
+        assertFalse(ShellPolicy.isAppOrigin("https://checkout.razorpay.com/"));
+        assertFalse(ShellPolicy.isAppOrigin("file:///android_asset/"));
+        assertFalse(ShellPolicy.isAppOrigin("null"));
+        assertFalse(ShellPolicy.isAppOrigin(""));
+        assertFalse(ShellPolicy.isAppOrigin(null));
+    }
+
+    @Test
+    public void grantsTheCameraOnlyToTheApp() {
+        assertEquals(VIDEO, ShellPolicy.VIDEO_CAPTURE);
+        assertTrue(ShellPolicy.allowsCamera(O + "/", res(VIDEO)));
+        assertTrue(ShellPolicy.allowsCamera(O, res(VIDEO)));
+        assertTrue(ShellPolicy.allowsCamera(O + "/", res(VIDEO, VIDEO)));
+        // any other origin
+        assertFalse(ShellPolicy.allowsCamera("https://example.org/", res(VIDEO)));
+        assertFalse(ShellPolicy.allowsCamera("https://checkout.razorpay.com/", res(VIDEO)));
+        assertFalse(ShellPolicy.allowsCamera("https://appassets.androidplatform.net.evil.com/", res(VIDEO)));
+        assertFalse(ShellPolicy.allowsCamera("http://appassets.androidplatform.net/", res(VIDEO)));
+        assertFalse(ShellPolicy.allowsCamera(null, res(VIDEO)));
+    }
+
+    @Test
+    public void deniesEverythingButTheCamera() {
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(AUDIO)));      // speech is native
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(VIDEO, AUDIO)));   // no partial grants
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(AUDIO, VIDEO)));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(DRM)));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(MIDI)));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(VIDEO, MIDI)));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res("android.webkit.resource.SOMETHING_NEW")));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(VIDEO.toLowerCase(java.util.Locale.ROOT))));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res(VIDEO, null)));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", res()));
+        assertFalse(ShellPolicy.allowsCamera(O + "/", null));
+    }
+
+    // ---- haptics ----
+
+    @Test
+    public void vibrationPatternWhitelist() {
+        for (String ok : new String[] {"tap", "success", "soft"}) {
+            assertTrue(ok, ShellPolicy.haptic(ok) != null);
+        }
+        for (String bad : new String[] {null, "", "TAP", "Tap", " tap", "tap ", "taps", "buzz",
+                "long", "error", "10", "1000", "[200,100,200]", "200,100", "tap,success", "success\u0000"}) {
+            assertNull(String.valueOf(bad), ShellPolicy.haptic(bad));
+        }
+    }
+
+    @Test
+    public void vibrationPatternsAreShort() {
+        assertEquals(10, onTime(ShellPolicy.haptic("tap")));
+        assertEquals(1, pulses(ShellPolicy.haptic("tap")));
+        assertEquals(20, onTime(ShellPolicy.haptic("soft")));
+        assertEquals(1, pulses(ShellPolicy.haptic("soft")));
+        assertEquals(2, pulses(ShellPolicy.haptic("success")));
+        for (String name : new String[] {"tap", "success", "soft"}) {
+            ShellPolicy.Haptic h = ShellPolicy.haptic(name);
+            assertEquals(name, h.timings.length, h.amplitudes.length);
+            assertEquals(name, 0, h.timings.length % 2);           // pause, pulse, pause, pulse …
+            long total = 0;
+            for (int i = 0; i < h.timings.length; i++) {
+                assertTrue(name, h.timings[i] >= 0);
+                total += h.timings[i];
+                if (i % 2 == 0) {
+                    assertEquals(name, 0, h.amplitudes[i]);       // pauses are silent
+                } else {
+                    assertTrue(name, h.timings[i] > 0 && h.timings[i] <= 30);
+                    int a = h.amplitudes[i];
+                    assertTrue(name, a == ShellPolicy.DEFAULT_AMPLITUDE || (a >= 1 && a <= 255));
+                }
+            }
+            assertTrue(name, total <= 150);
+        }
+        // the "soft" pulse is gentler than the default strength where the phone can vary it
+        int soft = ShellPolicy.haptic("soft").amplitudes[1];
+        assertTrue(soft > 0 && soft < 255);
+        // each call gets its own arrays (a caller can't change the pattern for others)
+        ShellPolicy.haptic("tap").timings[1] = 5000;
+        assertEquals(10, onTime(ShellPolicy.haptic("tap")));
+    }
+
+    private static long onTime(ShellPolicy.Haptic h) {
+        long on = 0;
+        for (int i = 1; i < h.timings.length; i += 2) {
+            on += h.timings[i];
+        }
+        return on;
+    }
+
+    private static int pulses(ShellPolicy.Haptic h) {
+        return h.timings.length / 2;
+    }
+
     // ---- events ----
 
     @Test

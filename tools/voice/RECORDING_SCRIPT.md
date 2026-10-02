@@ -5,7 +5,164 @@
 महिला आवाज़ की फ़ाइलें `tools/voice/recordings/female/` में, पुरुष आवाज़ की `tools/voice/recordings/male/` में।
 कैसे रिकॉर्ड करें: `docs/VOICE.md` देखें। प्यार से, मुस्कुराते हुए, धीरे और साफ़ बोलें — जैसे किसी 3 साल के बच्चे से बात कर रहे हों।
 
-कुल पंक्तियाँ: **1465** (हिंदी: 764, English: 701)
+कुल पंक्तियाँ: **2476** (हिंदी: 1265, English: 1211)
+
+## UI › robo
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0765` | हिंदी | नमस्ते! मैं चिंटू हूँ — एक रोबो। मैं मशीन हूँ, पर तुमसे नई चीज़ें सीख सकता हूँ! क्या खेलें — रोबो को सिखाओ, रास्ता बताओ, या रोबो से पूछो? |
+| ☐ | ☐ | `en-0702` | English | Hello! I'm Chintu — a robot. I'm a machine, but I can learn new things from you! What shall we play — teach the robot, show the way, or ask the robot? |
+| ☐ | ☐ | `hi-0766` | हिंदी | फिर से नमस्ते, दोस्त! आज क्या खेलें — रोबो को सिखाओ, रास्ता बताओ, या रोबो से पूछो? |
+| ☐ | ☐ | `en-0703` | English | Hello again, friend! What shall we play today — teach the robot, show the way, or ask the robot? |
+| ☐ | ☐ | `hi-0767` | हिंदी | मुझे अभी कुछ नहीं पता! तुम मुझे सिखाओगे? हर चीज़ को सही टोकरी में डालो — मैं देखकर सीखूँगा। |
+| ☐ | ☐ | `en-0704` | English | I don't know anything yet! Will you teach me? Put each thing in the right basket — I'll learn by watching. |
+| ☐ | ☐ | `hi-0768` | हिंदी | किस टोकरी में? |
+| ☐ | ☐ | `en-0705` | English | Which basket? |
+| ☐ | ☐ | `hi-0769` | हिंदी | बीप! याद कर लिया। |
+| ☐ | ☐ | `en-0706` | English | Beep! Got it. |
+| ☐ | ☐ | `hi-0770` | हिंदी | हम्म… पक्का? ध्यान से देखो और फिर से सोचो! |
+| ☐ | ☐ | `en-0707` | English | Hmm… are you sure? Look carefully and think again! |
+| ☐ | ☐ | `hi-0771` | हिंदी | अब मैं सीख रहा हूँ… बीप बूप बीप! |
+| ☐ | ☐ | `en-0708` | English | Now I'm learning… beep boop beep! |
+| ☐ | ☐ | `hi-0772` | हिंदी | सीख लिया! अब मैं नई चीज़ों का अंदाज़ा लगाऊँगा। तुम जाँचना — मैं सही हूँ या नहीं! |
+| ☐ | ☐ | `en-0709` | English | I learned! Now I'll guess new things. You check if I'm right! |
+| ☐ | ☐ | `hi-0773` | हिंदी | हम्म… सोच रहा हूँ… |
+| ☐ | ☐ | `en-0710` | English | Hmm… thinking… |
+| ☐ | ☐ | `hi-0774` | हिंदी | हम्म… मुझे पक्का नहीं पता! तुम बताओ, ये किस टोकरी में जाएगा? |
+| ☐ | ☐ | `en-0711` | English | Hmm… I'm not sure! You tell me — which basket does it go in? |
+| ☐ | ☐ | `hi-0775` | हिंदी | धन्यवाद! अब मुझे पता चल गया। |
+| ☐ | ☐ | `en-0712` | English | Thank you! Now I know. |
+| ☐ | ☐ | `hi-0776` | हिंदी | क्या रोबो ने सही किया? |
+| ☐ | ☐ | `en-0713` | English | Did the robot get it right? |
+| ☐ | ☐ | `hi-0777` | हिंदी | हाँ! रोबो ने सही पहचाना। |
+| ☐ | ☐ | `en-0714` | English | Yes! The robot got it right. |
+| ☐ | ☐ | `hi-0778` | हिंदी | ध्यान से देखो — इस बार रोबो सही है! टोकरी ठीक है। |
+| ☐ | ☐ | `en-0715` | English | Look carefully — this time the robot is right! The basket is correct. |
+| ☐ | ☐ | `hi-0779` | हिंदी | हाँ! रोबो ने गलती की! चलो उसे सही करें — सही टोकरी दबाओ। |
+| ☐ | ☐ | `en-0716` | English | Yes! The robot made a mistake! Let's fix it — tap the right basket. |
+| ☐ | ☐ | `hi-0780` | हिंदी | ध्यान से देखो… ये उस टोकरी का नहीं है। रोबो ने गलती की! चलो उसे सही करें — सही टोकरी दबाओ। |
+| ☐ | ☐ | `en-0717` | English | Look carefully… it doesn't belong in that basket. The robot made a mistake! Let's fix it — tap the right basket. |
+| ☐ | ☐ | `hi-0781` | हिंदी | धन्यवाद! गलती ठीक करने से मैं और अच्छा सीखता हूँ। |
+| ☐ | ☐ | `en-0718` | English | Thank you! When you fix my mistakes, I learn better. |
+| ☐ | ☐ | `hi-0782` | हिंदी | मुझे और चीज़ें दिखाओगे? ज़्यादा देखूँगा, तो ज़्यादा सीखूँगा! |
+| ☐ | ☐ | `en-0719` | English | Will you show me more things? The more I see, the more I learn! |
+| ☐ | ☐ | `hi-0783` | हिंदी | देखा? तुमने ज़्यादा चीज़ें दिखाईं, तो रोबो ने ज़्यादा सही पहचाना! |
+| ☐ | ☐ | `en-0720` | English | See? You showed more things, so the robot guessed better! |
+| ☐ | ☐ | `hi-0784` | हिंदी | याद रखो: रोबो चीज़ें देखकर सीखता है — पर वो गलती भी कर सकता है। इसलिए हम हमेशा जाँचते हैं! |
+| ☐ | ☐ | `en-0721` | English | Remember: a robot learns by looking at examples — but it can make mistakes too. That's why we always check! |
+| ☐ | ☐ | `hi-0785` | हिंदी | चलो, एक शरारत करें! इस बार रोबो को उल्टा सिखाओ — हर चीज़ को दूसरी टोकरी में डालो! |
+| ☐ | ☐ | `en-0722` | English | Let's play a trick! This time teach the robot backwards — put each thing in the other basket! |
+| ☐ | ☐ | `hi-0786` | हिंदी | उल्टी टोकरी में डालो! |
+| ☐ | ☐ | `en-0723` | English | Put it in the wrong basket! |
+| ☐ | ☐ | `hi-0787` | हिंदी | अरे, आज तो उल्टा खेल है! दूसरी टोकरी दबाओ! |
+| ☐ | ☐ | `en-0724` | English | Oh, today is mix-up day! Tap the other basket! |
+| ☐ | ☐ | `hi-0788` | हिंदी | देखा? रोबो ने वही सीखा जो हमने सिखाया — उल्टा! गलत सिखाओगे, तो रोबो भी गलत सीखेगा। इसलिए रोबो को सही-सही सिखाना ज़रूरी है। |
+| ☐ | ☐ | `en-0725` | English | See? The robot learned exactly what we taught it — backwards! Teach it wrong, and it learns wrong. That's why we must teach robots carefully. |
+| ☐ | ☐ | `hi-0789` | हिंदी | तीर वाले कार्ड चुनो, फिर हरा बटन दबाओ। रोबो वही करेगा जो तुम बताओगे! |
+| ☐ | ☐ | `en-0726` | English | Pick arrow cards, then press the green button. The robot will do exactly what you say! |
+| ☐ | ☐ | `hi-0790` | हिंदी | रोबो जिधर देख रहा है, आगे उधर ही जाता है। मुड़ने वाले कार्ड से वो घूमता है। |
+| ☐ | ☐ | `en-0727` | English | Forward means the way the robot is facing. The turn cards make it turn. |
+| ☐ | ☐ | `hi-0791` | हिंदी | आखिरी कार्ड अब ज़्यादा बार चलेगा! |
+| ☐ | ☐ | `en-0728` | English | The last card will now repeat! |
+| ☐ | ☐ | `hi-0792` | हिंदी | पहले कोई तीर वाला कार्ड चुनो! |
+| ☐ | ☐ | `en-0729` | English | First pick an arrow card! |
+| ☐ | ☐ | `hi-0793` | हिंदी | बस! इतने कार्ड काफ़ी हैं। अब चलाकर देखो। |
+| ☐ | ☐ | `en-0730` | English | That's enough cards! Now press go and see. |
+| ☐ | ☐ | `hi-0794` | हिंदी | कार्ड हटा दिया। |
+| ☐ | ☐ | `en-0731` | English | Card removed. |
+| ☐ | ☐ | `hi-0795` | हिंदी | ओह! रोबो पेड़ से टकरा गया! कोई बात नहीं — लाल कार्ड को छूकर हटाओ और फिर से चलाओ। |
+| ☐ | ☐ | `en-0732` | English | Oops! The robot bumped into a tree! No problem — tap the red card to remove it, then try again. |
+| ☐ | ☐ | `hi-0796` | हिंदी | ओह! आगे रास्ता ही नहीं है! लाल कार्ड को छूकर हटाओ और फिर से चलाओ। |
+| ☐ | ☐ | `en-0733` | English | Oops! There's no path that way! Tap the red card to remove it, then try again. |
+| ☐ | ☐ | `hi-0797` | हिंदी | रोबो रुक गया — पर अभी पहुँचा नहीं! और कार्ड जोड़ो, फिर चलाओ। |
+| ☐ | ☐ | `en-0734` | English | The robot stopped — but it isn't there yet! Add more cards, then press go. |
+| ☐ | ☐ | `hi-0798` | हिंदी | पहुँच गया! शाबाश! तुमने रोबो को एक-एक करके सही रास्ता बताया। |
+| ☐ | ☐ | `en-0735` | English | It got there! Well done! You told the robot the way, step by step. |
+| ☐ | ☐ | `hi-0799` | हिंदी | ये कार्ड रोबो को गलत ले जाता है। इसे छूकर हटाओ! |
+| ☐ | ☐ | `en-0736` | English | This card takes the robot the wrong way. Tap it to remove it! |
+| ☐ | ☐ | `hi-0800` | हिंदी | वाह! तुमने सारे रास्ते बता दिए! गलती ढूँढकर ठीक करना — ये बहुत बड़ा काम है। |
+| ☐ | ☐ | `en-0737` | English | Wow! You solved every path! Finding and fixing mistakes is a very big skill. |
+| ☐ | ☐ | `hi-0801` | हिंदी | धन्यवाद! तुमने साफ़-साफ़ बताया, तो मैंने सही चीज़ दी। |
+| ☐ | ☐ | `en-0738` | English | Thank you! You asked clearly, so I gave you the right thing. |
+| ☐ | ☐ | `hi-0802` | हिंदी | उफ़! मैं समझ नहीं पाया, तो मैंने गलत चीज़ दे दी। साफ़-साफ़ बोलो — कौन-सी चीज़, कैसी चीज़! |
+| ☐ | ☐ | `en-0739` | English | Oops! I didn't understand, so I gave the wrong thing. Say it clearly — which thing, what kind! |
+| ☐ | ☐ | `hi-0803` | हिंदी | मैंने कुछ बना दिया… पर क्या ये तुम्हें चाहिए था? साफ़ बताओ क्या बनाना है! |
+| ☐ | ☐ | `en-0740` | English | I drew something… but is it what you wanted? Tell me clearly what to draw! |
+| ☐ | ☐ | `hi-0804` | हिंदी | ये लो! तुमने साफ़ बताया, तो सही चित्र बना! |
+| ☐ | ☐ | `en-0741` | English | Here you go! You said it clearly, so the picture came out right! |
+| ☐ | ☐ | `hi-0805` | हिंदी | कैसे बोलोगे? दबाओ! |
+| ☐ | ☐ | `en-0742` | English | How will you say it? Tap! |
+| ☐ | ☐ | `hi-0806` | हिंदी | मैं तो मशीन हूँ! चोट, डर या उदासी की बात बड़ों से कहो — वो सच में मदद करते हैं। |
+| ☐ | ☐ | `en-0743` | English | I'm just a machine! Tell a grown-up when you're hurt, scared or sad — they can really help. |
+| ☐ | ☐ | `hi-0807` | हिंदी | नहीं-नहीं! मुझे खाना नहीं चाहिए। मैं मशीन हूँ, बिजली से चलता हूँ! |
+| ☐ | ☐ | `en-0744` | English | No, no! I don't eat food. I'm a machine — I run on electricity! |
+| ☐ | ☐ | `hi-0808` | हिंदी | आज तुमने सीखा: साफ़-साफ़ पूछो, रोबो की बात जाँचो, और दिल की बात बड़ों से कहो! |
+| ☐ | ☐ | `en-0745` | English | Today you learned: ask clearly, check what the robot says, and share your feelings with grown-ups! |
+| ☐ | ☐ | `hi-0809` | हिंदी | या |
+| ☐ | ☐ | `en-0746` | English | or |
+
+## UI › future
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0810` | हिंदी | चलो, आने वाले कल की सैर करें! किसी भी तस्वीर पर दबाओ। |
+| ☐ | ☐ | `en-0747` | English | Let's take a trip into tomorrow! Tap any picture. |
+| ☐ | ☐ | `hi-0811` | हिंदी | तस्वीर में चीज़ों को छूकर देखो! |
+| ☐ | ☐ | `en-0748` | English | Tap the things in the picture! |
+| ☐ | ☐ | `hi-0812` | हिंदी | फिर से सोचो! |
+| ☐ | ☐ | `en-0749` | English | Think again! |
+| ☐ | ☐ | `hi-0813` | हिंदी | चलो, एक छोटा सा सवाल! |
+| ☐ | ☐ | `en-0750` | English | Now, a little question! |
+| ☐ | ☐ | `hi-0814` | हिंदी | आज का मिशन |
+| ☐ | ☐ | `en-0751` | English | Today's mission |
+| ☐ | ☐ | `hi-0815` | हिंदी | शाबाश, खोजी! आने वाला कल तुम जैसे बच्चों से ही बनेगा। |
+| ☐ | ☐ | `en-0752` | English | Well done, explorer! Tomorrow will be made by children like you. |
+| ☐ | ☐ | `hi-0816` | हिंदी | आज बहुत सैर हो गई! अब स्क्रीन को आराम दो — बाहर खेलो और दूर तक देखो। आँखों को भी खुली हवा चाहिए! |
+| ☐ | ☐ | `en-0753` | English | That's a lot of trips today! Now let the screen rest — play outside and look far away. Eyes need fresh air too! |
+| ☐ | ☐ | `hi-0817` | हिंदी | हम्म… ये उस डिब्बे का नहीं। फिर से सोचो! |
+| ☐ | ☐ | `en-0754` | English | Hmm… that's not its bin. Think again! |
+
+## UI › magic
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0818` | हिंदी | ये जादुई खिड़की है! इसमें से एक दूसरी दुनिया दिखती है। कौन-सी दुनिया देखें? |
+| ☐ | ☐ | `en-0755` | English | This is a magic window! It shows another world. Which world shall we look at? |
+| ☐ | ☐ | `hi-0819` | हिंदी | खिड़की में देखो! कुछ जानवर छिपे हैं। इधर-उधर देखकर उन्हें ढूँढो! |
+| ☐ | ☐ | `en-0756` | English | Look through the window! Some animals are hiding. Look around to find them! |
+| ☐ | ☐ | `hi-0820` | हिंदी | फ़ोन को धीरे-धीरे घुमाओ — खिड़की भी घूमेगी! |
+| ☐ | ☐ | `en-0757` | English | Turn the phone slowly — the window turns too! |
+| ☐ | ☐ | `hi-0821` | हिंदी | उँगली से खिड़की को इधर-उधर खिसकाओ! |
+| ☐ | ☐ | `en-0758` | English | Slide the window around with your finger! |
+| ☐ | ☐ | `hi-0822` | हिंदी | फ़ोन घुमाकर देखना है? ये बटन दबाओ! |
+| ☐ | ☐ | `en-0759` | English | Want to look by turning the phone? Press this button! |
+| ☐ | ☐ | `hi-0823` | हिंदी | अरे! कोई झाँक रहा है! उसे छुओ! |
+| ☐ | ☐ | `en-0760` | English | Oh! Someone is peeking! Tap it! |
+| ☐ | ☐ | `hi-0824` | हिंदी | शाबाश! तुमने सबको ढूँढ लिया! |
+| ☐ | ☐ | `en-0761` | English | Well done! You found everyone! |
+| ☐ | ☐ | `hi-0825` | हिंदी | अब आँखों को आराम दो — बाहर खेलो और दूर तक देखो! |
+| ☐ | ☐ | `en-0762` | English | Now rest your eyes — play outside and look far away! |
+| ☐ | ☐ | `hi-0826` | हिंदी | जादू देखो! फ़ोन के कैमरे से तुम्हारे असली कमरे में एक जादुई तितली आएगी। पहले किसी बड़े को बुलाओ — वो कैमरा चालू करेंगे। |
+| ☐ | ☐ | `en-0763` | English | Watch some magic! Through the phone's camera, a magic butterfly will fly into your real room. First call a grown-up — they will turn the camera on. |
+| ☐ | ☐ | `hi-0827` | हिंदी | यह हिस्सा बड़ों के लिए है। |
+| ☐ | ☐ | `en-0764` | English | This part is for grown-ups. |
+| ☐ | ☐ | `hi-0828` | हिंदी | जवाब सही नहीं है। नया सवाल… |
+| ☐ | ☐ | `en-0765` | English | That's not right. A new question… |
+| ☐ | ☐ | `hi-0829` | हिंदी | देखो! तितली तुम्हारे कमरे में आ गई! स्क्रीन पर कहीं भी छुओ — वहाँ एक फूल उगेगा, और तितली उस पर बैठेगी। |
+| ☐ | ☐ | `en-0766` | English | Look! The butterfly is in your room! Tap anywhere on the screen — a flower will grow there, and the butterfly will sit on it. |
+| ☐ | ☐ | `hi-0830` | हिंदी | तितली फूल पर बैठ गई! |
+| ☐ | ☐ | `en-0767` | English | The butterfly sat on the flower! |
+| ☐ | ☐ | `hi-0831` | हिंदी | हीही! गुदगुदी हुई! |
+| ☐ | ☐ | `en-0768` | English | Hee hee! That tickles! |
+| ☐ | ☐ | `hi-0832` | हिंदी | ये तितली जादू की थी — असली नहीं! अब असली दुनिया में ढूँढो — किसी बड़े के साथ बाहर जाकर असली तितली या फूल ढूँढो! |
+| ☐ | ☐ | `en-0769` | English | That butterfly was magic — not real! Now look in the real world — go outside with a grown-up and find a real butterfly or flower! |
+| ☐ | ☐ | `hi-0833` | हिंदी | कैमरा चालू नहीं हुआ — कोई बात नहीं! चलो, तितली के जादुई बगीचे में चलें। नीचे बटन दबाओ। |
+| ☐ | ☐ | `en-0770` | English | The camera didn't turn on — that's OK! Let's visit the butterfly's magic garden instead. Press the button below. |
+| ☐ | ☐ | `hi-0834` | हिंदी | इस फ़ोन में कैमरा नहीं मिला — कोई बात नहीं! चलो, तितली के जादुई बगीचे में चलें। नीचे बटन दबाओ। |
+| ☐ | ☐ | `en-0771` | English | There's no camera here — that's OK! Let's visit the butterfly's magic garden instead. Press the button below. |
+| ☐ | ☐ | `hi-0835` | हिंदी | कैमरा बंद हो गया। |
+| ☐ | ☐ | `en-0772` | English | The camera is off. |
 
 ## Home tiles
 
@@ -49,6 +206,27 @@
 | ☐ | ☐ | `hi-0420` | हिंदी | बात बडी |
 | ☐ | ☐ | `en-0363` | English | Talk Buddy |
 | ☐ | ☐ | `hi-0421` | हिंदी | Baat Buddy |
+| ☐ | ☐ | `hi-0836` | हिंदी | रोबो दोस्त |
+| ☐ | ☐ | `en-0773` | English | Robot Friend |
+| ☐ | ☐ | `hi-0837` | हिंदी | Robo Dost |
+| ☐ | ☐ | `hi-0838` | हिंदी | भविष्य की सैर |
+| ☐ | ☐ | `en-0774` | English | Future Trip |
+| ☐ | ☐ | `hi-0839` | हिंदी | Bhavishya ki sair |
+| ☐ | ☐ | `hi-0840` | हिंदी | जादुई खिड़की |
+| ☐ | ☐ | `en-0775` | English | Magic Window |
+| ☐ | ☐ | `hi-0841` | हिंदी | Jaadui khidki |
+| ☐ | ☐ | `hi-0842` | हिंदी | लिखना सीखो |
+| ☐ | ☐ | `en-0776` | English | Let's write |
+| ☐ | ☐ | `hi-0843` | हिंदी | Likhna seekho |
+| ☐ | ☐ | `hi-0844` | हिंदी | रंग भरो और चित्र बनाओ |
+| ☐ | ☐ | `en-0777` | English | Colour and draw |
+| ☐ | ☐ | `hi-0845` | हिंदी | Rang bharo aur chitra banao |
+| ☐ | ☐ | `hi-0846` | हिंदी | संगीत |
+| ☐ | ☐ | `en-0778` | English | Music |
+| ☐ | ☐ | `hi-0847` | हिंदी | Sangeet |
+| ☐ | ☐ | `hi-0848` | हिंदी | पहेली जोड़ो |
+| ☐ | ☐ | `en-0779` | English | Jigsaw puzzles |
+| ☐ | ☐ | `hi-0849` | हिंदी | Paheli jodo |
 
 ## lessons › ABC
 
@@ -194,16 +372,16 @@
 | ☐ | ☐ | `en-0432` | English | W for Watch |
 | ☐ | ☐ | `hi-0491` | हिंदी | W |
 | ☐ | ☐ | `en-0433` | English | W |
-| ☐ | ☐ | `hi-0492` | हिंदी | Xylophone |
-| ☐ | ☐ | `en-0434` | English | Xylophone |
-| ☐ | ☐ | `hi-0493` | हिंदी | X for Xylophone |
-| ☐ | ☐ | `en-0435` | English | X for Xylophone |
+| ☐ | ☐ | `hi-0850` | हिंदी | X-mas tree |
+| ☐ | ☐ | `en-0780` | English | X-mas tree |
+| ☐ | ☐ | `hi-0851` | हिंदी | X for X-mas tree |
+| ☐ | ☐ | `en-0781` | English | X for X-mas tree |
 | ☐ | ☐ | `hi-0494` | हिंदी | X |
 | ☐ | ☐ | `en-0436` | English | X |
-| ☐ | ☐ | `hi-0495` | हिंदी | Yak |
-| ☐ | ☐ | `en-0437` | English | Yak |
-| ☐ | ☐ | `hi-0496` | हिंदी | Y for Yak |
-| ☐ | ☐ | `en-0438` | English | Y for Yak |
+| ☐ | ☐ | `hi-0852` | हिंदी | Yo-yo |
+| ☐ | ☐ | `en-0782` | English | Yo-yo |
+| ☐ | ☐ | `hi-0853` | हिंदी | Y for Yo-yo |
+| ☐ | ☐ | `en-0783` | English | Y for Yo-yo |
 | ☐ | ☐ | `hi-0497` | हिंदी | Y |
 | ☐ | ☐ | `en-0439` | English | Y |
 | ☐ | ☐ | `hi-0498` | हिंदी | Zebra |
@@ -219,10 +397,10 @@
 |---|---|---|---|---|
 | ☐ | ☐ | `hi-0501` | हिंदी | हिंदी वर्णमाला! अ आ इ ई |
 | ☐ | ☐ | `en-0443` | English | हिंदी वर्णमाला! अ आ इ ई |
-| ☐ | ☐ | `hi-0502` | हिंदी | अनार |
-| ☐ | ☐ | `en-0444` | English | अनार |
-| ☐ | ☐ | `hi-0503` | हिंदी | अ से अनार |
-| ☐ | ☐ | `en-0445` | English | अ से अनार |
+| ☐ | ☐ | `hi-0854` | हिंदी | अनानास |
+| ☐ | ☐ | `en-0784` | English | अनानास |
+| ☐ | ☐ | `hi-0855` | हिंदी | अ से अनानास |
+| ☐ | ☐ | `en-0785` | English | अ से अनानास |
 | ☐ | ☐ | `hi-0504` | हिंदी | अ |
 | ☐ | ☐ | `en-0446` | English | अ |
 | ☐ | ☐ | `hi-0092` | हिंदी | आम |
@@ -231,16 +409,16 @@
 | ☐ | ☐ | `en-0448` | English | आ से आम |
 | ☐ | ☐ | `hi-0506` | हिंदी | आ |
 | ☐ | ☐ | `en-0449` | English | आ |
-| ☐ | ☐ | `hi-0507` | हिंदी | इमली |
-| ☐ | ☐ | `en-0450` | English | इमली |
-| ☐ | ☐ | `hi-0508` | हिंदी | इ से इमली |
-| ☐ | ☐ | `en-0451` | English | इ से इमली |
+| ☐ | ☐ | `hi-0856` | हिंदी | इंजन |
+| ☐ | ☐ | `en-0786` | English | इंजन |
+| ☐ | ☐ | `hi-0857` | हिंदी | इ से इंजन |
+| ☐ | ☐ | `en-0787` | English | इ से इंजन |
 | ☐ | ☐ | `hi-0509` | हिंदी | इ |
 | ☐ | ☐ | `en-0452` | English | इ |
-| ☐ | ☐ | `hi-0510` | हिंदी | ईख |
-| ☐ | ☐ | `en-0453` | English | ईख |
-| ☐ | ☐ | `hi-0511` | हिंदी | ई से ईख |
-| ☐ | ☐ | `en-0454` | English | ई से ईख |
+| ☐ | ☐ | `hi-0858` | हिंदी | ईंट |
+| ☐ | ☐ | `en-0788` | English | ईंट |
+| ☐ | ☐ | `hi-0859` | हिंदी | ई से ईंट |
+| ☐ | ☐ | `en-0789` | English | ई से ईंट |
 | ☐ | ☐ | `hi-0512` | हिंदी | ई |
 | ☐ | ☐ | `en-0455` | English | ई |
 | ☐ | ☐ | `hi-0221` | हिंदी | उल्लू |
@@ -255,10 +433,10 @@
 | ☐ | ☐ | `en-0460` | English | ऊ से ऊन |
 | ☐ | ☐ | `hi-0517` | हिंदी | ऊ |
 | ☐ | ☐ | `en-0461` | English | ऊ |
-| ☐ | ☐ | `hi-0518` | हिंदी | एड़ी |
-| ☐ | ☐ | `en-0462` | English | एड़ी |
-| ☐ | ☐ | `hi-0519` | हिंदी | ए से एड़ी |
-| ☐ | ☐ | `en-0463` | English | ए से एड़ी |
+| ☐ | ☐ | `hi-0702` | हिंदी | एम्बुलेंस |
+| ☐ | ☐ | `en-0790` | English | एम्बुलेंस |
+| ☐ | ☐ | `hi-0860` | हिंदी | ए से एम्बुलेंस |
+| ☐ | ☐ | `en-0791` | English | ए से एम्बुलेंस |
 | ☐ | ☐ | `hi-0520` | हिंदी | ए |
 | ☐ | ☐ | `en-0464` | English | ए |
 | ☐ | ☐ | `hi-0521` | हिंदी | ऐनक |
@@ -267,10 +445,10 @@
 | ☐ | ☐ | `en-0466` | English | ऐ से ऐनक |
 | ☐ | ☐ | `hi-0523` | हिंदी | ऐ |
 | ☐ | ☐ | `en-0467` | English | ऐ |
-| ☐ | ☐ | `hi-0524` | हिंदी | ओखली |
-| ☐ | ☐ | `en-0468` | English | ओखली |
-| ☐ | ☐ | `hi-0525` | हिंदी | ओ से ओखली |
-| ☐ | ☐ | `en-0469` | English | ओ से ओखली |
+| ☐ | ☐ | `hi-0861` | हिंदी | ओस |
+| ☐ | ☐ | `en-0792` | English | ओस |
+| ☐ | ☐ | `hi-0862` | हिंदी | ओ से ओस |
+| ☐ | ☐ | `en-0793` | English | ओ से ओस |
 | ☐ | ☐ | `hi-0526` | हिंदी | ओ |
 | ☐ | ☐ | `en-0470` | English | ओ |
 | ☐ | ☐ | `hi-0527` | हिंदी | औरत |
@@ -339,16 +517,16 @@
 | ☐ | ☐ | `en-0502` | English | ट से टमाटर |
 | ☐ | ☐ | `hi-0559` | हिंदी | ट |
 | ☐ | ☐ | `en-0503` | English | ट |
-| ☐ | ☐ | `hi-0560` | हिंदी | ठठेरा |
-| ☐ | ☐ | `en-0504` | English | ठठेरा |
-| ☐ | ☐ | `hi-0561` | हिंदी | ठ से ठठेरा |
-| ☐ | ☐ | `en-0505` | English | ठ से ठठेरा |
+| ☐ | ☐ | `hi-0863` | हिंदी | ठेला |
+| ☐ | ☐ | `en-0794` | English | ठेला |
+| ☐ | ☐ | `hi-0864` | हिंदी | ठ से ठेला |
+| ☐ | ☐ | `en-0795` | English | ठ से ठेला |
 | ☐ | ☐ | `hi-0562` | हिंदी | ठ |
 | ☐ | ☐ | `en-0506` | English | ठ |
-| ☐ | ☐ | `hi-0563` | हिंदी | डमरू |
-| ☐ | ☐ | `en-0507` | English | डमरू |
-| ☐ | ☐ | `hi-0564` | हिंदी | ड से डमरू |
-| ☐ | ☐ | `en-0508` | English | ड से डमरू |
+| ☐ | ☐ | `hi-0865` | हिंदी | डिब्बा |
+| ☐ | ☐ | `en-0796` | English | डिब्बा |
+| ☐ | ☐ | `hi-0866` | हिंदी | ड से डिब्बा |
+| ☐ | ☐ | `en-0797` | English | ड से डिब्बा |
 | ☐ | ☐ | `hi-0565` | हिंदी | ड |
 | ☐ | ☐ | `en-0509` | English | ड |
 | ☐ | ☐ | `hi-0566` | हिंदी | ढोल |
@@ -369,10 +547,10 @@
 | ☐ | ☐ | `en-0517` | English | थ से थाली |
 | ☐ | ☐ | `hi-0574` | हिंदी | थ |
 | ☐ | ☐ | `en-0518` | English | थ |
-| ☐ | ☐ | `hi-0575` | हिंदी | दवात |
-| ☐ | ☐ | `en-0519` | English | दवात |
-| ☐ | ☐ | `hi-0576` | हिंदी | द से दवात |
-| ☐ | ☐ | `en-0520` | English | द से दवात |
+| ☐ | ☐ | `hi-0867` | हिंदी | दूध |
+| ☐ | ☐ | `en-0798` | English | दूध |
+| ☐ | ☐ | `hi-0868` | हिंदी | द से दूध |
+| ☐ | ☐ | `en-0799` | English | द से दूध |
 | ☐ | ☐ | `hi-0577` | हिंदी | द |
 | ☐ | ☐ | `en-0521` | English | द |
 | ☐ | ☐ | `hi-0578` | हिंदी | धनुष |
@@ -381,10 +559,10 @@
 | ☐ | ☐ | `en-0523` | English | ध से धनुष |
 | ☐ | ☐ | `hi-0580` | हिंदी | ध |
 | ☐ | ☐ | `en-0524` | English | ध |
-| ☐ | ☐ | `hi-0581` | हिंदी | नल |
-| ☐ | ☐ | `en-0525` | English | नल |
-| ☐ | ☐ | `hi-0582` | हिंदी | न से नल |
-| ☐ | ☐ | `en-0526` | English | न से नल |
+| ☐ | ☐ | `hi-0701` | हिंदी | नाव |
+| ☐ | ☐ | `en-0800` | English | नाव |
+| ☐ | ☐ | `hi-0869` | हिंदी | न से नाव |
+| ☐ | ☐ | `en-0801` | English | न से नाव |
 | ☐ | ☐ | `hi-0583` | हिंदी | न |
 | ☐ | ☐ | `en-0527` | English | न |
 | ☐ | ☐ | `hi-0584` | हिंदी | पतंग |
@@ -393,10 +571,10 @@
 | ☐ | ☐ | `en-0529` | English | प से पतंग |
 | ☐ | ☐ | `hi-0586` | हिंदी | प |
 | ☐ | ☐ | `en-0530` | English | प |
-| ☐ | ☐ | `hi-0587` | हिंदी | फल |
-| ☐ | ☐ | `en-0531` | English | फल |
-| ☐ | ☐ | `hi-0588` | हिंदी | फ से फल |
-| ☐ | ☐ | `en-0532` | English | फ से फल |
+| ☐ | ☐ | `hi-0870` | हिंदी | फूल |
+| ☐ | ☐ | `en-0802` | English | फूल |
+| ☐ | ☐ | `hi-0871` | हिंदी | फ से फूल |
+| ☐ | ☐ | `en-0803` | English | फ से फूल |
 | ☐ | ☐ | `hi-0589` | हिंदी | फ |
 | ☐ | ☐ | `en-0533` | English | फ |
 | ☐ | ☐ | `hi-0590` | हिंदी | बकरी |
@@ -417,22 +595,22 @@
 | ☐ | ☐ | `en-0541` | English | म से मछली |
 | ☐ | ☐ | `hi-0597` | हिंदी | म |
 | ☐ | ☐ | `en-0542` | English | म |
-| ☐ | ☐ | `hi-0598` | हिंदी | यंत्र |
-| ☐ | ☐ | `en-0543` | English | यंत्र |
-| ☐ | ☐ | `hi-0599` | हिंदी | य से यंत्र |
-| ☐ | ☐ | `en-0544` | English | य से यंत्र |
+| ☐ | ☐ | `hi-0872` | हिंदी | योग |
+| ☐ | ☐ | `en-0804` | English | योग |
+| ☐ | ☐ | `hi-0873` | हिंदी | य से योग |
+| ☐ | ☐ | `en-0805` | English | य से योग |
 | ☐ | ☐ | `hi-0600` | हिंदी | य |
 | ☐ | ☐ | `en-0545` | English | य |
-| ☐ | ☐ | `hi-0601` | हिंदी | रथ |
-| ☐ | ☐ | `en-0546` | English | रथ |
-| ☐ | ☐ | `hi-0602` | हिंदी | र से रथ |
-| ☐ | ☐ | `en-0547` | English | र से रथ |
+| ☐ | ☐ | `hi-0874` | हिंदी | रोटी |
+| ☐ | ☐ | `en-0806` | English | रोटी |
+| ☐ | ☐ | `hi-0875` | हिंदी | र से रोटी |
+| ☐ | ☐ | `en-0807` | English | र से रोटी |
 | ☐ | ☐ | `hi-0603` | हिंदी | र |
 | ☐ | ☐ | `en-0548` | English | र |
-| ☐ | ☐ | `hi-0604` | हिंदी | लट्टू |
-| ☐ | ☐ | `en-0549` | English | लट्टू |
-| ☐ | ☐ | `hi-0605` | हिंदी | ल से लट्टू |
-| ☐ | ☐ | `en-0550` | English | ल से लट्टू |
+| ☐ | ☐ | `hi-0876` | हिंदी | लकड़ी |
+| ☐ | ☐ | `en-0808` | English | लकड़ी |
+| ☐ | ☐ | `hi-0877` | हिंदी | ल से लकड़ी |
+| ☐ | ☐ | `en-0809` | English | ल से लकड़ी |
 | ☐ | ☐ | `hi-0606` | हिंदी | ल |
 | ☐ | ☐ | `en-0551` | English | ल |
 | ☐ | ☐ | `hi-0607` | हिंदी | वन |
@@ -459,10 +637,10 @@
 | ☐ | ☐ | `en-0562` | English | ह से हाथी |
 | ☐ | ☐ | `hi-0616` | हिंदी | ह |
 | ☐ | ☐ | `en-0563` | English | ह |
-| ☐ | ☐ | `hi-0617` | हिंदी | क्षत्रिय |
-| ☐ | ☐ | `en-0564` | English | क्षत्रिय |
-| ☐ | ☐ | `hi-0618` | हिंदी | क्ष से क्षत्रिय |
-| ☐ | ☐ | `en-0565` | English | क्ष से क्षत्रिय |
+| ☐ | ☐ | `hi-0878` | हिंदी | क्षितिज |
+| ☐ | ☐ | `en-0810` | English | क्षितिज |
+| ☐ | ☐ | `hi-0879` | हिंदी | क्ष से क्षितिज |
+| ☐ | ☐ | `en-0811` | English | क्ष से क्षितिज |
 | ☐ | ☐ | `hi-0619` | हिंदी | क्ष |
 | ☐ | ☐ | `en-0566` | English | क्ष |
 | ☐ | ☐ | `hi-0620` | हिंदी | त्रिशूल |
@@ -664,9 +842,7 @@
 | ☐ | ☐ | `en-0643` | English | Auto |
 | ☐ | ☐ | `hi-0700` | हिंदी | ऑटो रिक्शा |
 | ☐ | ☐ | `en-0644` | English | Auto rickshaw |
-| ☐ | ☐ | `hi-0701` | हिंदी | नाव |
 | ☐ | ☐ | `en-0645` | English | Boat |
-| ☐ | ☐ | `hi-0702` | हिंदी | एम्बुलेंस |
 | ☐ | ☐ | `en-0646` | English | Ambulance |
 
 ## lessons › शरीर
@@ -1821,4 +1997,939 @@
 | ☐ | ☐ | `en-0101` | English | That's okay — look once more, carefully. |
 | ☐ | ☐ | `hi-0103` | हिंदी | अरे, लगभग! फिर से कोशिश करो। |
 | ☐ | ☐ | `en-0102` | English | Oh, almost! Try again. |
+
+## future › सूरज की बिजली
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0880` | हिंदी | सूरज की बिजली |
+| ☐ | ☐ | `en-0812` | English | Power from the Sun |
+| ☐ | ☐ | `hi-0881` | हिंदी | Sooraj ki bijli |
+| ☐ | ☐ | `en-0813` | English | the Sun |
+| ☐ | ☐ | `hi-0882` | हिंदी | घर |
+| ☐ | ☐ | `en-0814` | English | a house |
+| ☐ | ☐ | `hi-0883` | हिंदी | पेड़ |
+| ☐ | ☐ | `en-0815` | English | a tree |
+| ☐ | ☐ | `hi-0884` | हिंदी | देखो, सूरज चमक रहा है! सूरज हमें रोशनी और गर्मी देता है। |
+| ☐ | ☐ | `en-0816` | English | Look, the Sun is shining! The Sun gives us light and warmth. |
+| ☐ | ☐ | `hi-0885` | हिंदी | सोलर पैनल |
+| ☐ | ☐ | `en-0817` | English | a solar panel |
+| ☐ | ☐ | `hi-0886` | हिंदी | घर की छत पर नीली चमकती प्लेटें हैं। इन्हें सोलर पैनल कहते हैं — ये धूप पकड़ते हैं! |
+| ☐ | ☐ | `en-0818` | English | On the roof are shiny blue plates. They're called solar panels — they catch sunshine! |
+| ☐ | ☐ | `hi-0887` | हिंदी | बैटरी |
+| ☐ | ☐ | `en-0819` | English | the battery |
+| ☐ | ☐ | `hi-0888` | हिंदी | सोलर पैनल धूप से बिजली बनाता है, और बिजली बैटरी में जमा होती है। |
+| ☐ | ☐ | `en-0820` | English | The solar panel turns sunshine into electricity, and the battery stores it. |
+| ☐ | ☐ | `hi-0889` | हिंदी | सूरज को तीन बार छुओ और धूप भेजो! |
+| ☐ | ☐ | `en-0821` | English | Tap the Sun three times to send sunshine! |
+| ☐ | ☐ | `hi-0890` | हिंदी | धूप से बिजली बन गई! बैटरी भर गई। |
+| ☐ | ☐ | `en-0822` | English | Sunshine made electricity! The battery is full. |
+| ☐ | ☐ | `hi-0891` | हिंदी | बल्ब |
+| ☐ | ☐ | `en-0823` | English | a light bulb |
+| ☐ | ☐ | `hi-0892` | हिंदी | टीवी |
+| ☐ | ☐ | `en-0824` | English | a TV |
+| ☐ | ☐ | `hi-0893` | हिंदी | अब इसी बिजली से बल्ब जलता है और टीवी चलता है — बिना धुएँ के! |
+| ☐ | ☐ | `en-0825` | English | Now this electricity lights the bulb and runs the TV — with no smoke! |
+| ☐ | ☐ | `en-0826` | English | a farmer |
+| ☐ | ☐ | `hi-0894` | हिंदी | खेत में सोलर पंप ज़मीन से पानी निकालता है। किसान ख़ुश, पौधे ख़ुश! |
+| ☐ | ☐ | `en-0827` | English | On the farm, a solar pump brings up water. Happy farmer, happy plants! |
+| ☐ | ☐ | `en-0828` | English | the Moon |
+| ☐ | ☐ | `hi-0895` | हिंदी | रात को सूरज नहीं होता। तो घर में बिजली कहाँ से आती है? |
+| ☐ | ☐ | `en-0829` | English | There's no Sun at night. So where does the electricity come from? |
+| ☐ | ☐ | `hi-0896` | हिंदी | बताओ — बैटरी से, या चाँद से? |
+| ☐ | ☐ | `en-0830` | English | Tell me — from the battery, or from the Moon? |
+| ☐ | ☐ | `hi-0897` | हिंदी | बैटरी से |
+| ☐ | ☐ | `en-0831` | English | From the battery |
+| ☐ | ☐ | `hi-0898` | हिंदी | चाँद से |
+| ☐ | ☐ | `en-0832` | English | From the Moon |
+| ☐ | ☐ | `hi-0899` | हिंदी | हाँ! दिन में भरी बैटरी रात को बिजली देती है। |
+| ☐ | ☐ | `en-0833` | English | Yes! The battery filled in the day gives power at night. |
+| ☐ | ☐ | `hi-0900` | हिंदी | चाँद बिजली नहीं देता! दिन में भरी बैटरी देती है। |
+| ☐ | ☐ | `en-0834` | English | The Moon doesn't give electricity! The battery filled in the day does. |
+| ☐ | ☐ | `hi-0901` | हिंदी | सूरज हर दिन आता है और कभी ख़त्म नहीं होता। आने वाले कल में और भी ज़्यादा घर सूरज की बिजली से चलेंगे! |
+| ☐ | ☐ | `en-0835` | English | The Sun comes every day and never runs out. Tomorrow, more and more homes will run on sunshine! |
+| ☐ | ☐ | `hi-0902` | हिंदी | सोलर पैनल किससे बिजली बनाता है? |
+| ☐ | ☐ | `en-0836` | English | What does a solar panel make electricity from? |
+| ☐ | ☐ | `hi-0903` | हिंदी | धूप से |
+| ☐ | ☐ | `en-0837` | English | Sunshine |
+| ☐ | ☐ | `hi-0904` | हिंदी | बारिश से |
+| ☐ | ☐ | `en-0838` | English | Rain |
+| ☐ | ☐ | `hi-0905` | हिंदी | आइसक्रीम से |
+| ☐ | ☐ | `hi-0906` | हिंदी | हाँ, धूप से! सोलर पैनल धूप पकड़ता है। |
+| ☐ | ☐ | `en-0839` | English | Yes, sunshine! A solar panel catches the sunlight. |
+| ☐ | ☐ | `hi-0907` | हिंदी | आज धूप में खड़े होकर अपनी परछाई देखो। सूरज को सीधे कभी मत देखना! फिर किसी बड़े के साथ ढूँढो — आस-पास कहीं सोलर पैनल है? |
+| ☐ | ☐ | `en-0840` | English | Today, stand in the sunshine and look at your shadow. Never look straight at the Sun! Then, with a grown-up, look for solar panels nearby. |
+
+## future › बिजली वाली गाड़ी
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0908` | हिंदी | बिजली वाली गाड़ी |
+| ☐ | ☐ | `en-0841` | English | The Electric Car |
+| ☐ | ☐ | `hi-0909` | हिंदी | Bijli wali gaadi |
+| ☐ | ☐ | `hi-0910` | हिंदी | पुरानी बस |
+| ☐ | ☐ | `en-0842` | English | an old bus |
+| ☐ | ☐ | `hi-0911` | हिंदी | पुरानी गाड़ियाँ पेट्रोल-डीज़ल पीती हैं और धुआँ छोड़ती हैं। खाँसी! खाँसी! |
+| ☐ | ☐ | `en-0843` | English | Old cars and buses drink petrol and puff out smoke. Cough, cough! |
+| ☐ | ☐ | `en-0844` | English | an electric car |
+| ☐ | ☐ | `hi-0912` | हिंदी | ये है बिजली वाली गाड़ी! इसमें पेट्रोल की टंकी नहीं, एक बड़ी बैटरी है। |
+| ☐ | ☐ | `en-0845` | English | This is an electric car! It has a big battery instead of a petrol tank. |
+| ☐ | ☐ | `hi-0913` | हिंदी | गाड़ी की बैटरी ख़ाली है। चलो, सूरज की बिजली से इसे चार्ज करें! |
+| ☐ | ☐ | `en-0846` | English | The car's battery is empty. Let's charge it with sunshine power! |
+| ☐ | ☐ | `hi-0914` | हिंदी | सूरज को छूकर गाड़ी चार्ज करो! |
+| ☐ | ☐ | `en-0847` | English | Tap the Sun to charge the car! |
+| ☐ | ☐ | `hi-0915` | हिंदी | गाड़ी चार्ज हो गई! चलो, घूमने चलें — बिना धुएँ के। |
+| ☐ | ☐ | `en-0848` | English | The car is charged! Let's go for a ride — with no smoke. |
+| ☐ | ☐ | `hi-0916` | हिंदी | बिजली वाली गाड़ी चुपचाप चलती है — ना धुआँ, ना शोर। हवा साफ़ रहती है, चिड़िया भी ख़ुश! |
+| ☐ | ☐ | `en-0849` | English | The electric car goes quietly — no smoke, no noise. The air stays clean, and the birds are happy too! |
+| ☐ | ☐ | `hi-0917` | हिंदी | बिजली वाला ऑटो |
+| ☐ | ☐ | `en-0850` | English | an electric auto-rickshaw |
+| ☐ | ☐ | `hi-0918` | हिंदी | बिजली वाली बस |
+| ☐ | ☐ | `en-0851` | English | an electric bus |
+| ☐ | ☐ | `hi-0919` | हिंदी | बिजली वाला स्कूटर |
+| ☐ | ☐ | `en-0852` | English | an electric scooter |
+| ☐ | ☐ | `hi-0920` | हिंदी | अब बिजली से ऑटो, बस और स्कूटर भी चलते हैं। इन्हें छूकर देखो! |
+| ☐ | ☐ | `en-0853` | English | Now autos, buses and scooters run on electricity too. Tap them! |
+| ☐ | ☐ | `hi-0921` | हिंदी | चार्जर |
+| ☐ | ☐ | `en-0854` | English | the charger |
+| ☐ | ☐ | `hi-0922` | हिंदी | रात को गाड़ी चार्जिंग पर आराम करती है — जैसे तुम सोकर फिर से ताज़ा हो जाते हो! |
+| ☐ | ☐ | `en-0855` | English | At night the car rests on its charger — just like you sleep and wake up fresh! |
+| ☐ | ☐ | `hi-0923` | हिंदी | चार्जर को छूकर गाड़ी को सुला दो! |
+| ☐ | ☐ | `en-0856` | English | Tap the charger to put the car to bed! |
+| ☐ | ☐ | `hi-0924` | हिंदी | गाड़ी चार्ज हो रही है और आराम कर रही है। शुभ रात्रि, गाड़ी! |
+| ☐ | ☐ | `en-0857` | English | The car is charging and resting. Good night, car! |
+| ☐ | ☐ | `en-0858` | English | a bicycle |
+| ☐ | ☐ | `hi-0925` | हिंदी | पैदल चलना |
+| ☐ | ☐ | `en-0859` | English | walking |
+| ☐ | ☐ | `hi-0926` | हिंदी | आने वाले कल में सड़कें शांत होंगी और हवा साफ़। और सबसे साफ़ सवारी? साइकिल और पैदल चलना! |
+| ☐ | ☐ | `en-0860` | English | Tomorrow, roads will be quieter and the air cleaner. And the cleanest ride of all? Cycling and walking! |
+| ☐ | ☐ | `hi-0927` | हिंदी | किस गाड़ी से धुआँ नहीं निकलता? |
+| ☐ | ☐ | `en-0861` | English | Which one makes no smoke? |
+| ☐ | ☐ | `en-0862` | English | The electric car |
+| ☐ | ☐ | `hi-0928` | हिंदी | धुएँ वाला ट्रक |
+| ☐ | ☐ | `en-0863` | English | The smoky truck |
+| ☐ | ☐ | `hi-0929` | हिंदी | सही! बिजली वाली गाड़ी धुआँ नहीं छोड़ती। |
+| ☐ | ☐ | `en-0864` | English | Right! An electric car makes no smoke. |
+| ☐ | ☐ | `hi-0930` | हिंदी | आज किसी बड़े के साथ थोड़ा पैदल चलो, और गिनो — रास्ते में कितनी साइकिलें दिखीं? |
+| ☐ | ☐ | `en-0865` | English | Today, take a little walk with a grown-up and count how many bicycles you see! |
+
+## future › ड्रोन डाकिया
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0931` | हिंदी | ड्रोन डाकिया |
+| ☐ | ☐ | `en-0866` | English | The Drone Postman |
+| ☐ | ☐ | `hi-0932` | हिंदी | Drone daakiya |
+| ☐ | ☐ | `hi-0933` | हिंदी | ड्रोन |
+| ☐ | ☐ | `en-0867` | English | a drone |
+| ☐ | ☐ | `en-0868` | English | a bird |
+| ☐ | ☐ | `en-0869` | English | an aeroplane |
+| ☐ | ☐ | `hi-0934` | हिंदी | ऊपर क्या उड़ रहा है? ना चिड़िया, ना हवाई जहाज़ — ये ड्रोन है! |
+| ☐ | ☐ | `en-0870` | English | What's flying up there? Not a bird, not a plane — it's a drone! |
+| ☐ | ☐ | `hi-0935` | हिंदी | ड्रोन के चार छोटे पंखे बहुत तेज़ घूमते हैं — फ़र्र फ़र्र! और वह ऊपर उठ जाता है। |
+| ☐ | ☐ | `en-0871` | English | A drone has four little fans that spin very fast — whirr whirr! — and up it goes. |
+| ☐ | ☐ | `hi-0936` | हिंदी | ड्रोन को तीन बार छुओ — पंखे घुमाओ! |
+| ☐ | ☐ | `en-0872` | English | Tap the drone three times to spin its fans! |
+| ☐ | ☐ | `hi-0937` | हिंदी | ड्रोन उड़ गया! फ़र्र फ़र्र! |
+| ☐ | ☐ | `en-0873` | English | The drone is flying! Whirr whirr! |
+| ☐ | ☐ | `hi-0938` | हिंदी | दादी को दवा चाहिए। ड्रोन डाकिया दवा का डिब्बा लेकर आया है। |
+| ☐ | ☐ | `en-0874` | English | Grandma needs her medicine. The drone postman has brought the parcel. |
+| ☐ | ☐ | `hi-0939` | हिंदी | दादी का घर कौन-सा है? वो जिसके आगे बगीचा है! |
+| ☐ | ☐ | `en-0875` | English | Which is Grandma's house? The one with a garden! |
+| ☐ | ☐ | `hi-0940` | हिंदी | स्कूल |
+| ☐ | ☐ | `en-0876` | English | School |
+| ☐ | ☐ | `hi-0941` | हिंदी | अस्पताल |
+| ☐ | ☐ | `en-0877` | English | Hospital |
+| ☐ | ☐ | `hi-0942` | हिंदी | बगीचे वाला घर |
+| ☐ | ☐ | `en-0878` | English | House with a garden |
+| ☐ | ☐ | `hi-0943` | हिंदी | ड्रोन ने दवा पहुँचा दी! धन्यवाद, ड्रोन! |
+| ☐ | ☐ | `en-0879` | English | The drone delivered the medicine! Thank you, drone! |
+| ☐ | ☐ | `hi-0944` | हिंदी | ये दादी का घर नहीं है। बगीचे वाला घर ढूँढो! |
+| ☐ | ☐ | `en-0880` | English | That's not Grandma's house. Find the house with a garden! |
+| ☐ | ☐ | `hi-0945` | हिंदी | ड्रोन पहाड़ों और दूर के गाँवों तक दवाइयाँ ले जाते हैं, जहाँ सड़क बहुत लंबी है। |
+| ☐ | ☐ | `en-0881` | English | Drones carry medicines to mountains and faraway villages where the road is very long. |
+| ☐ | ☐ | `hi-0946` | हिंदी | खेत का ड्रोन |
+| ☐ | ☐ | `en-0882` | English | the farm drone |
+| ☐ | ☐ | `hi-0947` | हिंदी | खेत में ड्रोन ऊपर से देखता है कि कौन-से पौधे प्यासे हैं। |
+| ☐ | ☐ | `en-0883` | English | On the farm, a drone looks from the sky to see which plants are thirsty. |
+| ☐ | ☐ | `hi-0948` | हिंदी | ड्रोन को छूकर पौधों को पानी दो! |
+| ☐ | ☐ | `en-0884` | English | Tap the drone to water the plants! |
+| ☐ | ☐ | `hi-0949` | हिंदी | पौधे हरे-भरे हो गए! शाबाश! |
+| ☐ | ☐ | `en-0885` | English | The plants are green and happy! Well done! |
+| ☐ | ☐ | `hi-0950` | हिंदी | ड्रोन चलाने वाले |
+| ☐ | ☐ | `en-0886` | English | the drone pilot |
+| ☐ | ☐ | `hi-0951` | हिंदी | ड्रोन को कोई इंसान चलाता है और नियम मानता है — किसी के घर में झाँकना नहीं! |
+| ☐ | ☐ | `en-0887` | English | A person controls the drone and follows the rules — no peeking into anyone's home! |
+| ☐ | ☐ | `hi-0952` | हिंदी | तोहफ़ा |
+| ☐ | ☐ | `en-0888` | English | a present |
+| ☐ | ☐ | `hi-0953` | हिंदी | आने वाले कल में आसमान में मददगार ड्रोन होंगे। तुम ड्रोन से किसे क्या भेजोगे? |
+| ☐ | ☐ | `en-0889` | English | Tomorrow, helpful drones will fly in the sky. What would you send with a drone, and to whom? |
+| ☐ | ☐ | `hi-0954` | हिंदी | ड्रोन कैसे उड़ता है? |
+| ☐ | ☐ | `en-0890` | English | How does a drone fly? |
+| ☐ | ☐ | `hi-0955` | हिंदी | घूमते पंखों से |
+| ☐ | ☐ | `en-0891` | English | With spinning fans |
+| ☐ | ☐ | `hi-0956` | हिंदी | पैरों से कूदकर |
+| ☐ | ☐ | `en-0892` | English | By jumping on its feet |
+| ☐ | ☐ | `hi-0957` | हिंदी | हाँ! उसके पंखे घूमते हैं, फ़र्र फ़र्र! |
+| ☐ | ☐ | `en-0893` | English | Yes! Its fans spin — whirr whirr! |
+| ☐ | ☐ | `hi-0958` | हिंदी | किसी बड़े के साथ काग़ज़ का हवाई जहाज़ बनाओ और देखो वो कितनी दूर उड़ता है! |
+| ☐ | ☐ | `en-0894` | English | Make a paper plane with a grown-up and see how far it flies! |
+
+## future › अंतरिक्ष यात्रा
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0959` | हिंदी | अंतरिक्ष यात्रा |
+| ☐ | ☐ | `en-0895` | English | Trip to Space |
+| ☐ | ☐ | `hi-0960` | हिंदी | Antariksh yatra |
+| ☐ | ☐ | `hi-0961` | हिंदी | रात को आसमान में चाँद और तारे दिखते हैं। क्या हम वहाँ जा सकते हैं? |
+| ☐ | ☐ | `en-0896` | English | At night we see the Moon and stars. Can we go there? |
+| ☐ | ☐ | `hi-0962` | हिंदी | रॉकेट |
+| ☐ | ☐ | `en-0897` | English | the rocket |
+| ☐ | ☐ | `hi-0963` | हिंदी | हाँ! रॉकेट में बैठकर। रॉकेट बहुत तेज़ ऊपर जाता है। |
+| ☐ | ☐ | `en-0898` | English | Yes! In a rocket. A rocket zooms up very fast. |
+| ☐ | ☐ | `hi-0964` | हिंदी | रॉकेट को तीन बार छुओ — गिनती करो! |
+| ☐ | ☐ | `en-0899` | English | Tap the rocket three times — count down! |
+| ☐ | ☐ | `hi-0965` | हिंदी | 3… 2… 1… उड़ान! रॉकेट अंतरिक्ष की ओर! |
+| ☐ | ☐ | `en-0900` | English | 3… 2… 1… lift off! The rocket is off to space! |
+| ☐ | ☐ | `hi-0966` | हिंदी | चंद्रयान |
+| ☐ | ☐ | `en-0901` | English | Chandrayaan |
+| ☐ | ☐ | `hi-0967` | हिंदी | भारत के वैज्ञानिकों ने चंद्रयान भेजा। वह चाँद पर धीरे से उतरा — एक ऐसी जगह के पास, जहाँ पहले कोई नहीं उतरा था! |
+| ☐ | ☐ | `en-0902` | English | Scientists in India sent Chandrayaan. It landed gently on the Moon — near a place where nobody had landed before! |
+| ☐ | ☐ | `hi-0968` | हिंदी | प्रज्ञान रोवर |
+| ☐ | ☐ | `en-0903` | English | the Pragyan rover |
+| ☐ | ☐ | `hi-0969` | हिंदी | उसमें से एक छोटी गाड़ी निकली — प्रज्ञान रोवर। वह छह पहियों पर धीरे-धीरे चली और चाँद की मिट्टी को जाँचा। |
+| ☐ | ☐ | `en-0904` | English | Out came a little rover named Pragyan. It rolled slowly on six wheels and studied the Moon's soil. |
+| ☐ | ☐ | `hi-0970` | हिंदी | रोवर को छूकर आगे चलाओ! |
+| ☐ | ☐ | `en-0905` | English | Tap the rover to drive it forward! |
+| ☐ | ☐ | `hi-0971` | हिंदी | शाबाश! रोवर ने चाँद पर नए निशान बना दिए। |
+| ☐ | ☐ | `en-0906` | English | Well done! The rover made new tracks on the Moon. |
+| ☐ | ☐ | `en-0907` | English | an astronaut |
+| ☐ | ☐ | `hi-0972` | हिंदी | अंतरिक्ष में साँस लेने वाली हवा नहीं है, इसलिए अंतरिक्ष यात्री ख़ास सूट पहनते हैं। |
+| ☐ | ☐ | `en-0908` | English | There is no air to breathe in space, so astronauts wear special suits. |
+| ☐ | ☐ | `hi-0973` | हिंदी | अंतरिक्ष में क्या पहनोगे — ख़ास सूट या टी-शर्ट? |
+| ☐ | ☐ | `en-0909` | English | What will you wear in space — a special suit or a T-shirt? |
+| ☐ | ☐ | `hi-0974` | हिंदी | ख़ास सूट |
+| ☐ | ☐ | `en-0910` | English | A special suit |
+| ☐ | ☐ | `hi-0975` | हिंदी | टी-शर्ट |
+| ☐ | ☐ | `en-0911` | English | A T-shirt |
+| ☐ | ☐ | `hi-0976` | हिंदी | सही! सूट में हवा भी है और गर्मी भी। |
+| ☐ | ☐ | `en-0912` | English | Right! The suit has air inside and keeps you warm. |
+| ☐ | ☐ | `hi-0977` | हिंदी | टी-शर्ट में अंतरिक्ष में साँस नहीं ले पाओगे! ख़ास सूट चाहिए। |
+| ☐ | ☐ | `en-0913` | English | You couldn't breathe in space in a T-shirt! You need a special suit. |
+| ☐ | ☐ | `hi-0978` | हिंदी | मंगल ग्रह |
+| ☐ | ☐ | `en-0914` | English | planet Mars |
+| ☐ | ☐ | `hi-0979` | हिंदी | ये है मंगल ग्रह — लाल ग्रह! एक दिन इंसान वहाँ भी जाएँगे — शायद तुम भी! |
+| ☐ | ☐ | `en-0915` | English | This is Mars — the red planet! One day people will go there too — maybe even you! |
+| ☐ | ☐ | `hi-0980` | हिंदी | हमारी धरती |
+| ☐ | ☐ | `en-0916` | English | our Earth |
+| ☐ | ☐ | `hi-0981` | हिंदी | अंतरिक्ष से हमारी धरती नीली-हरी गेंद जैसी दिखती है। यही हमारा प्यारा घर है! |
+| ☐ | ☐ | `en-0917` | English | From space, our Earth looks like a blue-green ball. It's our lovely home! |
+| ☐ | ☐ | `hi-0982` | हिंदी | चाँद पर जाने के लिए किसमें बैठेंगे? |
+| ☐ | ☐ | `en-0918` | English | What will we ride to go to the Moon? |
+| ☐ | ☐ | `en-0919` | English | A rocket |
+| ☐ | ☐ | `en-0920` | English | A bicycle |
+| ☐ | ☐ | `hi-0983` | हिंदी | हाँ, रॉकेट! 3… 2… 1… उड़ान! |
+| ☐ | ☐ | `en-0921` | English | Yes, a rocket! 3… 2… 1… lift off! |
+| ☐ | ☐ | `hi-0984` | हिंदी | अंतरिक्ष यात्री ख़ास सूट क्यों पहनते हैं? |
+| ☐ | ☐ | `en-0922` | English | Why do astronauts wear special suits? |
+| ☐ | ☐ | `hi-0985` | हिंदी | वहाँ हवा नहीं है |
+| ☐ | ☐ | `en-0923` | English | There's no air there |
+| ☐ | ☐ | `hi-0986` | हिंदी | पार्टी के लिए |
+| ☐ | ☐ | `en-0924` | English | For a party |
+| ☐ | ☐ | `hi-0987` | हिंदी | सही! अंतरिक्ष में साँस लेने वाली हवा नहीं है। |
+| ☐ | ☐ | `en-0925` | English | Right! There's no air to breathe in space. |
+| ☐ | ☐ | `hi-0988` | हिंदी | आज रात किसी बड़े के साथ चाँद को देखो। वो कैसा दिखा — गोल, आधा या पतला? कल फिर देखना — क्या बदला? |
+| ☐ | ☐ | `en-0926` | English | Tonight, look at the Moon with a grown-up. Was it round, half or thin? Look again tomorrow — what changed? |
+
+## future › डॉक्टर के रोबो मददगार
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-0989` | हिंदी | डॉक्टर के रोबो मददगार |
+| ☐ | ☐ | `en-0927` | English | Robot Helpers |
+| ☐ | ☐ | `hi-0990` | हिंदी | Doctor ke robo madadgaar |
+| ☐ | ☐ | `en-0928` | English | a doctor |
+| ☐ | ☐ | `en-0929` | English | a nurse |
+| ☐ | ☐ | `hi-0991` | हिंदी | ये है अस्पताल। यहाँ डॉक्टर और नर्स सबका ख़याल रखते हैं। |
+| ☐ | ☐ | `en-0930` | English | This is a hospital. Doctors and nurses take care of everyone here. |
+| ☐ | ☐ | `hi-0992` | हिंदी | रोबो मददगार |
+| ☐ | ☐ | `en-0931` | English | the robot helper |
+| ☐ | ☐ | `hi-0993` | हिंदी | आज अस्पताल में एक रोबो मददगार भी है! वह दवा और खाना एक कमरे से दूसरे कमरे तक ले जाता है। |
+| ☐ | ☐ | `en-0932` | English | Today the hospital has a robot helper too! It carries medicine and food from room to room. |
+| ☐ | ☐ | `hi-0994` | हिंदी | रोबो को बताओ — दवा किसे चाहिए? जिसे बुख़ार है! |
+| ☐ | ☐ | `en-0933` | English | Tell the robot — who needs the medicine? The one with a fever! |
+| ☐ | ☐ | `hi-0995` | हिंदी | बुख़ार वाला |
+| ☐ | ☐ | `en-0934` | English | The one with a fever |
+| ☐ | ☐ | `hi-0996` | हिंदी | हँसता हुआ |
+| ☐ | ☐ | `en-0935` | English | The smiling one |
+| ☐ | ☐ | `hi-0997` | हिंदी | सोता हुआ |
+| ☐ | ☐ | `en-0936` | English | The sleeping one |
+| ☐ | ☐ | `hi-0998` | हिंदी | हाँ! रोबो ने बुख़ार वाले को दवा दे दी। जल्दी ठीक हो जाओ! |
+| ☐ | ☐ | `en-0937` | English | Yes! The robot gave the medicine to the one with a fever. Get well soon! |
+| ☐ | ☐ | `hi-0999` | हिंदी | इसे दवा नहीं चाहिए। जिसे बुख़ार है, उसे ढूँढो — थर्मामीटर वाला! |
+| ☐ | ☐ | `en-0938` | English | This one doesn't need medicine. Find the one with a fever — with the thermometer! |
+| ☐ | ☐ | `hi-1000` | हिंदी | रोबो हाथ |
+| ☐ | ☐ | `en-0939` | English | a robot arm |
+| ☐ | ☐ | `hi-1001` | हिंदी | कुछ रोबो हाथ बहुत स्थिर रहते हैं, ताकि डॉक्टर बहुत बारीक काम आराम से कर सकें। |
+| ☐ | ☐ | `en-0940` | English | Some robot arms stay very steady, so doctors can do tiny, careful work. |
+| ☐ | ☐ | `en-0941` | English | the doctor |
+| ☐ | ☐ | `hi-1002` | हिंदी | पर रोबो अपने-आप फ़ैसला नहीं करता। डॉक्टर सोचते हैं और तय करते हैं — रोबो बस मदद करता है। |
+| ☐ | ☐ | `en-0942` | English | But the robot doesn't decide on its own. The doctor thinks and decides — the robot just helps. |
+| ☐ | ☐ | `hi-1003` | हिंदी | दादाजी |
+| ☐ | ☐ | `en-0943` | English | Grandpa |
+| ☐ | ☐ | `hi-1004` | हिंदी | घर पर एक छोटा रोबो दादाजी को याद दिलाता है: 'दवा का समय!' और पानी भी लाता है। |
+| ☐ | ☐ | `en-0944` | English | At home, a little robot reminds Grandpa, 'Time for medicine!' and brings water too. |
+| ☐ | ☐ | `hi-1005` | हिंदी | रोबो को छुओ — दादाजी के लिए पानी लाओ! |
+| ☐ | ☐ | `en-0945` | English | Tap the robot to bring Grandpa some water! |
+| ☐ | ☐ | `hi-1006` | हिंदी | दादाजी ने पानी पिया और दवा ली। धन्यवाद, रोबो! |
+| ☐ | ☐ | `en-0946` | English | Grandpa drank the water and took his medicine. Thank you, robot! |
+| ☐ | ☐ | `hi-1007` | हिंदी | रोबो मदद कर सकता है। पर गले लगाना, प्यार करना और सच में ख़याल रखना — ये हम इंसान करते हैं! |
+| ☐ | ☐ | `en-0947` | English | Robots can help. But hugging, loving and truly caring — that's what we people do! |
+| ☐ | ☐ | `hi-1008` | हिंदी | दादाजी को प्यार की झप्पी कौन देगा? |
+| ☐ | ☐ | `en-0948` | English | Who will give Grandpa a loving hug? |
+| ☐ | ☐ | `hi-1009` | हिंदी | मैं |
+| ☐ | ☐ | `en-0949` | English | Me |
+| ☐ | ☐ | `hi-1010` | हिंदी | रोबो |
+| ☐ | ☐ | `en-0950` | English | The robot |
+| ☐ | ☐ | `hi-1011` | हिंदी | हाँ, तुम! रोबो मदद करता है, पर प्यार की झप्पी तुम देते हो। |
+| ☐ | ☐ | `en-0951` | English | Yes, you! A robot helps, but the hugs come from you. |
+| ☐ | ☐ | `hi-1012` | हिंदी | आज घर में किसी बड़े की एक मदद करो — पानी लाओ या चप्पलें सजाओ — और उन्हें एक प्यारी झप्पी दो! |
+| ☐ | ☐ | `en-0952` | English | Today, help a grown-up at home — bring water or tidy the shoes — and give them a big hug! |
+
+## future › बात करने वाले कंप्यूटर
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1013` | हिंदी | बात करने वाले कंप्यूटर |
+| ☐ | ☐ | `en-0953` | English | Talking Computers |
+| ☐ | ☐ | `hi-1014` | हिंदी | Baat karne wale computer |
+| ☐ | ☐ | `hi-1015` | हिंदी | फ़ोन |
+| ☐ | ☐ | `en-0954` | English | a phone |
+| ☐ | ☐ | `hi-1016` | हिंदी | बोलने वाला स्पीकर |
+| ☐ | ☐ | `en-0955` | English | a talking speaker |
+| ☐ | ☐ | `hi-1017` | हिंदी | कुछ फ़ोन और स्पीकर हमारी बात सुन सकते हैं और जवाब भी दे सकते हैं। |
+| ☐ | ☐ | `en-0956` | English | Some phones and speakers can listen to us and even answer back. |
+| ☐ | ☐ | `hi-1018` | हिंदी | कंप्यूटर |
+| ☐ | ☐ | `en-0957` | English | the computer |
+| ☐ | ☐ | `hi-1019` | हिंदी | ये कंप्यूटर बहुत, बहुत सारी बातें पढ़कर सीखते हैं — किताबें, कहानियाँ, गाने! |
+| ☐ | ☐ | `en-0958` | English | These computers learn by reading lots and lots of words — books, stories and songs! |
+| ☐ | ☐ | `hi-1020` | हिंदी | उससे साफ़-साफ़ पूछो, तभी वो ठीक से समझता है। |
+| ☐ | ☐ | `en-0959` | English | Ask it clearly — that's how it understands you best. |
+| ☐ | ☐ | `hi-1021` | हिंदी | कौन-सा सवाल साफ़ है? “वो क्या है?” या “आज बारिश होगी?” |
+| ☐ | ☐ | `en-0960` | English | Which question is clear? “What's that?” or “Will it rain today?” |
+| ☐ | ☐ | `hi-1022` | हिंदी | वो क्या है? |
+| ☐ | ☐ | `en-0961` | English | What's that? |
+| ☐ | ☐ | `hi-1023` | हिंदी | आज बारिश होगी? |
+| ☐ | ☐ | `en-0962` | English | Will it rain today? |
+| ☐ | ☐ | `hi-1024` | हिंदी | हाँ! साफ़ सवाल पूछा, तो साफ़ जवाब मिलेगा। |
+| ☐ | ☐ | `en-0963` | English | Yes! A clear question gets a clear answer. |
+| ☐ | ☐ | `hi-1025` | हिंदी | 'वो' मतलब क्या? कंप्यूटर समझ नहीं पाएगा। साफ़ सवाल चुनो! |
+| ☐ | ☐ | `en-0964` | English | What is 'that'? The computer won't understand. Pick the clear question! |
+| ☐ | ☐ | `en-0965` | English | a cat |
+| ☐ | ☐ | `hi-1026` | हिंदी | कंप्यूटर बहुत सी बातें पढ़कर सीखता है, पर वह भी गलती कर सकता है! |
+| ☐ | ☐ | `en-0966` | English | The computer learns by reading lots of things, but it can make mistakes too! |
+| ☐ | ☐ | `hi-1027` | हिंदी | स्पीकर ने कहा: “बिल्ली भौं-भौं करती है!” — सही या गलत? |
+| ☐ | ☐ | `en-0967` | English | The speaker said: “Cats say woof woof!” — right or wrong? |
+| ☐ | ☐ | `hi-1028` | हिंदी | सही |
+| ☐ | ☐ | `en-0968` | English | Right |
+| ☐ | ☐ | `hi-1029` | हिंदी | गलत |
+| ☐ | ☐ | `en-0969` | English | Wrong |
+| ☐ | ☐ | `hi-1030` | हिंदी | हाँ, गलत! बिल्ली तो म्याऊँ करती है। कंप्यूटर ने गलती की — तुमने पकड़ ली! |
+| ☐ | ☐ | `en-0970` | English | Yes, wrong! Cats say meow. The computer made a mistake — and you caught it! |
+| ☐ | ☐ | `hi-1031` | हिंदी | सोचो — बिल्ली कैसे बोलती है? म्याऊँ! तो कंप्यूटर ने गलती की। |
+| ☐ | ☐ | `en-0971` | English | Think — what does a cat say? Meow! So the computer made a mistake. |
+| ☐ | ☐ | `hi-1032` | हिंदी | मम्मी |
+| ☐ | ☐ | `en-0972` | English | Mummy |
+| ☐ | ☐ | `hi-1033` | हिंदी | इसलिए वो जो भी कहे, उस पर सोचो — और किसी बड़े से भी पूछ लो। |
+| ☐ | ☐ | `en-0973` | English | So think about whatever it says — and check with a grown-up too. |
+| ☐ | ☐ | `hi-1034` | हिंदी | कंप्यूटर इंसान नहीं है। उसे भूख नहीं लगती, नींद नहीं आती — वो एक मशीन है, एक औज़ार, जैसे पेंसिल या कैंची। |
+| ☐ | ☐ | `en-0974` | English | A computer isn't a person. It doesn't get hungry or sleepy — it's a machine, a tool, like a pencil or scissors. |
+| ☐ | ☐ | `hi-1035` | हिंदी | अपना पूरा नाम, घर का पता या फ़ोटो किसी मशीन को मत बताओ — पहले बड़ों से पूछो। |
+| ☐ | ☐ | `en-0975` | English | Don't tell a machine your full name, address or photos — ask a grown-up first. |
+| ☐ | ☐ | `hi-1036` | हिंदी | क्या कंप्यूटर भी गलती कर सकता है? |
+| ☐ | ☐ | `en-0976` | English | Can a computer make mistakes? |
+| ☐ | ☐ | `hi-1037` | हिंदी | हाँ |
+| ☐ | ☐ | `en-0977` | English | Yes |
+| ☐ | ☐ | `hi-1038` | हिंदी | नहीं |
+| ☐ | ☐ | `en-0978` | English | No |
+| ☐ | ☐ | `hi-1039` | हिंदी | हाँ! इसलिए हम सोचते हैं और बड़ों से पूछते हैं। |
+| ☐ | ☐ | `en-0979` | English | Yes! That's why we think and ask grown-ups. |
+| ☐ | ☐ | `hi-1040` | हिंदी | कंप्यूटर क्या है? |
+| ☐ | ☐ | `en-0980` | English | What is a computer? |
+| ☐ | ☐ | `hi-1041` | हिंदी | एक मशीन, एक औज़ार |
+| ☐ | ☐ | `en-0981` | English | A machine, a tool |
+| ☐ | ☐ | `hi-1042` | हिंदी | एक इंसान |
+| ☐ | ☐ | `en-0982` | English | A person |
+| ☐ | ☐ | `hi-1043` | हिंदी | सही! कंप्यूटर एक मशीन है — इंसान नहीं। |
+| ☐ | ☐ | `en-0983` | English | Right! A computer is a machine — not a person. |
+| ☐ | ☐ | `hi-1044` | हिंदी | आज किसी बड़े से एक ऐसा सवाल पूछो जिसका जवाब तुम्हें नहीं पता — और साथ में जवाब ढूँढो! |
+| ☐ | ☐ | `en-0984` | English | Today, ask a grown-up a question you don't know the answer to — and find the answer together! |
+
+## future › पानी बचाओ, पेड़ लगाओ
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1045` | हिंदी | पानी बचाओ, पेड़ लगाओ |
+| ☐ | ☐ | `en-0985` | English | Save Water, Plant Trees |
+| ☐ | ☐ | `hi-1046` | हिंदी | Paani bachao, ped lagao |
+| ☐ | ☐ | `hi-1047` | हिंदी | धरती |
+| ☐ | ☐ | `en-0986` | English | the Earth |
+| ☐ | ☐ | `hi-1048` | हिंदी | हमारी धरती हमारा घर है। उसे साफ़ और हरा रखना हम सबका काम है! |
+| ☐ | ☐ | `en-0987` | English | The Earth is our home. Keeping it clean and green is everyone's job! |
+| ☐ | ☐ | `hi-0581` | हिंदी | नल |
+| ☐ | ☐ | `en-0988` | English | the tap |
+| ☐ | ☐ | `hi-1049` | हिंदी | अरे! नल खुला छूट गया। टप-टप-टप, पानी बह रहा है! |
+| ☐ | ☐ | `en-0989` | English | Oh no! The tap was left open. Drip, drip, drip — water is running away! |
+| ☐ | ☐ | `hi-1050` | हिंदी | नल को छूकर बंद करो! |
+| ☐ | ☐ | `en-0990` | English | Tap the tap to turn it off! |
+| ☐ | ☐ | `hi-1051` | हिंदी | शाबाश! तुमने पानी बचाया। |
+| ☐ | ☐ | `en-0991` | English | Well done! You saved water. |
+| ☐ | ☐ | `hi-1052` | हिंदी | टूथब्रश |
+| ☐ | ☐ | `en-0992` | English | a toothbrush |
+| ☐ | ☐ | `hi-1053` | हिंदी | दाँत साफ़ करते समय नल बंद रखो। एक बार में बाल्टी भर पानी बचता है! |
+| ☐ | ☐ | `en-0993` | English | Keep the tap off while you brush. You can save a whole bucket of water! |
+| ☐ | ☐ | `hi-1054` | हिंदी | कचरा भी सही डिब्बे में जाता है। गीला कचरा हरे डिब्बे में, सूखा कचरा नीले डिब्बे में। |
+| ☐ | ☐ | `en-0994` | English | Rubbish goes in the right bin too. Wet waste in the green bin, dry waste in the blue bin. |
+| ☐ | ☐ | `hi-1055` | हिंदी | हर चीज़ को सही डिब्बे में डालो — हरा या नीला? |
+| ☐ | ☐ | `en-0995` | English | Put each thing in the right bin — green or blue? |
+| ☐ | ☐ | `hi-1056` | हिंदी | गीला कचरा |
+| ☐ | ☐ | `en-0996` | English | Wet waste |
+| ☐ | ☐ | `hi-1057` | हिंदी | सूखा कचरा |
+| ☐ | ☐ | `en-0997` | English | Dry waste |
+| ☐ | ☐ | `hi-1058` | हिंदी | केले का छिलका |
+| ☐ | ☐ | `en-0998` | English | banana peel |
+| ☐ | ☐ | `hi-1059` | हिंदी | पुराना अख़बार |
+| ☐ | ☐ | `en-0999` | English | old newspaper |
+| ☐ | ☐ | `hi-1060` | हिंदी | सेब का बचा टुकड़ा |
+| ☐ | ☐ | `en-1000` | English | apple core |
+| ☐ | ☐ | `hi-1061` | हिंदी | प्लास्टिक की बोतल |
+| ☐ | ☐ | `en-1001` | English | plastic bottle |
+| ☐ | ☐ | `hi-1062` | हिंदी | वाह! सारा कचरा सही डिब्बे में! |
+| ☐ | ☐ | `en-1002` | English | Wow! All the rubbish is in the right bin! |
+| ☐ | ☐ | `hi-1063` | हिंदी | रीसायकल |
+| ☐ | ☐ | `en-1003` | English | recycling |
+| ☐ | ☐ | `hi-1064` | हिंदी | पुरानी प्लास्टिक की बोतलें फिर से नई चीज़ें बन सकती हैं — कुर्सी, थैला, खिलौना! इसे रीसायकल कहते हैं। |
+| ☐ | ☐ | `en-1004` | English | Old plastic bottles can become new things — a chair, a bag, a toy! That's called recycling. |
+| ☐ | ☐ | `hi-1065` | हिंदी | बीज |
+| ☐ | ☐ | `en-1005` | English | a seed |
+| ☐ | ☐ | `hi-1066` | हिंदी | चलो, एक पेड़ लगाएँ! बीज को पानी चाहिए। |
+| ☐ | ☐ | `en-1006` | English | Let's plant a tree! The seed needs water. |
+| ☐ | ☐ | `hi-1067` | हिंदी | पानी को तीन बार छुओ और बीज को सींचो! |
+| ☐ | ☐ | `en-1007` | English | Tap the water three times to water the seed! |
+| ☐ | ☐ | `hi-1068` | हिंदी | देखो! बीज से पौधा, और पौधे से पेड़ बन गया! |
+| ☐ | ☐ | `en-1008` | English | Look! The seed became a plant, and the plant became a tree! |
+| ☐ | ☐ | `hi-1069` | हिंदी | पेड़ हमें छाया, फल और साफ़ हवा देते हैं। आओ, आने वाले कल को हरा-भरा बनाएँ! |
+| ☐ | ☐ | `en-1009` | English | Trees give us shade, fruit and clean air. Let's make tomorrow green! |
+| ☐ | ☐ | `hi-1070` | हिंदी | केले का छिलका किस डिब्बे में जाएगा? |
+| ☐ | ☐ | `en-1010` | English | Which bin does a banana peel go in? |
+| ☐ | ☐ | `hi-1071` | हिंदी | हरा — गीला कचरा |
+| ☐ | ☐ | `en-1011` | English | Green — wet waste |
+| ☐ | ☐ | `hi-1072` | हिंदी | नीला — सूखा कचरा |
+| ☐ | ☐ | `en-1012` | English | Blue — dry waste |
+| ☐ | ☐ | `hi-1073` | हिंदी | सही! छिलका गीला कचरा है — हरे डिब्बे में। |
+| ☐ | ☐ | `en-1013` | English | Right! A peel is wet waste — the green bin. |
+| ☐ | ☐ | `hi-1074` | हिंदी | आज किसी पौधे को पानी दो, और दाँत साफ़ करते समय नल बंद रखना! |
+| ☐ | ☐ | `en-1014` | English | Today, water a plant — and keep the tap off while you brush! |
+
+## future › 3D प्रिंटर
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1075` | हिंदी | 3D प्रिंटर |
+| ☐ | ☐ | `en-1015` | English | The 3D Printer |
+| ☐ | ☐ | `hi-1076` | हिंदी | 3D printer |
+| ☐ | ☐ | `en-1016` | English | a 3D printer |
+| ☐ | ☐ | `hi-1077` | हिंदी | ये है एक कमाल की मशीन — 3D प्रिंटर! ये चीज़ें बनाता है, परत पर परत। |
+| ☐ | ☐ | `en-1017` | English | This is an amazing machine — a 3D printer! It builds things, layer on layer. |
+| ☐ | ☐ | `hi-1078` | हिंदी | चलो, प्रिंटर से एक खिलौना बनाएँ! |
+| ☐ | ☐ | `en-1018` | English | Let's make a toy with the printer! |
+| ☐ | ☐ | `hi-1079` | हिंदी | प्रिंटर को चार बार छुओ — हर बार एक परत जुड़ेगी! |
+| ☐ | ☐ | `en-1019` | English | Tap the printer four times — each tap adds a layer! |
+| ☐ | ☐ | `hi-1080` | हिंदी | देखो, परत पर परत से एक मीनार बन गई! |
+| ☐ | ☐ | `en-1020` | English | Look — layer on layer, a tower is ready! |
+| ☐ | ☐ | `hi-1081` | हिंदी | चित्र |
+| ☐ | ☐ | `en-1021` | English | a design |
+| ☐ | ☐ | `hi-1082` | हिंदी | पहले कोई चित्र बनाता है — क्या बनाना है। फिर प्रिंटर उसे सच में बना देता है। |
+| ☐ | ☐ | `en-1022` | English | First someone draws a design — what to make. Then the printer makes it for real. |
+| ☐ | ☐ | `hi-1083` | हिंदी | खिलौने का हिस्सा |
+| ☐ | ☐ | `en-1023` | English | a toy part |
+| ☐ | ☐ | `hi-1084` | हिंदी | मदद वाला हाथ |
+| ☐ | ☐ | `en-1024` | English | a helper hand |
+| ☐ | ☐ | `hi-1085` | हिंदी | छोटा घर |
+| ☐ | ☐ | `en-1025` | English | a small house |
+| ☐ | ☐ | `hi-1086` | हिंदी | 3D प्रिंटर से टूटे खिलौने का हिस्सा, किसी के लिए मदद वाला हाथ, यहाँ तक कि छोटे घर भी बन सकते हैं! |
+| ☐ | ☐ | `en-1026` | English | 3D printers can make a missing toy piece, a helper hand for someone, even small houses! |
+| ☐ | ☐ | `hi-1087` | हिंदी | अगर तुम्हारे पास 3D प्रिंटर होता, तो तुम क्या बनाते? |
+| ☐ | ☐ | `en-1027` | English | If you had a 3D printer, what would you make? |
+| ☐ | ☐ | `hi-1088` | हिंदी | चुनो — गाड़ी, डायनासोर या घर? |
+| ☐ | ☐ | `en-1028` | English | Choose — a car, a dinosaur or a house? |
+| ☐ | ☐ | `hi-1089` | हिंदी | डायनासोर |
+| ☐ | ☐ | `en-1029` | English | A dinosaur |
+| ☐ | ☐ | `en-1030` | English | A house |
+| ☐ | ☐ | `hi-1090` | हिंदी | वाह! बढ़िया चुना। अब प्रिंटर परत पर परत उसे बनाएगा! |
+| ☐ | ☐ | `en-1031` | English | Wow! Great choice. Now the printer will build it layer by layer! |
+| ☐ | ☐ | `hi-1091` | हिंदी | पर पहले सोचना पड़ता है। बनाने वाले तुम हो — मशीन बस मदद करती है! |
+| ☐ | ☐ | `en-1032` | English | But first you have to think. You are the maker — the machine just helps! |
+| ☐ | ☐ | `hi-1092` | हिंदी | 3D प्रिंटर चीज़ें कैसे बनाता है? |
+| ☐ | ☐ | `en-1033` | English | How does a 3D printer make things? |
+| ☐ | ☐ | `hi-1093` | हिंदी | परत पर परत |
+| ☐ | ☐ | `en-1034` | English | Layer on layer |
+| ☐ | ☐ | `hi-1094` | हिंदी | जादू से |
+| ☐ | ☐ | `en-1035` | English | By magic |
+| ☐ | ☐ | `hi-1095` | हिंदी | हाँ! परत पर परत, जैसे पराठे की परतें। |
+| ☐ | ☐ | `en-1036` | English | Yes! Layer on layer, like a stack of pancakes. |
+| ☐ | ☐ | `hi-1096` | हिंदी | आज ब्लॉक, मिट्टी या आटे से परत-पर-परत एक मीनार बनाओ। कितनी ऊँची बनी? |
+| ☐ | ☐ | `en-1037` | English | Today, build a tower layer by layer with blocks, clay or dough. How tall did it get? |
+
+## future › इंटरनेट पर सुरक्षा
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1097` | हिंदी | इंटरनेट पर सुरक्षा |
+| ☐ | ☐ | `en-1038` | English | Safe on the Internet |
+| ☐ | ☐ | `hi-1098` | हिंदी | Internet par suraksha |
+| ☐ | ☐ | `hi-1099` | हिंदी | इंटरनेट |
+| ☐ | ☐ | `en-1039` | English | the internet |
+| ☐ | ☐ | `hi-1100` | हिंदी | इंटरनेट एक बहुत बड़े शहर जैसा है — उसमें कहानियाँ, गाने और खेल हैं। |
+| ☐ | ☐ | `en-1040` | English | The internet is like a giant city — full of stories, songs and games. |
+| ☐ | ☐ | `hi-1101` | हिंदी | अनजान |
+| ☐ | ☐ | `en-1041` | English | a stranger |
+| ☐ | ☐ | `hi-1102` | हिंदी | उस शहर में अनजान लोग भी होते हैं। सड़क की तरह इंटरनेट पर भी — अनजान लोगों को अपनी बातें नहीं बताते। |
+| ☐ | ☐ | `en-1042` | English | That city has strangers too. Just like on the street, we don't tell strangers about ourselves online. |
+| ☐ | ☐ | `hi-1103` | हिंदी | फ़ोन पर कोई अनजान पूछता है: “तुम्हारा घर कहाँ है?” |
+| ☐ | ☐ | `en-1043` | English | Someone you don't know asks on the phone: “Where do you live?” |
+| ☐ | ☐ | `hi-1104` | हिंदी | तुम क्या करोगे? पता बताओगे, या बड़ों को बुलाओगे? |
+| ☐ | ☐ | `en-1044` | English | What will you do? Tell them, or call a grown-up? |
+| ☐ | ☐ | `hi-1105` | हिंदी | पता बता दूँ |
+| ☐ | ☐ | `en-1045` | English | Tell my address |
+| ☐ | ☐ | `hi-1106` | हिंदी | बड़ों को बुलाऊँ |
+| ☐ | ☐ | `en-1046` | English | Call a grown-up |
+| ☐ | ☐ | `hi-1107` | हिंदी | बिल्कुल सही! पहले बड़ों को बताओ। |
+| ☐ | ☐ | `en-1047` | English | Exactly right! Tell a grown-up first. |
+| ☐ | ☐ | `hi-1108` | हिंदी | रुको! घर का पता किसी अनजान को नहीं बताते। बड़ों को बुलाओ। |
+| ☐ | ☐ | `en-1048` | English | Stop! We never tell a stranger where we live. Call a grown-up. |
+| ☐ | ☐ | `hi-1109` | हिंदी | अगर स्क्रीन पर अचानक चमकता डिब्बा आए — “दबाओ, इनाम जीतो!” — तो उसे मत दबाओ। |
+| ☐ | ☐ | `en-1049` | English | If a shiny box suddenly pops up — “Tap here to win a prize!” — don't tap it. |
+| ☐ | ☐ | `hi-1110` | हिंदी | तुम क्या दबाओगे? चमकता इनाम, या बड़ों से पूछोगे? |
+| ☐ | ☐ | `en-1050` | English | What will you tap? The shiny prize, or ask a grown-up? |
+| ☐ | ☐ | `hi-1111` | हिंदी | इनाम जीतो! |
+| ☐ | ☐ | `en-1051` | English | Win a prize! |
+| ☐ | ☐ | `hi-1112` | हिंदी | बड़ों से पूछूँ |
+| ☐ | ☐ | `en-1052` | English | Ask a grown-up |
+| ☐ | ☐ | `hi-1113` | हिंदी | शाबाश! अनजान चीज़ दबाने से पहले बड़ों से पूछते हैं। |
+| ☐ | ☐ | `en-1053` | English | Well done! Ask a grown-up before tapping something you don't know. |
+| ☐ | ☐ | `hi-1114` | हिंदी | ओह! अनजान चमकते बटन धोखा भी हो सकते हैं। पहले बड़ों से पूछो। |
+| ☐ | ☐ | `en-1054` | English | Oops! Strange shiny buttons can be tricks. Ask a grown-up first. |
+| ☐ | ☐ | `hi-1115` | हिंदी | ख़ज़ाने का बक्सा |
+| ☐ | ☐ | `en-1055` | English | the treasure box |
+| ☐ | ☐ | `hi-1116` | हिंदी | तुम्हारा नाम, स्कूल, फ़ोटो और पासवर्ड — ये सब तुम्हारा ख़ज़ाना हैं। ख़ज़ाना छुपाकर रखते हैं! |
+| ☐ | ☐ | `en-1056` | English | Your name, school, photos and passwords are your treasure. We keep treasure safe! |
+| ☐ | ☐ | `hi-1117` | हिंदी | बक्से को छूकर ताला लगाओ! |
+| ☐ | ☐ | `en-1057` | English | Tap the box to lock it! |
+| ☐ | ☐ | `hi-1118` | हिंदी | ख़ज़ाना सुरक्षित! शाबाश! |
+| ☐ | ☐ | `en-1058` | English | Treasure locked and safe! Well done! |
+| ☐ | ☐ | `hi-1119` | हिंदी | घर के बड़े |
+| ☐ | ☐ | `en-1059` | English | grown-ups at home |
+| ☐ | ☐ | `hi-1120` | हिंदी | अगर कुछ भी अजीब लगे, डर लगे या समझ न आए — तुरंत किसी बड़े को बताओ। तुम्हें कोई डाँट नहीं पड़ेगी। मुसीबत हो तो बड़े 1098 या 112 पर फ़ोन करके मदद ले सकते हैं। |
+| ☐ | ☐ | `en-1060` | English | If anything feels strange, scary or confusing — tell a grown-up right away. You won't be in trouble. In an emergency, grown-ups can call 1098 or 112 for help. |
+| ☐ | ☐ | `hi-1121` | हिंदी | और याद रखो: स्क्रीन को भी आराम चाहिए! बाहर खेलो, दौड़ो और दूर तक देखो। |
+| ☐ | ☐ | `en-1061` | English | And remember: screens need rest too! Play outside, run around and look far away. |
+| ☐ | ☐ | `hi-1122` | हिंदी | कोई अनजान तुम्हारा पता पूछे, तो? |
+| ☐ | ☐ | `en-1062` | English | If a stranger asks where you live? |
+| ☐ | ☐ | `hi-1123` | हिंदी | बड़ों को बताओ |
+| ☐ | ☐ | `en-1063` | English | Tell a grown-up |
+| ☐ | ☐ | `hi-1124` | हिंदी | पता बता दो |
+| ☐ | ☐ | `en-1064` | English | Tell them |
+| ☐ | ☐ | `hi-1125` | हिंदी | हाँ! पहले बड़ों को बताओ। |
+| ☐ | ☐ | `en-1065` | English | Yes! Tell a grown-up first. |
+| ☐ | ☐ | `hi-1126` | हिंदी | आज किसी बड़े के साथ अपना सुरक्षा नियम ज़ोर से बोलो: “कुछ भी अनजान हो, तो पहले बड़ों से पूछूँगा!” |
+| ☐ | ☐ | `en-1066` | English | Today, say your safety rule out loud with a grown-up: “If it's something I don't know, I'll ask a grown-up first!” |
+
+## future › जंगल
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1127` | हिंदी | जंगल |
+| ☐ | ☐ | `en-1067` | English | Jungle |
+| ☐ | ☐ | `hi-1128` | हिंदी | Jungle |
+| ☐ | ☐ | `en-1068` | English | a monkey |
+| ☐ | ☐ | `hi-1129` | हिंदी | बंदर पेड़ों पर झूलता है! |
+| ☐ | ☐ | `en-1069` | English | Monkeys swing from the trees! |
+| ☐ | ☐ | `hi-1130` | हिंदी | मोर |
+| ☐ | ☐ | `en-1070` | English | a peacock |
+| ☐ | ☐ | `hi-1131` | हिंदी | मोर अपने रंग-बिरंगे पंख फैलाता है! |
+| ☐ | ☐ | `en-1071` | English | A peacock spreads its colourful feathers! |
+| ☐ | ☐ | `en-1072` | English | an elephant |
+| ☐ | ☐ | `hi-1132` | हिंदी | हाथी अपनी सूँड से पानी पीता है! |
+| ☐ | ☐ | `en-1073` | English | An elephant drinks with its trunk! |
+| ☐ | ☐ | `hi-1133` | हिंदी | बाघ |
+| ☐ | ☐ | `en-1074` | English | a tiger |
+| ☐ | ☐ | `hi-1134` | हिंदी | बाघ की धारियाँ उसे छिपने में मदद करती हैं! |
+| ☐ | ☐ | `en-1075` | English | A tiger's stripes help it hide! |
+| ☐ | ☐ | `hi-1135` | हिंदी | तोता |
+| ☐ | ☐ | `en-1076` | English | a parrot |
+| ☐ | ☐ | `hi-1136` | हिंदी | तोता बातें दोहरा सकता है! |
+| ☐ | ☐ | `en-1077` | English | A parrot can copy words! |
+| ☐ | ☐ | `hi-1137` | हिंदी | तुमने सारे जानवर ढूँढ लिए! ये जादुई जंगल था। अब असली दुनिया में ढूँढो — खिड़की से बाहर कौन-सा पक्षी या पेड़ दिखता है? |
+| ☐ | ☐ | `en-1078` | English | You found all the animals! That was a magic jungle. Now look in the real world — which bird or tree can you see outside the window? |
+
+## future › समुद्र के अंदर
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1138` | हिंदी | समुद्र के अंदर |
+| ☐ | ☐ | `en-1079` | English | Under the Sea |
+| ☐ | ☐ | `hi-1139` | हिंदी | Samudra ke andar |
+| ☐ | ☐ | `hi-1140` | हिंदी | रंगीन मछली |
+| ☐ | ☐ | `en-1080` | English | a colourful fish |
+| ☐ | ☐ | `hi-1141` | हिंदी | मछली पानी में साँस लेती है! |
+| ☐ | ☐ | `en-1081` | English | Fish breathe under water! |
+| ☐ | ☐ | `hi-1142` | हिंदी | ऑक्टोपस |
+| ☐ | ☐ | `en-1082` | English | an octopus |
+| ☐ | ☐ | `hi-1143` | हिंदी | ऑक्टोपस की आठ भुजाएँ होती हैं! |
+| ☐ | ☐ | `en-1083` | English | An octopus has eight arms! |
+| ☐ | ☐ | `hi-1144` | हिंदी | समुद्री कछुआ |
+| ☐ | ☐ | `en-1084` | English | a sea turtle |
+| ☐ | ☐ | `hi-1145` | हिंदी | समुद्री कछुआ बहुत दूर तक तैरता है! |
+| ☐ | ☐ | `en-1085` | English | Sea turtles swim very far! |
+| ☐ | ☐ | `hi-1146` | हिंदी | केकड़ा |
+| ☐ | ☐ | `en-1086` | English | a crab |
+| ☐ | ☐ | `hi-1147` | हिंदी | केकड़ा टेढ़ा-टेढ़ा चलता है! |
+| ☐ | ☐ | `en-1087` | English | A crab walks sideways! |
+| ☐ | ☐ | `hi-1148` | हिंदी | व्हेल |
+| ☐ | ☐ | `en-1088` | English | a whale |
+| ☐ | ☐ | `hi-1149` | हिंदी | व्हेल सबसे बड़ा जानवर है! |
+| ☐ | ☐ | `en-1089` | English | The blue whale is the biggest animal of all! |
+| ☐ | ☐ | `hi-1150` | हिंदी | तुमने सारे समुद्री दोस्त ढूँढ लिए! ये जादुई समुद्र था। नहाते समय सोचो — मछली की तरह तैरना कैसा लगता होगा? |
+| ☐ | ☐ | `en-1090` | English | You found all the sea friends! That was a magic sea. At bath time, imagine — how would it feel to swim like a fish? |
+
+## future › अंतरिक्ष
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1151` | हिंदी | अंतरिक्ष |
+| ☐ | ☐ | `en-1091` | English | Space |
+| ☐ | ☐ | `hi-1152` | हिंदी | Antariksh |
+| ☐ | ☐ | `en-1092` | English | a rocket |
+| ☐ | ☐ | `hi-1153` | हिंदी | रॉकेट बहुत तेज़ ऊपर जाता है! |
+| ☐ | ☐ | `en-1093` | English | A rocket zooms up very fast! |
+| ☐ | ☐ | `hi-1154` | हिंदी | अंतरिक्ष यात्री ख़ास सूट पहनते हैं! |
+| ☐ | ☐ | `en-1094` | English | Astronauts wear special suits! |
+| ☐ | ☐ | `hi-1155` | हिंदी | उपग्रह |
+| ☐ | ☐ | `en-1095` | English | a satellite |
+| ☐ | ☐ | `hi-1156` | हिंदी | उपग्रह धरती के चारों ओर घूमता है! |
+| ☐ | ☐ | `en-1096` | English | A satellite goes round and round the Earth! |
+| ☐ | ☐ | `hi-1157` | हिंदी | शनि ग्रह |
+| ☐ | ☐ | `en-1097` | English | planet Saturn |
+| ☐ | ☐ | `hi-1158` | हिंदी | शनि ग्रह के चारों ओर छल्ले हैं! |
+| ☐ | ☐ | `en-1098` | English | Saturn has rings all around it! |
+| ☐ | ☐ | `hi-1159` | हिंदी | उड़न तश्तरी |
+| ☐ | ☐ | `en-1099` | English | a flying saucer |
+| ☐ | ☐ | `hi-1160` | हिंदी | ये तो कहानी वाली उड़न तश्तरी है — मज़े के लिए! |
+| ☐ | ☐ | `en-1100` | English | This flying saucer is from stories — just for fun! |
+| ☐ | ☐ | `hi-1161` | हिंदी | तुमने अंतरिक्ष की सारी चीज़ें ढूँढ लीं! आज रात किसी बड़े के साथ असली आसमान देखो — कितने तारे दिखे? |
+| ☐ | ☐ | `en-1101` | English | You found everything in space! Tonight, look at the real sky with a grown-up — how many stars can you see? |
+
+## future › तितली का बगीचा
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1162` | हिंदी | तितली का बगीचा |
+| ☐ | ☐ | `en-1102` | English | Butterfly Garden |
+| ☐ | ☐ | `hi-1163` | हिंदी | Titli ka bagicha |
+| ☐ | ☐ | `en-1103` | English | a butterfly |
+| ☐ | ☐ | `hi-1164` | हिंदी | तितली फूलों का रस पीती है! |
+| ☐ | ☐ | `en-1104` | English | Butterflies sip nectar from flowers! |
+| ☐ | ☐ | `hi-1165` | हिंदी | मधुमक्खी |
+| ☐ | ☐ | `en-1105` | English | a bee |
+| ☐ | ☐ | `hi-1166` | हिंदी | मधुमक्खी शहद बनाती है! |
+| ☐ | ☐ | `en-1106` | English | Bees make honey! |
+| ☐ | ☐ | `hi-1167` | हिंदी | लाल कीड़ा |
+| ☐ | ☐ | `en-1107` | English | a ladybird |
+| ☐ | ☐ | `hi-1168` | हिंदी | इस कीड़े की पीठ पर काले धब्बे हैं! |
+| ☐ | ☐ | `en-1108` | English | This ladybird has black spots on its back! |
+| ☐ | ☐ | `hi-1169` | हिंदी | गिलहरी |
+| ☐ | ☐ | `en-1109` | English | a squirrel |
+| ☐ | ☐ | `hi-1170` | हिंदी | गिलहरी की पीठ पर धारियाँ होती हैं! |
+| ☐ | ☐ | `en-1110` | English | Indian squirrels have stripes on their backs! |
+| ☐ | ☐ | `hi-1171` | हिंदी | तुमने बगीचे के सारे दोस्त ढूँढ लिए! अब किसी बड़े के साथ बाहर जाओ — असली तितली या मधुमक्खी ढूँढो! |
+| ☐ | ☐ | `en-1111` | English | You found all the garden friends! Now go outside with a grown-up — look for a real butterfly or bee! |
+
+## robo › चिंटू रोबो
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1172` | हिंदी | चिंटू रोबो |
+| ☐ | ☐ | `en-1112` | English | Chintu the robot |
+| ☐ | ☐ | `hi-1173` | हिंदी | Chintu Robo |
+| ☐ | ☐ | `en-1113` | English | red |
+| ☐ | ☐ | `hi-1174` | हिंदी | ये लाल है |
+| ☐ | ☐ | `en-1114` | English | it is red |
+| ☐ | ☐ | `en-1115` | English | green |
+| ☐ | ☐ | `hi-1175` | हिंदी | ये हरा है |
+| ☐ | ☐ | `en-1116` | English | it is green |
+| ☐ | ☐ | `en-1117` | English | yellow |
+| ☐ | ☐ | `hi-1176` | हिंदी | ये पीला है |
+| ☐ | ☐ | `en-1118` | English | it is yellow |
+| ☐ | ☐ | `en-1119` | English | orange |
+| ☐ | ☐ | `hi-1177` | हिंदी | ये नारंगी है |
+| ☐ | ☐ | `en-1120` | English | it is orange |
+| ☐ | ☐ | `en-1121` | English | purple |
+| ☐ | ☐ | `hi-1178` | हिंदी | ये बैंगनी है |
+| ☐ | ☐ | `en-1122` | English | it is purple |
+| ☐ | ☐ | `en-1123` | English | blue |
+| ☐ | ☐ | `hi-1179` | हिंदी | ये नीला है |
+| ☐ | ☐ | `en-1124` | English | it is blue |
+| ☐ | ☐ | `en-1125` | English | brown |
+| ☐ | ☐ | `hi-1180` | हिंदी | ये भूरा है |
+| ☐ | ☐ | `en-1126` | English | it is brown |
+| ☐ | ☐ | `en-1127` | English | white |
+| ☐ | ☐ | `hi-1181` | हिंदी | ये सफ़ेद है |
+| ☐ | ☐ | `en-1128` | English | it is white |
+| ☐ | ☐ | `hi-1182` | हिंदी | स्लेटी |
+| ☐ | ☐ | `en-1129` | English | grey |
+| ☐ | ☐ | `hi-1183` | हिंदी | ये स्लेटी है |
+| ☐ | ☐ | `en-1130` | English | it is grey |
+| ☐ | ☐ | `en-1131` | English | pink |
+| ☐ | ☐ | `hi-1184` | हिंदी | ये गुलाबी है |
+| ☐ | ☐ | `en-1132` | English | it is pink |
+| ☐ | ☐ | `hi-1185` | हिंदी | गोल |
+| ☐ | ☐ | `en-1133` | English | round |
+| ☐ | ☐ | `hi-1186` | हिंदी | ये गोल है |
+| ☐ | ☐ | `en-1134` | English | it is round |
+| ☐ | ☐ | `hi-1187` | हिंदी | लंबा |
+| ☐ | ☐ | `en-1135` | English | long |
+| ☐ | ☐ | `hi-1188` | हिंदी | ये लंबा है |
+| ☐ | ☐ | `en-1136` | English | it is long |
+| ☐ | ☐ | `hi-1189` | हिंदी | छोटा |
+| ☐ | ☐ | `en-1137` | English | small |
+| ☐ | ☐ | `hi-1190` | हिंदी | ये छोटा है |
+| ☐ | ☐ | `en-1138` | English | it is small |
+| ☐ | ☐ | `hi-1191` | हिंदी | खाने की चीज़ |
+| ☐ | ☐ | `en-1139` | English | food |
+| ☐ | ☐ | `hi-1192` | हिंदी | ये खाने की चीज़ है |
+| ☐ | ☐ | `en-1140` | English | it is food |
+| ☐ | ☐ | `en-1141` | English | animal |
+| ☐ | ☐ | `hi-1193` | हिंदी | ये जानवर है |
+| ☐ | ☐ | `en-1142` | English | it is an animal |
+| ☐ | ☐ | `hi-1194` | हिंदी | पौधा |
+| ☐ | ☐ | `en-1143` | English | plant |
+| ☐ | ☐ | `hi-1195` | हिंदी | ये पौधा है |
+| ☐ | ☐ | `en-1144` | English | it is a plant |
+| ☐ | ☐ | `en-1145` | English | vehicle |
+| ☐ | ☐ | `hi-1196` | हिंदी | ये गाड़ी है |
+| ☐ | ☐ | `en-1146` | English | it is a vehicle |
+| ☐ | ☐ | `hi-1197` | हिंदी | मीठा |
+| ☐ | ☐ | `en-1147` | English | sweet |
+| ☐ | ☐ | `hi-1198` | हिंदी | ये मीठा है |
+| ☐ | ☐ | `en-1148` | English | it is sweet |
+| ☐ | ☐ | `hi-1199` | हिंदी | पकाकर खाते हैं |
+| ☐ | ☐ | `en-1149` | English | cooked |
+| ☐ | ☐ | `hi-1200` | हिंदी | इसे पकाकर खाते हैं |
+| ☐ | ☐ | `en-1150` | English | we cook it |
+| ☐ | ☐ | `hi-1201` | हिंदी | तैरता है |
+| ☐ | ☐ | `en-1151` | English | swims |
+| ☐ | ☐ | `hi-1202` | हिंदी | ये तैरता है |
+| ☐ | ☐ | `en-1152` | English | it swims |
+| ☐ | ☐ | `hi-1203` | हिंदी | चलता है |
+| ☐ | ☐ | `en-1153` | English | walks |
+| ☐ | ☐ | `hi-1204` | हिंदी | ये पैरों से चलता है |
+| ☐ | ☐ | `en-1154` | English | it walks on legs |
+| ☐ | ☐ | `hi-1205` | हिंदी | धारियाँ |
+| ☐ | ☐ | `en-1155` | English | stripes |
+| ☐ | ☐ | `hi-1206` | हिंदी | इस पर धारियाँ हैं |
+| ☐ | ☐ | `en-1156` | English | it has stripes |
+| ☐ | ☐ | `hi-1207` | हिंदी | मुलायम |
+| ☐ | ☐ | `en-1157` | English | soft |
+| ☐ | ☐ | `hi-1208` | हिंदी | ये मुलायम है |
+| ☐ | ☐ | `en-1158` | English | it is soft |
+| ☐ | ☐ | `hi-1209` | हिंदी | पूँछ |
+| ☐ | ☐ | `en-1159` | English | tail |
+| ☐ | ☐ | `hi-1210` | हिंदी | इसकी पूँछ है |
+| ☐ | ☐ | `en-1160` | English | it has a tail |
+| ☐ | ☐ | `en-1161` | English | teeth |
+| ☐ | ☐ | `hi-1211` | हिंदी | इसके बड़े दाँत हैं |
+| ☐ | ☐ | `en-1162` | English | it has big teeth |
+| ☐ | ☐ | `hi-1249` | हिंदी | ऊपर |
+| ☐ | ☐ | `en-1202` | English | Up |
+| ☐ | ☐ | `hi-1250` | हिंदी | Upar |
+| ☐ | ☐ | `hi-1251` | हिंदी | नीचे |
+| ☐ | ☐ | `en-1203` | English | Down |
+| ☐ | ☐ | `hi-1252` | हिंदी | Neeche |
+| ☐ | ☐ | `hi-1253` | हिंदी | बाएँ |
+| ☐ | ☐ | `en-1204` | English | Left |
+| ☐ | ☐ | `hi-1254` | हिंदी | Baayein |
+| ☐ | ☐ | `hi-1255` | हिंदी | दाएँ |
+| ☐ | ☐ | `hi-1256` | हिंदी | Daayein |
+| ☐ | ☐ | `hi-1257` | हिंदी | आगे |
+| ☐ | ☐ | `en-1205` | English | Forward |
+| ☐ | ☐ | `hi-1258` | हिंदी | Aage |
+| ☐ | ☐ | `hi-1259` | हिंदी | बाएँ मुड़ो |
+| ☐ | ☐ | `en-1206` | English | Turn left |
+| ☐ | ☐ | `hi-1260` | हिंदी | Baayein mudo |
+| ☐ | ☐ | `hi-1261` | हिंदी | दाएँ मुड़ो |
+| ☐ | ☐ | `en-1207` | English | Turn right |
+| ☐ | ☐ | `hi-1262` | हिंदी | Daayein mudo |
+| ☐ | ☐ | `en-1208` | English | the mango |
+| ☐ | ☐ | `hi-1263` | हिंदी | रोबो को आम तक पहुँचाओ! |
+| ☐ | ☐ | `en-1209` | English | Take the robot to the mango! |
+| ☐ | ☐ | `en-1210` | English | the ball |
+| ☐ | ☐ | `hi-1264` | हिंदी | रोबो को गेंद तक पहुँचाओ! |
+| ☐ | ☐ | `en-1211` | English | Take the robot to the ball! |
+| ☐ | ☐ | `en-1212` | English | the banana |
+| ☐ | ☐ | `hi-1265` | हिंदी | रोबो को केले तक पहुँचाओ! |
+| ☐ | ☐ | `en-1213` | English | Take the robot to the banana! |
+| ☐ | ☐ | `en-1214` | English | the present |
+| ☐ | ☐ | `hi-1266` | हिंदी | रोबो को तोहफ़े तक पहुँचाओ! |
+| ☐ | ☐ | `en-1215` | English | Take the robot to the present! |
+| ☐ | ☐ | `hi-1267` | हिंदी | लाल सेब |
+| ☐ | ☐ | `en-1216` | English | the red apple |
+| ☐ | ☐ | `hi-1268` | हिंदी | तुम्हें लाल सेब चाहिए। रोबो से कैसे माँगोगे? |
+| ☐ | ☐ | `en-1217` | English | You want the red apple. How will you ask the robot? |
+| ☐ | ☐ | `hi-1269` | हिंदी | वो दो! |
+| ☐ | ☐ | `en-1218` | English | Give me that! |
+| ☐ | ☐ | `hi-1270` | हिंदी | लाल सेब दो। |
+| ☐ | ☐ | `en-1219` | English | Please give me the red apple. |
+| ☐ | ☐ | `hi-1271` | हिंदी | पीली गाड़ी |
+| ☐ | ☐ | `en-1220` | English | the yellow car |
+| ☐ | ☐ | `hi-1272` | हिंदी | अब तुम्हें पीली गाड़ी चाहिए। कैसे माँगोगे? |
+| ☐ | ☐ | `en-1221` | English | Now you want the yellow car. How will you ask? |
+| ☐ | ☐ | `hi-1273` | हिंदी | गाड़ी दो! |
+| ☐ | ☐ | `en-1222` | English | Give me a car! |
+| ☐ | ☐ | `hi-1274` | हिंदी | पीली गाड़ी दो। |
+| ☐ | ☐ | `en-1223` | English | Please give me the yellow car. |
+| ☐ | ☐ | `hi-1275` | हिंदी | चिंटू से पूछो: क्या तुम्हें भूख लगती है? रोबो क्या खाता है? |
+| ☐ | ☐ | `en-1224` | English | Ask Chintu: do you get hungry? What does a robot eat? |
+| ☐ | ☐ | `hi-1276` | हिंदी | पिज़्ज़ा खाता है |
+| ☐ | ☐ | `en-1225` | English | It eats pizza |
+| ☐ | ☐ | `hi-1277` | हिंदी | बिजली से चलता है |
+| ☐ | ☐ | `en-1226` | English | It runs on electricity |
+| ☐ | ☐ | `hi-1278` | हिंदी | सही! मैं इंसान नहीं, मशीन हूँ। मुझे खाना नहीं, बिजली चाहिए। भूख तो तुम्हें लगती है — तुम खाना खाओ! |
+| ☐ | ☐ | `en-1227` | English | Right! I'm not a person, I'm a machine. I don't need food, I need electricity. You get hungry — you eat food! |
+| ☐ | ☐ | `hi-1279` | हिंदी | चिंटू चित्र बना सकता है! पर क्या बनाए? तुम बताओ। |
+| ☐ | ☐ | `en-1228` | English | Chintu can draw pictures! But what should it draw? You tell it. |
+| ☐ | ☐ | `hi-1280` | हिंदी | कुछ बनाओ। |
+| ☐ | ☐ | `en-1229` | English | Draw something. |
+| ☐ | ☐ | `hi-1281` | हिंदी | पेड़ पर बैठी पीली चिड़िया बनाओ, और ऊपर सूरज। |
+| ☐ | ☐ | `en-1230` | English | Draw a yellow bird sitting on a tree, with the sun above. |
+| ☐ | ☐ | `hi-1282` | हिंदी | चिंटू ने सेब गिने। चिंटू कहता है: यहाँ पाँच सेब हैं! क्या ये सही है? तुम ख़ुद गिनो। |
+| ☐ | ☐ | `en-1231` | English | Chintu counted the apples. Chintu says: there are five apples! Is that right? Count them yourself. |
+| ☐ | ☐ | `hi-1283` | हिंदी | हाँ! सेब तो तीन हैं। रोबो ने गलती की — इसलिए हम ख़ुद गिनकर जाँचते हैं। |
+| ☐ | ☐ | `en-1232` | English | Yes! There are only three apples. The robot made a mistake — that's why we count and check ourselves. |
+| ☐ | ☐ | `hi-1284` | हिंदी | फिर से गिनो — एक, दो, तीन! सेब तीन हैं, पाँच नहीं। रोबो भी गलती कर सकता है। |
+| ☐ | ☐ | `en-1233` | English | Count again — one, two, three! There are three apples, not five. Robots can make mistakes too. |
+| ☐ | ☐ | `hi-1285` | हिंदी | गिरने से घुटने में चोट लगी है। दर्द हो रहा है। किसे बताओगे? |
+| ☐ | ☐ | `en-1234` | English | You fell and hurt your knee. It hurts. Who will you tell? |
+| ☐ | ☐ | `hi-1286` | हिंदी | रोबो को |
+| ☐ | ☐ | `hi-1287` | हिंदी | मम्मी-पापा या किसी बड़े को |
+| ☐ | ☐ | `en-1235` | English | Mummy, Papa or a grown-up |
+| ☐ | ☐ | `hi-1288` | हिंदी | बिल्कुल! मैं मशीन हूँ — मैं गले नहीं लगा सकता, पट्टी नहीं कर सकता। चोट लगे तो बड़ों को बताओ। |
+| ☐ | ☐ | `en-1236` | English | Exactly! I'm a machine — I can't hug you or put on a bandage. When you're hurt, tell a grown-up. |
+| ☐ | ☐ | `hi-1289` | हिंदी | लाल किताब |
+| ☐ | ☐ | `en-1237` | English | the red book |
+| ☐ | ☐ | `hi-1290` | हिंदी | तुम्हें शेर वाली लाल किताब चाहिए। सबसे साफ़ कैसे माँगोगे? |
+| ☐ | ☐ | `en-1238` | English | You want the red book about lions. What's the clearest way to ask? |
+| ☐ | ☐ | `hi-1291` | हिंदी | किताब दो! |
+| ☐ | ☐ | `en-1239` | English | Give me a book! |
+| ☐ | ☐ | `hi-1292` | हिंदी | शेर वाली लाल किताब दो। |
+| ☐ | ☐ | `en-1240` | English | Please give me the red book about lions. |
+| ☐ | ☐ | `hi-1293` | हिंदी | रात को अँधेरे में डर लग रहा है। किससे कहोगे? |
+| ☐ | ☐ | `en-1241` | English | You feel scared in the dark at night. Who will you tell? |
+| ☐ | ☐ | `hi-1294` | हिंदी | रोबो से |
+| ☐ | ☐ | `hi-1295` | हिंदी | घर के किसी बड़े से |
+| ☐ | ☐ | `en-1242` | English | A grown-up at home |
+| ☐ | ☐ | `hi-1296` | हिंदी | हाँ! दिल की बात — डर, दुख, ख़ुशी — अपने बड़ों से कहो। वो तुम्हें सच में समझते हैं। |
+| ☐ | ☐ | `en-1243` | English | Yes! Feelings — scared, sad or happy — tell them to your grown-ups. They really understand you. |
+
+## robo › लाल या हरा?
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1212` | हिंदी | लाल या हरा? |
+| ☐ | ☐ | `en-1163` | English | Red or green? |
+| ☐ | ☐ | `hi-1213` | हिंदी | Laal ya hara? |
+| ☐ | ☐ | `hi-1214` | हिंदी | ये किस टोकरी में जाएगा — लाल या हरी? |
+| ☐ | ☐ | `en-1164` | English | Which basket — red or green? |
+| ☐ | ☐ | `hi-1215` | हिंदी | लाल टोकरी |
+| ☐ | ☐ | `en-1165` | English | Red basket |
+| ☐ | ☐ | `hi-1216` | हिंदी | Laal tokri |
+| ☐ | ☐ | `hi-1217` | हिंदी | हरी टोकरी |
+| ☐ | ☐ | `en-1166` | English | Green basket |
+| ☐ | ☐ | `hi-1218` | हिंदी | Hari tokri |
+| ☐ | ☐ | `en-1167` | English | frog |
+| ☐ | ☐ | `hi-1219` | हिंदी | हरा सेब |
+| ☐ | ☐ | `en-1168` | English | green apple |
+| ☐ | ☐ | `hi-1220` | हिंदी | दमकल गाड़ी |
+| ☐ | ☐ | `en-1169` | English | fire engine |
+| ☐ | ☐ | `hi-1221` | हिंदी | स्ट्रॉबेरी |
+| ☐ | ☐ | `en-1170` | English | strawberry |
+| ☐ | ☐ | `hi-1222` | हिंदी | पत्ता |
+| ☐ | ☐ | `en-1171` | English | leaf |
+| ☐ | ☐ | `en-1172` | English | ladybird |
+| ☐ | ☐ | `hi-1223` | हिंदी | खीरा |
+| ☐ | ☐ | `en-1173` | English | cucumber |
+| ☐ | ☐ | `hi-1224` | हिंदी | गुलाब |
+| ☐ | ☐ | `en-1174` | English | rose |
+| ☐ | ☐ | `en-1175` | English | tree |
+
+## robo › फल या सब्ज़ी?
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1225` | हिंदी | फल या सब्ज़ी? |
+| ☐ | ☐ | `en-1176` | English | Fruit or vegetable? |
+| ☐ | ☐ | `hi-1226` | हिंदी | Phal ya sabzi? |
+| ☐ | ☐ | `hi-1227` | हिंदी | ये फल है या सब्ज़ी? |
+| ☐ | ☐ | `en-1177` | English | Is it a fruit or a vegetable? |
+| ☐ | ☐ | `hi-1228` | हिंदी | फल की टोकरी |
+| ☐ | ☐ | `en-1178` | English | Fruit basket |
+| ☐ | ☐ | `hi-1229` | हिंदी | Phal ki tokri |
+| ☐ | ☐ | `hi-1230` | हिंदी | सब्ज़ी की टोकरी |
+| ☐ | ☐ | `en-1179` | English | Vegetable basket |
+| ☐ | ☐ | `hi-1231` | हिंदी | Sabzi ki tokri |
+| ☐ | ☐ | `hi-1232` | हिंदी | बैंगन |
+| ☐ | ☐ | `en-1180` | English | brinjal |
+| ☐ | ☐ | `hi-1233` | हिंदी | चेरी |
+| ☐ | ☐ | `en-1181` | English | cherries |
+| ☐ | ☐ | `hi-1234` | हिंदी | लहसुन |
+| ☐ | ☐ | `en-1182` | English | garlic |
+| ☐ | ☐ | `hi-1235` | हिंदी | भुट्टा |
+| ☐ | ☐ | `en-1183` | English | corn |
+| ☐ | ☐ | `en-1184` | English | carrot |
+| ☐ | ☐ | `en-1185` | English | watermelon |
+| ☐ | ☐ | `hi-1236` | हिंदी | हरी गोभी |
+| ☐ | ☐ | `en-1186` | English | broccoli |
+| ☐ | ☐ | `en-1187` | English | potato |
+| ☐ | ☐ | `en-1188` | English | pineapple |
+
+## robo › पानी में या ज़मीन पर?
+
+| ✓ F | ✓ M | id | भाषा | बोलना है |
+|---|---|---|---|---|
+| ☐ | ☐ | `hi-1237` | हिंदी | पानी में या ज़मीन पर? |
+| ☐ | ☐ | `en-1189` | English | Water or land? |
+| ☐ | ☐ | `hi-1238` | हिंदी | Paani mein ya zameen par? |
+| ☐ | ☐ | `hi-1239` | हिंदी | ये पानी में रहता है या ज़मीन पर? |
+| ☐ | ☐ | `en-1190` | English | Does it live in water or on land? |
+| ☐ | ☐ | `hi-1240` | हिंदी | पानी वाले |
+| ☐ | ☐ | `en-1191` | English | Water animals |
+| ☐ | ☐ | `hi-1241` | हिंदी | Paani wale |
+| ☐ | ☐ | `hi-1242` | हिंदी | ज़मीन वाले |
+| ☐ | ☐ | `en-1192` | English | Land animals |
+| ☐ | ☐ | `hi-1243` | हिंदी | Zameen wale |
+| ☐ | ☐ | `en-1193` | English | whale |
+| ☐ | ☐ | `hi-1244` | हिंदी | ख़रगोश |
+| ☐ | ☐ | `en-1194` | English | rabbit |
+| ☐ | ☐ | `hi-1245` | हिंदी | धारी वाली मछली |
+| ☐ | ☐ | `en-1195` | English | striped fish |
+| ☐ | ☐ | `en-1196` | English | octopus |
+| ☐ | ☐ | `en-1197` | English | tiger |
+| ☐ | ☐ | `en-1198` | English | monkey |
+| ☐ | ☐ | `hi-1246` | हिंदी | शार्क |
+| ☐ | ☐ | `en-1199` | English | shark |
+| ☐ | ☐ | `hi-1247` | हिंदी | जिराफ़ |
+| ☐ | ☐ | `en-1200` | English | giraffe |
+| ☐ | ☐ | `hi-1248` | हिंदी | डॉल्फ़िन |
+| ☐ | ☐ | `en-1201` | English | dolphin |
 

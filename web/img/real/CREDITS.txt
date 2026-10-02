@@ -1,0 +1,317 @@
+Pictures in web/img/real/ — credits and licences
+=================================================
+
+1. Fluent Emoji 3D renders (all *.webp files directly in this folder)
+
+   Fluent Emoji © Microsoft Corporation, MIT License.
+   Source: https://github.com/microsoft/fluentui-emoji (assets/<name>/3D/*.png, branch main)
+   Changes: converted from PNG to WebP at the original 256x256. The three family-*.webp
+   pictures are composed from several Fluent person renders (Fluent has no 3D family emoji).
+   People and hands use the Fluent "Medium" skin-tone render unless a specific tone is asked for.
+
+MIT License
+
+Copyright (c) Microsoft Corporation.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE
+
+   Files (picture, emoji it stands for, Fluent source):
+  adhesive-bandage.webp                      🩹  Adhesive bandage/3D/adhesive_bandage_3d.png
+  airplane.webp                              ✈  Airplane/3D/airplane_3d.png
+  alarm-clock.webp                           ⏰  Alarm clock/3D/alarm_clock_3d.png
+  ambulance.webp                             🚑  Ambulance/3D/ambulance_3d.png
+  ant.webp                                   🐜  Ant/3D/ant_3d.png
+  artist-palette.webp                        🎨  Artist palette/3D/artist_palette_3d.png
+  auto-rickshaw.webp                         🛺  Auto rickshaw/3D/auto_rickshaw_3d.png
+  automobile.webp                            🚗  Automobile/3D/automobile_3d.png
+  baby.webp                                  👶  Baby/Medium/3D/baby_3d_medium.png
+  baby-chick.webp                            🐤  Baby chick/3D/baby_chick_3d.png
+  backhand-index-pointing-down.webp          👇  Backhand index pointing down/Medium/3D/backhand_index_pointing_down_3d_medium.png
+  backhand-index-pointing-up.webp            👆  Backhand index pointing up/Medium/3D/backhand_index_pointing_up_3d_medium.png
+  backpack.webp                              🎒  Backpack/3D/backpack_3d.png
+  balloon.webp                               🎈  Balloon/3D/balloon_3d.png
+  banana.webp                                🍌  Banana/3D/banana_3d.png
+  basket.webp                                🧺  Basket/3D/basket_3d.png
+  bathtub.webp                               🛁  Bathtub/3D/bathtub_3d.png
+  battery.webp                               🔋  Battery/3D/battery_3d.png
+  beaming-face-with-smiling-eyes.webp        😁  Beaming face with smiling eyes/3D/beaming_face_with_smiling_eyes_3d.png
+  bear.webp                                  🐻  Bear/3D/bear_3d.png
+  bed.webp                                   🛏  Bed/3D/bed_3d.png
+  beverage-box.webp                          🧃  Beverage box/3D/beverage_box_3d.png
+  bicycle.webp                               🚲  Bicycle/3D/bicycle_3d.png
+  billed-cap.webp                            🧢  Billed cap/3D/billed_cap_3d.png
+  bird.webp                                  🐦  Bird/3D/bird_3d.png
+  blossom.webp                               🌼  Blossom/3D/blossom_3d.png
+  blue-book.webp                             📘  Blue book/3D/blue_book_3d.png
+  books.webp                                 📚  Books/3D/books_3d.png
+  bow-and-arrow.webp                         🏹  Bow and arrow/3D/bow_and_arrow_3d.png
+  boy.webp                                   👦  Boy/Medium/3D/boy_3d_medium.png
+  brick.webp                                 🧱  Brick/3D/brick_3d.png
+  broccoli.webp                              🥦  Broccoli/3D/broccoli_3d.png
+  broom.webp                                 🧹  Broom/3D/broom_3d.png
+  bucket.webp                                🪣  Bucket/3D/bucket_3d.png
+  bus.webp                                   🚌  Bus/3D/bus_3d.png
+  butterfly.webp                             🦋  Butterfly/3D/butterfly_3d.png
+  cactus.webp                                🌵  Cactus/3D/cactus_3d.png
+  candy.webp                                 🍬  Candy/3D/candy_3d.png
+  carrot.webp                                🥕  Carrot/3D/carrot_3d.png
+  cat.webp                                   🐱 🐈  Cat/3D/cat_3d.png
+  chequered-flag.webp                        🏁  Chequered flag/3D/chequered_flag_3d.png
+  cherries.webp                              🍒  Cherries/3D/cherries_3d.png
+  cherry-blossom.webp                        🌸  Cherry blossom/3D/cherry_blossom_3d.png
+  chestnut.webp                              🌰  Chestnut/3D/chestnut_3d.png
+  chicken.webp                               🐔  Chicken/3D/chicken_3d.png
+  child.webp                                 🧒  Child/Medium/3D/child_3d_medium.png
+  chocolate-bar.webp                         🍫  Chocolate bar/3D/chocolate_bar_3d.png
+  christmas-tree.webp                        🎄  Christmas tree/3D/christmas_tree_3d.png
+  clapping-hands.webp                        👏  Clapping hands/Medium/3D/clapping_hands_3d_medium.png
+  closed-book.webp                           📕  Closed book/3D/closed_book_3d.png
+  cloud.webp                                 ☁  Cloud/3D/cloud_3d.png
+  cloud-with-rain.webp                       🌧  Cloud with rain/3D/cloud_with_rain_3d.png
+  cooking.webp                               🍳  Cooking/3D/cooking_3d.png
+  cow.webp                                   🐮 🐄  Cow/3D/cow_3d.png
+  crayon.webp                                🖍  Crayon/3D/crayon_3d.png
+  crescent-moon.webp                         🌙  Crescent moon/3D/crescent_moon_3d.png
+  cricket.webp                               🦗  Cricket/3D/cricket_3d.png
+  crown.webp                                 👑  Crown/3D/crown_3d.png
+  cucumber.webp                              🥒  Cucumber/3D/cucumber_3d.png
+  curry-rice.webp                            🍛  Curry rice/3D/curry_rice_3d.png
+  deciduous-tree.webp                        🌳  Deciduous tree/3D/deciduous_tree_3d.png
+  dog.webp                                   🐶 🐕  Dog/3D/dog_3d.png
+  dolphin.webp                               🐬  Dolphin/3D/dolphin_3d.png
+  downcast-face-with-sweat.webp              😓  Downcast face with sweat/3D/downcast_face_with_sweat_3d.png
+  droplet.webp                               💧  Droplet/3D/droplet_3d.png
+  drum.webp                                  🥁  Drum/3D/drum_3d.png
+  duck.webp                                  🦆  Duck/3D/duck_3d.png
+  ear.webp                                   👂  Ear/Medium/3D/ear_3d_medium.png
+  ear-of-corn.webp                           🌽  Ear of corn/3D/ear_of_corn_3d.png
+  eggplant.webp                              🍆  Eggplant/3D/eggplant_3d.png
+  elephant.webp                              🐘  Elephant/3D/elephant_3d.png
+  ewe.webp                                   🐑  Ewe/3D/ewe_3d.png
+  eye.webp                                   👁  Eye/3D/eye_3d.png
+  eyes.webp                                  👀  Eyes/3D/eyes_3d.png
+  face-with-head-bandage.webp                🤕  Face with head-bandage/3D/face_with_head-bandage_3d.png
+  face-with-open-mouth.webp                  😮  Face with open mouth/3D/face_with_open_mouth_3d.png
+  family-man-woman-boy.webp                  👨‍👩‍👦  composed from: Man/Medium/3D/man_3d_medium.png + Woman/Medium/3D/woman_3d_medium.png + Boy/Medium/3D/boy_3d_medium.png
+  family-man-woman-girl.webp                 👨‍👩‍👧  composed from: Man/Medium/3D/man_3d_medium.png + Woman/Medium/3D/woman_3d_medium.png + Girl/Medium/3D/girl_3d_medium.png
+  family-woman-girl.webp                     👩‍👧  composed from: Woman/Medium/3D/woman_3d_medium.png + Girl/Medium/3D/girl_3d_medium.png
+  fire-engine.webp                           🚒  Fire engine/3D/fire_engine_3d.png
+  fish.webp                                  🐟  Fish/3D/fish_3d.png
+  flatbread.webp                             🫓  Flatbread/3D/flatbread_3d.png
+  flexed-biceps.webp                         💪  Flexed biceps/Medium/3D/flexed_biceps_3d_medium.png
+  fog.webp                                   🌫  Fog/3D/fog_3d.png
+  folded-hands.webp                          🙏  Folded hands/Medium/3D/folded_hands_3d_medium.png
+  foot.webp                                  🦶  Foot/Medium/3D/foot_3d_medium.png
+  fork-and-knife-with-plate.webp             🍽  Fork and knife with plate/3D/fork_and_knife_with_plate_3d.png
+  fountain-pen.webp                          🖋  Fountain pen/3D/fountain_pen_3d.png
+  fox.webp                                   🦊  Fox/3D/fox_3d.png
+  framed-picture.webp                        🖼  Framed picture/3D/framed_picture_3d.png
+  frog.webp                                  🐸  Frog/3D/frog_3d.png
+  front-facing-baby-chick.webp               🐥  Front-facing baby chick/3D/front-facing_baby_chick_3d.png
+  full-moon.webp                             🌕  Full moon/3D/full_moon_3d.png
+  garlic.webp                                🧄  Garlic/3D/garlic_3d.png
+  giraffe.webp                               🦒  Giraffe/3D/giraffe_3d.png
+  girl.webp                                  👧  Girl/Medium/3D/girl_3d_medium.png
+  glass-of-milk.webp                         🥛  Glass of milk/3D/glass_of_milk_3d.png
+  glasses.webp                               👓  Glasses/3D/glasses_3d.png
+  globe-showing-asia-australia.webp          🌍  Globe showing asia-australia/3D/globe_showing_asia-australia_3d.png
+  goat.webp                                  🐐  Goat/3D/goat_3d.png
+  grapes.webp                                🍇  Grapes/3D/grapes_3d.png
+  green-apple.webp                           🍏  Green apple/3D/green_apple_3d.png
+  green-book.webp                            📗  Green book/3D/green_book_3d.png
+  grinning-face.webp                         😀  Grinning face/3D/grinning_face_3d.png
+  grinning-face-with-smiling-eyes.webp       😄  Grinning face with smiling eyes/3D/grinning_face_with_smiling_eyes_3d.png
+  hammer.webp                                🔨  Hammer/3D/hammer_3d.png
+  handshake.webp                             🤝  Handshake/3D/handshake_3d.png
+  herb.webp                                  🌿  Herb/3D/herb_3d.png
+  hibiscus.webp                              🌺  Hibiscus/3D/hibiscus_3d.png
+  high-voltage.webp                          ⚡  High voltage/3D/high_voltage_3d.png
+  hiking-boot.webp                           🥾  Hiking boot/3D/hiking_boot_3d.png
+  hindu-temple.webp                          🛕  Hindu temple/3D/hindu_temple_3d.png
+  honey-pot.webp                             🍯  Honey pot/3D/honey_pot_3d.png
+  hospital.webp                              🏥  Hospital/3D/hospital_3d.png
+  house.webp                                 🏠  House/3D/house_3d.png
+  index-pointing-up.webp                     ☝  Index pointing up/Medium/3D/index_pointing_up_3d_medium.png
+  kite.webp                                  🪁  Kite/3D/kite_3d.png
+  koala.webp                                 🐨  Koala/3D/koala_3d.png
+  lady-beetle.webp                           🐞  Lady beetle/3D/lady_beetle_3d.png
+  last-quarter-moon.webp                     🌗  Last quarter moon/3D/last_quarter_moon_3d.png
+  leaf-fluttering-in-wind.webp               🍃  Leaf fluttering in wind/3D/leaf_fluttering_in_wind_3d.png
+  light-bulb.webp                            💡  Light bulb/3D/light_bulb_3d.png
+  lion.webp                                  🦁  Lion/3D/lion_3d.png
+  locomotive.webp                            🚂  Locomotive/3D/locomotive_3d.png
+  lollipop.webp                              🍭  Lollipop/3D/lollipop_3d.png
+  lotus.webp                                 🪷  Lotus/3D/lotus_3d.png
+  magnifying-glass-tilted-left.webp          🔍  Magnifying glass tilted left/3D/magnifying_glass_tilted_left_3d.png
+  man-artist-light.webp                      👨🏻‍🎨  Man artist/Light/3D/man_artist_3d_light.png
+  man-astronaut-medium.webp                  👨🏽‍🚀  Man astronaut/Medium/3D/man_astronaut_3d_medium.png
+  man-bouncing-ball-light.webp               ⛹🏻‍♂  Man bouncing ball/Light/3D/man_bouncing_ball_3d_light.png
+  man-cook-medium.webp                       👨🏽‍🍳  Man cook/Medium/3D/man_cook_3d_medium.png
+  man-farmer.webp                            👨‍🌾  Man farmer/Medium/3D/man_farmer_3d_medium.png
+  man-health-worker-light.webp               👨🏻‍⚕  Man health worker/Light/3D/man_health_worker_3d_light.png
+  man-health-worker-medium.webp              👨🏽‍⚕  Man health worker/Medium/3D/man_health_worker_3d_medium.png
+  man-mechanic.webp                          👨‍🔧  Man mechanic/Medium/3D/man_mechanic_3d_medium.png
+  man-medium.webp                            👨🏽  Man/Medium/3D/man_3d_medium.png
+  man-medium-dark.webp                       👨🏾  Man/Medium-Dark/3D/man_3d_medium-dark.png
+  man-pilot-medium-dark.webp                 👨🏾‍✈  Man pilot/Medium-Dark/3D/man_pilot_3d_medium-dark.png
+  man-police-officer-light.webp              👮🏻‍♂  Man police officer/Light/3D/man_police_officer_3d_light.png
+  man-scientist-light.webp                   👨🏻‍🔬  Man scientist/Light/3D/man_scientist_3d_light.png
+  man-teacher-medium-dark.webp               👨🏾‍🏫  Man teacher/Medium-Dark/3D/man_teacher_3d_medium-dark.png
+  man-white-hair-light.webp                  👨🏻‍🦳  Man white hair/Light/3D/man_white_hair_3d_light.png
+  mango.webp                                 🥭  Mango/3D/mango_3d.png
+  megaphone.webp                             📣  Megaphone/3D/megaphone_3d.png
+  microbe.webp                               🦠  Microbe/3D/microbe_3d.png
+  microscope.webp                            🔬  Microscope/3D/microscope_3d.png
+  military-helmet.webp                       🪖  Military helmet/3D/military_helmet_3d.png
+  military-medal.webp                        🎖  Military medal/3D/military_medal_3d.png
+  minibus.webp                               🚐  Minibus/3D/minibus_3d.png
+  monkey.webp                                🐵 🐒  Monkey/3D/monkey_3d.png
+  mouth.webp                                 👄  Mouth/3D/mouth_3d.png
+  nest-with-eggs.webp                        🪺  Nest with eggs/3D/nest_with_eggs_3d.png
+  nose.webp                                  👃  Nose/Medium/3D/nose_3d_medium.png
+  octopus.webp                               🐙  Octopus/3D/octopus_3d.png
+  old-man.webp                               👴  Old man/Medium/3D/old_man_3d_medium.png
+  old-woman.webp                             👵  Old woman/Medium/3D/old_woman_3d_medium.png
+  one-oclock.webp                            🕐  One oclock/3D/one_oclock_3d.png
+  onion.webp                                 🧅  Onion/3D/onion_3d.png
+  open-book.webp                             📖  Open book/3D/open_book_3d.png
+  owl.webp                                   🦉  Owl/3D/owl_3d.png
+  ox.webp                                    🐂  Ox/3D/ox_3d.png
+  package.webp                               📦  Package/3D/package_3d.png
+  page-facing-up.webp                        📄  Page facing up/3D/page_facing_up_3d.png
+  panda.webp                                 🐼  Panda/3D/panda_3d.png
+  parrot.webp                                🦜  Parrot/3D/parrot_3d.png
+  paw-prints.webp                            🐾  Paw prints/3D/paw_prints_3d.png
+  pea-pod.webp                               🫛  Pea pod/3D/pea_pod_3d.png
+  peacock.webp                               🦚  Peacock/3D/peacock_3d.png
+  pencil.webp                                ✏  Pencil/3D/pencil_3d.png
+  penguin.webp                               🐧  Penguin/3D/penguin_3d.png
+  person-bowing.webp                         🙇  Person bowing/Medium/3D/person_bowing_3d_medium.png
+  person-getting-haircut.webp                💇  Person getting haircut/Medium/3D/person_getting_haircut_3d_medium.png
+  person-in-bed.webp                         🛌  Person in bed/Medium/3D/person_in_bed_3d_medium.png
+  person-in-lotus-position.webp              🧘  Person in lotus position/Medium/3D/person_in_lotus_position_3d_medium.png
+  person-raising-hand.webp                   🙋  Person raising hand/Medium/3D/person_raising_hand_3d_medium.png
+  person-running.webp                        🏃  Person running/Medium/3D/person_running_3d_medium.png
+  pig.webp                                   🐷  Pig/3D/pig_3d.png
+  pineapple.webp                             🍍  Pineapple/3D/pineapple_3d.png
+  pizza.webp                                 🍕  Pizza/3D/pizza_3d.png
+  police-car.webp                            🚓  Police car/3D/police_car_3d.png
+  pot-of-food.webp                           🍲  Pot of food/3D/pot_of_food_3d.png
+  potable-water.webp                         🚰  Potable water/3D/potable_water_3d.png
+  potato.webp                                🥔  Potato/3D/potato_3d.png
+  potted-plant.webp                          🪴  Potted plant/3D/potted_plant_3d.png
+  princess.webp                              👸  Princess/Medium/3D/princess_3d_medium.png
+  puzzle-piece.webp                          🧩  Puzzle piece/3D/puzzle_piece_3d.png
+  rabbit.webp                                🐰 🐇  Rabbit/3D/rabbit_3d.png
+  rainbow.webp                               🌈  Rainbow/3D/rainbow_3d.png
+  raised-hand.webp                           ✋  Raised hand/Medium/3D/raised_hand_3d_medium.png
+  red-apple.webp                             🍎  Red apple/3D/red_apple_3d.png
+  red-heart.webp                             ❤  Red heart/3D/red_heart_3d.png
+  relieved-face.webp                         😌  Relieved face/3D/relieved_face_3d.png
+  robot.webp                                 🤖  Robot/3D/robot_3d.png
+  rocket.webp                                🚀  Rocket/3D/rocket_3d.png
+  rooster.webp                               🐓  Rooster/3D/rooster_3d.png
+  rose.webp                                  🌹  Rose/3D/rose_3d.png
+  sailboat.webp                              ⛵  Sailboat/3D/sailboat_3d.png
+  school.webp                                🏫  School/3D/school_3d.png
+  seedling.webp                              🌱  Seedling/3D/seedling_3d.png
+  sewing-needle.webp                         🪡  Sewing needle/3D/sewing_needle_3d.png
+  shark.webp                                 🦈  Shark/3D/shark_3d.png
+  sheaf-of-rice.webp                         🌾  Sheaf of rice/3D/sheaf_of_rice_3d.png
+  ship.webp                                  🚢  Ship/3D/ship_3d.png
+  shopping-cart.webp                         🛒  Shopping cart/3D/shopping_cart_3d.png
+  sleeping-face.webp                         😴  Sleeping face/3D/sleeping_face_3d.png
+  slightly-smiling-face.webp                 🙂  Slightly smiling face/3D/slightly_smiling_face_3d.png
+  smiling-face-with-smiling-eyes.webp        😊  Smiling face with smiling eyes/3D/smiling_face_with_smiling_eyes_3d.png
+  snowflake.webp                             ❄  Snowflake/3D/snowflake_3d.png
+  soap.webp                                  🧼  Soap/3D/soap_3d.png
+  soccer-ball.webp                           ⚽  Soccer ball/3D/soccer_ball_3d.png
+  soft-ice-cream.webp                        🍦  Soft ice cream/3D/soft_ice_cream_3d.png
+  sponge.webp                                🧽  Sponge/3D/sponge_3d.png
+  spoon.webp                                 🥄  Spoon/3D/spoon_3d.png
+  sport-utility-vehicle.webp                 🚙  Sport utility vehicle/3D/sport_utility_vehicle_3d.png
+  sports-medal.webp                          🏅  Sports medal/3D/sports_medal_3d.png
+  star.webp                                  ⭐  Star/3D/star_3d.png
+  stethoscope.webp                           🩺  Stethoscope/3D/stethoscope_3d.png
+  straight-ruler.webp                        📏  Straight ruler/3D/straight_ruler_3d.png
+  strawberry.webp                            🍓  Strawberry/3D/strawberry_3d.png
+  sun.webp                                   ☀  Sun/3D/sun_3d.png
+  sun-with-face.webp                         🌞  Sun with face/3D/sun_with_face_3d.png
+  sunflower.webp                             🌻  Sunflower/3D/sunflower_3d.png
+  sunrise.webp                               🌅  Sunrise/3D/sunrise_3d.png
+  sunset.webp                                🌇  Sunset/3D/sunset_3d.png
+  syringe.webp                               💉  Syringe/3D/syringe_3d.png
+  tangerine.webp                             🍊  Tangerine/3D/tangerine_3d.png
+  taxi.webp                                  🚕  Taxi/3D/taxi_3d.png
+  teddy-bear.webp                            🧸  Teddy bear/3D/teddy_bear_3d.png
+  television.webp                            📺  Television/3D/television_3d.png
+  tennis.webp                                🎾  Tennis/3D/tennis_3d.png
+  tent.webp                                  ⛺  Tent/3D/tent_3d.png
+  thinking-face.webp                         🤔  Thinking face/3D/thinking_face_3d.png
+  thread.webp                                🧵  Thread/3D/thread_3d.png
+  three-oclock.webp                          🕒  Three oclock/3D/three_oclock_3d.png
+  thumbs-down.webp                           👎  Thumbs down/Medium/3D/thumbs_down_3d_medium.png
+  tiger.webp                                 🐯 🐅  Tiger/3D/tiger_3d.png
+  tomato.webp                                🍅  Tomato/3D/tomato_3d.png
+  tooth.webp                                 🦷  Tooth/3D/tooth_3d.png
+  toothbrush.webp                            🪥  Toothbrush/3D/toothbrush_3d.png
+  top-hat.webp                               🎩  Top hat/3D/top_hat_3d.png
+  triangular-flag.webp                       🚩  Triangular flag/3D/triangular_flag_3d.png
+  trident-emblem.webp                        🔱  Trident emblem/3D/trident_emblem_3d.png
+  trophy.webp                                🏆  Trophy/3D/trophy_3d.png
+  tropical-fish.webp                         🐠  Tropical fish/3D/tropical_fish_3d.png
+  tulip.webp                                 🌷  Tulip/3D/tulip_3d.png
+  turtle.webp                                🐢  Turtle/3D/turtle_3d.png
+  umbrella.webp                              ☂  Umbrella/3D/umbrella_3d.png
+  unicorn.webp                               🦄  Unicorn/3D/unicorn_3d.png
+  vertical-traffic-light.webp                🚦  Vertical traffic light/3D/vertical_traffic_light_3d.png
+  violin.webp                                🎻  Violin/3D/violin_3d.png
+  watch.webp                                 ⌚  Watch/3D/watch_3d.png
+  water-wave.webp                            🌊  Water wave/3D/water_wave_3d.png
+  watermelon.webp                            🍉  Watermelon/3D/watermelon_3d.png
+  whale.webp                                 🐋  Whale/3D/whale_3d.png
+  wheel.webp                                 🛞  Wheel/3D/wheel_3d.png
+  wind-face.webp                             🌬  Wind face/3D/wind_face_3d.png
+  woman-artist-medium-dark.webp              👩🏾‍🎨  Woman artist/Medium-Dark/3D/woman_artist_3d_medium-dark.png
+  woman-astronaut.webp                       👩‍🚀  Woman astronaut/Medium/3D/woman_astronaut_3d_medium.png
+  woman-cook-light.webp                      👩🏻‍🍳  Woman cook/Light/3D/woman_cook_3d_light.png
+  woman-dancing.webp                         💃  Woman dancing/Medium/3D/woman_dancing_3d_medium.png
+  woman-farmer-medium-dark.webp              👩🏾‍🌾  Woman farmer/Medium-Dark/3D/woman_farmer_3d_medium-dark.png
+  woman-health-worker.webp                   👩‍⚕  Woman health worker/Medium/3D/woman_health_worker_3d_medium.png
+  woman-health-worker-medium-dark.webp       👩🏾‍⚕  Woman health worker/Medium-Dark/3D/woman_health_worker_3d_medium-dark.png
+  woman-light.webp                           👩🏻  Woman/Light/3D/woman_3d_light.png
+  woman-mechanic-medium.webp                 👩🏽‍🔧  Woman mechanic/Medium/3D/woman_mechanic_3d_medium.png
+  woman-medium.webp                          👩🏽 👩  Woman/Medium/3D/woman_3d_medium.png
+  woman-medium-dark.webp                     👩🏾  Woman/Medium-Dark/3D/woman_3d_medium-dark.png
+  woman-pilot-light.webp                     👩🏻‍✈  Woman pilot/Light/3D/woman_pilot_3d_light.png
+  woman-police-officer-medium.webp           👮🏽‍♀  Woman police officer/Medium/3D/woman_police_officer_3d_medium.png
+  woman-running-medium.webp                  🏃🏽‍♀  Woman running/Medium/3D/woman_running_3d_medium.png
+  woman-scientist-medium-dark.webp           👩🏾‍🔬  Woman scientist/Medium-Dark/3D/woman_scientist_3d_medium-dark.png
+  woman-teacher-light.webp                   👩🏻‍🏫  Woman teacher/Light/3D/woman_teacher_3d_light.png
+  wood.webp                                  🪵  Wood/3D/wood_3d.png
+  world-map.webp                             🗺  World map/3D/world_map_3d.png
+  worried-face.webp                          😟  Worried face/3D/worried_face_3d.png
+  wrapped-gift.webp                          🎁  Wrapped gift/3D/wrapped_gift_3d.png
+  wrench.webp                                🔧  Wrench/3D/wrench_3d.png
+  yarn.webp                                  🧶  Yarn/3D/yarn_3d.png
+  yawning-face.webp                          🥱  Yawning face/3D/yawning_face_3d.png
+  yo-yo.webp                                 🪀  Yo-yo/3D/yo-yo_3d.png
+  zebra.webp                                 🦓  Zebra/3D/zebra_3d.png
+
+2. Photographs: none yet. See docs/IMAGES.md for how real photographs can be added later.
