@@ -19,7 +19,14 @@
      NS.stripEmoji(text)             remove emoji (never read aloud; also used for clip keys)
      NS.open(id), NS.home()          navigation (set by ui.js)
      NS.native                       Android bridge: NS.native.available, NS.native.onEvent(json)
-   Filled in by later core files: NS.store, NS.voice, NS.rewards, NS.billing, NS.ui, NS.mascot. */
+     NS.picture(key, {alt, cls, size, eager})
+                                     an element showing the realistic picture for an emoji key
+                                     (NS.img, js/content/images.js) or, when there is none or it
+                                     fails to load, the emoji itself. Strings of several emoji
+                                     ("🍎🍎🍎") show one picture per emoji (the element gets
+                                     class pic-many and --n, --cols, --rows for a calm layout).
+   Filled in by later core files: NS.store, NS.voice, NS.sfx, NS.rewards, NS.billing, NS.ui,
+   NS.mascot. */
 (function () {
   "use strict";
 
@@ -36,7 +43,8 @@
   NS.content = NS.content || {};
 
   /* ---------------- Activity registry ---------------- */
-  const SECTIONS = ["learn", "grow", "play"];
+  /* Home sections, in this order: सीखो, अच्छी आदतें, खेलो, कल की दुनिया. */
+  const SECTIONS = ["learn", "grow", "play", "future"];
   const registry = new Map();
   NS.SECTIONS = SECTIONS;
   NS.registerActivity = function (def) {
@@ -85,6 +93,65 @@
     if (onClick) b.addEventListener("click", onClick);
     return b;
   };
+  /* Realistic pictures (js/content/images.js provides NS.img). Only same-origin image files or
+     data: images are shown; anything else falls back to the emoji. */
+  const SAFE_IMG = /^(?:[\w\-]+\/)*[\w\-.]+\.(?:webp|png|jpe?g|avif|svg)$|^data:image\/(?:webp|png|jpeg|avif);base64,[A-Za-z0-9+/=]+$/;
+  NS.imgUrl = function (key) {
+    if (typeof NS.img !== "function" || key == null) return null;
+    let u = null;
+    try { u = NS.img(String(key)); } catch (e) { u = null; }
+    return typeof u === "string" && SAFE_IMG.test(u) && !u.includes("..") ? u : null;
+  };
+  function onePicture(key, url, opt) {
+    const emo = NS.el("span", "pic-emo", key);
+    emo.setAttribute("aria-hidden", "true");
+    if (!url) return emo;
+    const box = NS.el("span", "pic-one has-img");
+    const im = document.createElement("img");
+    im.className = "pic-img";
+    im.alt = opt.alt || "";
+    im.width = im.height = opt.size || 192;
+    im.loading = opt.eager ? "eager" : "lazy";
+    im.decoding = "async";
+    im.draggable = false;
+    emo.hidden = true;
+    im.addEventListener("error", () => { im.remove(); emo.hidden = false; box.classList.remove("has-img"); }, { once: true });
+    im.src = url;
+    box.append(im, emo);
+    return box;
+  }
+  NS.picture = function (key, opt) {
+    opt = opt || {};
+    const k = String(key == null ? "" : key);
+    const wrap = NS.el("span", "pic" + (opt.cls ? " " + opt.cls : ""));
+    let parts = null;
+    if (typeof NS.img === "function" && typeof NS.img.parts === "function") {
+      try { parts = NS.img.parts(k); } catch (e) { parts = null; }
+    }
+    const bare = s => s.replace(/[︎️\s]/g, "");
+    if (parts && parts.length > 1 && bare(parts.map(p => p.key).join("")) === bare(k)) {
+      wrap.classList.add("pic-many");
+      // A calm arrangement for counting: 4 → 2 + 2, 5 → 3 + 2, 7 → 4 + 3, 10 → 5 + 5 (like a ten-frame).
+      const n = parts.length;
+      const cols = n <= 3 ? n : n === 4 ? 2 : n <= 6 ? 3 : n <= 8 ? 4 : 5;
+      wrap.style.setProperty("--n", String(n));
+      wrap.style.setProperty("--cols", String(cols));
+      wrap.style.setProperty("--rows", String(Math.ceil(n / cols)));
+      parts.forEach(p => wrap.appendChild(onePicture(p.key, NS.imgUrl(p.key), { size: opt.size, eager: opt.eager })));
+      if (opt.alt) { wrap.setAttribute("role", "img"); wrap.setAttribute("aria-label", opt.alt); }
+      return wrap;
+    }
+    const url = NS.imgUrl(k);
+    wrap.classList.toggle("has-img", !!url);
+    const one = onePicture(k, url, opt);
+    if (one.classList.contains("pic-one")) {
+      // The fallback emoji shows again if the picture fails; keep the wrapper's state in step.
+      one.querySelector("img").addEventListener("error", () => wrap.classList.remove("has-img"), { once: true });
+      wrap.append(...one.childNodes);
+    } else wrap.appendChild(one);
+    return wrap;
+  };
+
   const SVGNS = "http://www.w3.org/2000/svg";
   NS.svg = function (tag, attrs, children) {
     const e = document.createElementNS(SVGNS, tag);
@@ -174,6 +241,12 @@
     secLearn: { hi: "सीखो", en: "Learn", hinglish: "Seekho" },
     secGrow: { hi: "अच्छी आदतें", en: "Good habits", hinglish: "Achhi aadatein" },
     secPlay: { hi: "खेलो", en: "Play", hinglish: "Khelo" },
+    secFuture: { hi: "कल की दुनिया", en: "Tomorrow's world", hinglish: "Kal ki duniya" },
+    suggest: [
+      { hi: "चलो, {name} खेलें?", en: "Shall we try {name}?", hinglish: "Chalo, {name} khelein?" },
+      { hi: "आज {name} कैसा रहेगा?", en: "How about {name} today?", hinglish: "Aaj {name} kaisa rahega?" },
+      { hi: "मुझे {name} बहुत पसंद है! तुम्हें?", en: "I love {name}! Do you?", hinglish: "Mujhe {name} bahut pasand hai! Tumhe?" },
+    ],
     bedtime: { hi: "सोने की तैयारी", en: "Bedtime", hinglish: "Sone ki taiyari" },
     bedtimeSub: { hi: "लोरी सुनो और सो जाओ", en: "A lullaby, then sleep", hinglish: "Lori suno aur so jao" },
     locked: { hi: "बंद है", en: "locked", hinglish: "band hai" },
@@ -216,6 +289,8 @@
     stop: { hi: "रुको", en: "Stop", hinglish: "Ruko" },
     oops: { hi: "ओह! कुछ गड़बड़ हुई। चलो घर चलें।", en: "Oops! Something went wrong. Let's go home.", hinglish: "Oh! Kuch gadbad hui. Chalo ghar chalein." },
     install: { hi: "ऐप इंस्टॉल करें", en: "Install the app", hinglish: "App install karein" },
+    installCard: { hi: "बड़ों के लिए: नन्हा स्कूल को फ़ोन की होम स्क्रीन पर रखें — बिना इंटरनेट भी चलेगा।", en: "For grown-ups: keep Nanha School on your home screen — it works offline too.", hinglish: "Bado ke liye: Nanha School ko home screen pe rakhein — bina internet bhi chalega." },
+    notNow: { hi: "अभी नहीं", en: "Not now", hinglish: "Abhi nahi" },
   };
   NS.strings = S;
   NS.tr = function (key, vars, lang) {

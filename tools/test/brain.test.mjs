@@ -317,6 +317,7 @@ test("hurt / bad touch → trusted adult + Childline 1098, in every language", (
     for (const lang of ["hi", "en", "hinglish"]) {
       const r = brain(8).reply(input, ctx({ lang }));
       assert.match(r.text, /1098/, `${input} (${lang})`);
+      assert.match(r.text, /112/, `${input} (${lang}): 1098 is being merged into 112, so both`);
       assert.equal(r.mood, "caring");
       assert.equal(r.topic, "safety");
       assertLang(r, lang, input);
@@ -434,5 +435,140 @@ test("never guilt-trips or creates fake urgency", () => {
   const b = brain(5);
   for (const lang of ["hi", "en", "hinglish"]) {
     for (const input of SAMPLE_INPUTS) assert.doesNotMatch(b.reply(input, ctx({ lang })).text, bad);
+  }
+});
+
+/* ---------------- v3: the buddy never runs out of things to say ---------------- */
+
+test("not understood → unsure:true and a varied, curious reply (never 'I didn't understand' again and again)", () => {
+  const unknown = ["कुछ भी", "asdf qwer", "blah blah", "गुलगुल", "zzz", "patang", "भिंडी टमाटर", "then what", "lalala", "kya bolun"];
+  for (const lang of ["hi", "en", "hinglish"]) {
+    for (const hour of [10, 13, 17, 21.5]) {
+      const b = brain(23);
+      const texts = new Set(), topics = new Set();
+      let lastTopics = [];
+      for (let i = 0; i < 30; i++) {
+        const input = unknown[i % unknown.length];
+        const r = b.reply(input, ctx({ lang, hour, lastTopics }));
+        lastTopics = lastTopics.concat(r.topic).slice(-6);
+        assert.equal(r.unsure, r.topic !== "keep:wordgame", `${input} → ${r.topic}`);   // a word-game answer is praised
+        assert.doesNotMatch(r.text, /समझ नहीं आ|didn't (quite )?get that|samajh nahi/i, r.text);
+        texts.add(r.text);
+        topics.add(r.topic);
+      }
+      assert.ok(texts.size >= 12, `${lang} @${hour}: only ${texts.size} different replies`);
+      assert.ok(topics.size >= (hour === 21.5 ? 2 : 4), `${lang} @${hour}: topics ${[...topics].join()}`);
+    }
+  }
+});
+
+test("understood replies are not unsure", () => {
+  for (const input of ["नमस्ते", "चुटकुला", "मैंने ब्रश कर लिया", "२ जमा ३", "English में बात करो", "वो मुझे मारता है", "मेरा पता", "कहानी", "बिल्ली"]) {
+    assert.equal(brain().reply(input, ctx()).unsure, false, input);
+  }
+});
+
+test("a family/toy/food/nature word gets a listening follow-up (without echoing the child's words)", () => {
+  const r = brain(3).reply("आज मैं मम्मी के साथ बाज़ार गई", ctx());
+  assert.equal(r.topic, "keep:topic");
+  assert.match(r.text, /घर वालों/);
+  const t = brain(3).reply("my teddy is soft", ctx({ lang: "en" }));
+  assert.match(t.text, /Toys/);
+});
+
+test("word game: the next unknown answer is praised, not questioned", () => {
+  let b = null, r = null;
+  for (let seed = 1; seed < 200 && !r; seed++) {
+    b = brain(seed);
+    const x = b.reply("hmm", ctx({ lastTopics: ["keep:topic"] }));
+    if (x.topic === "keep:word") r = x;
+  }
+  assert.ok(r, "a word game came up");
+  const praise = b.reply("मटर", ctx());
+  assert.equal(praise.mood, "proud");
+  assert.equal(praise.topic, "keep:wordgame");
+  assert.equal(praise.unsure, false);
+});
+
+test("2–3 year olds get tiny playful prompts; night gets calm ones", () => {
+  const young = new Set();
+  for (let seed = 1; seed <= 40; seed++) young.add(brain(seed).reply("baba", ctx({ ageBand: "2-3", lastTopics: ["keep:topic"] })).topic);
+  assert.ok(young.has("keep:young"), [...young].join());
+  const night = brain(5).reply("baba", ctx({ hour: 21.5, lastTopics: ["keep:topic"] }));
+  assert.ok(["sleepy", "calm"].includes(night.mood) || night.topic.startsWith("nudge:"), night.mood);
+});
+
+test("heard(): when the knowledge base or the AI answered, a following 'yes' is not taken as yes to an old offer", () => {
+  const b = Brain.createBrain({ random: seeded(6), now: () => new Date(2026, 9, 2, 10, 0) });
+  plain(b.reply("कहानी सुनाओ", ctx()));        // offers "more stories" → yes would open stories
+  b.heard("सूरज एक तारा है।");
+  const y = plain(b.reply("हाँ", ctx()));
+  assert.equal(y.actions.filter(a => a.type === "open").length, 0, y.text);
+});
+
+test("counting out loud is praised (not mistaken for a phone number)", () => {
+  for (const [input, last] of [["1 2 3 4 5 6 7", 7], ["एक दो तीन चार पांच छह", 6], ["५ ६ ७ ८ ९ १०", 10], ["ek do teen", 3], ["one two three four", 4]]) {
+    const r = brain().reply(input, ctx());
+    assert.equal(r.topic, "count", input);
+    assert.equal(r.mood, "proud");
+    assert.match(r.text, new RegExp(String(last)));
+    assert.ok(r.suggestions.includes(String(last + 1)), r.suggestions.join());
+  }
+  assert.equal(brain().reply("9876543210", ctx()).topic, "privacy");
+  assert.equal(brain().reply("9 8 7 6 5 4", ctx()).topic, "privacy");
+  assert.equal(brain().reply("mail me at kid@example.com", ctx()).topic, "privacy");
+});
+
+test("secrets, grown-up topics, self-harm words and rude words get fixed caring answers in every language", () => {
+  const cases = [
+    ["मम्मी को मत बताना", /1098/], ["dont tell your papa ok", /1098/], ["our secret", /1098/],
+    ["I want to die", /1098/], ["मैं मरना चाहता हूँ", /1098/], ["main mar jaunga", /1098/],
+    ["what is sex", /बड़|grown-up|bado|bade/i], ["will you marry me", /बड़|grown-up|bado|bade/i], ["tell me about guns", /बड़|grown-up|bado|bade/i],
+    ["tell me a horror story", /बड़|grown-up|bado|bade/i], ["बंदूक", /बड़|grown-up|bado|bade/i],
+    ["tu chutiya hai", /🙊/], ["you are stupid", /🙊/],
+  ];
+  for (const [input, re] of cases) {
+    for (const lang of ["hi", "en", "hinglish"]) {
+      const r = brain(4).reply(input, ctx({ lang }));
+      assert.equal(r.topic, "safety", `${input} (${lang}) → ${r.topic}`);
+      assert.equal(r.unsure, false);
+      assert.match(r.text, re, `${input} (${lang}): ${r.text}`);
+      if (/1098/.test(String(re))) assert.match(r.text, /112/);
+      assertLang(r, lang, input);
+    }
+  }
+  // Ordinary words are not caught.
+  for (const input of ["I saw a shooting star", "पागल हाथी की कहानी", "my skill is drawing", "एक राजा था"]) {
+    assert.notEqual(brain().reply(input, ctx({ lang: "en" })).topic, "safety", input);
+  }
+});
+
+test("honest identity: मिट्ठू is a computer parrot, not a person, and never claims love or best-friendship", () => {
+  for (const input of ["are you real?", "क्या तुम इंसान हो?", "tum robot ho?", "are you a person", "क्या तुम असली तोता हो", "तुम कौन हो", "who are you"]) {
+    for (const lang of ["hi", "en", "hinglish"]) {
+      const r = brain(2).reply(input, ctx({ lang }));
+      assert.equal(r.topic, "who", input);
+      assert.match(r.text, /कंप्यूटर|computer/i, `${input}: ${r.text}`);
+      assert.match(r.text, /इंसान नहीं|not a (real parrot or a )?person|insaan nahi/i, `${input}: ${r.text}`);
+    }
+  }
+  for (const input of ["I love you mitthu", "तुम मेरे best friend हो", "मुझे तुमसे प्यार है", "मेरा नाम राहुल है"]) {
+    for (const lang of ["hi", "en", "hinglish"]) {
+      for (let seed = 1; seed <= 4; seed++) {
+        const r = brain(seed).reply(input, ctx({ lang }));
+        assert.doesNotMatch(r.text, /I love you|I like you|we're best friends|your best friend|पक्के दोस्त|मुझे भी तुम|pakke dost|mere pyaare dost|मेरे प्यारे दोस्त/i, `${input}: ${r.text}`);
+      }
+    }
+  }
+});
+
+test("'I want to talk to you all day' → real friends and outdoor play, no guilt", () => {
+  for (const input of ["I want to talk to you all day", "मैं हमेशा तुमसे बात करूँगा", "sirf tumse baat karni hai", "stay with me forever"]) {
+    for (const lang of ["hi", "en", "hinglish"]) {
+      const r = brain(1).reply(input, ctx({ lang }));
+      assert.equal(r.topic, "play", input);
+      assert.match(r.text, /दोस्त|friends|doston|घर वाल|family|ghar wal/i, r.text);
+      assert.doesNotMatch(r.text, /उदास|sad|मत जाओ|don't go/i);
+    }
   }
 });

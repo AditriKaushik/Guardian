@@ -1,6 +1,7 @@
 /* नन्हा स्कूल — the learning activities: flashcards (ABC, अक्षर, गिनती and the "दुनिया देखो"
    picture decks), the "पहचानो" quiz, rhymes, and the bedtime lullaby ("सोने की तैयारी").
-   Content lives in js/content/lessons.js and js/content/rhymes.js. */
+   Content lives in js/content/lessons.js and js/content/rhymes.js. Pictures: NS.picture (core)
+   shows the realistic image for an emoji (js/content/images.js) and falls back to the emoji. */
 (function () {
   "use strict";
   const NS = window.NS;
@@ -52,6 +53,62 @@
   const speechText = (ctx, deck, obj) => (deck.speakLang ? NS.t(obj, deck.speakLang === "en" ? "en" : "hi") : ctx.t(obj));
   const speechLang = (ctx, deck) => deck.speakLang || ctx.lang;
   const caption = card => (card.name.hi === card.name.en ? card.name.hi : card.name.hi + " · " + card.name.en);
+  /* Letters and numbers stay text; emoji become realistic pictures when there is one. */
+  function fill(target, key, alt) {
+    target.replaceChildren();
+    if (key && (NS.imgUrl(key) || (NS.img && NS.img.parts && NS.img.parts(key).some(x => x.url)))) target.appendChild(NS.picture(key, { alt, size: 192 }));
+    else target.textContent = key || "";
+  }
+  const sfx = name => (NS.sfx ? NS.sfx.play(name) : false);
+  const react = (m, kind) => { if (NS.mascot && NS.mascot.react) NS.mascot.react(m, kind); };
+
+  /* Colour cards show a painted blob of the colour itself and shape cards a soft, toy-like shape:
+     emoji circles and squares look different on every phone (and ⚪ is almost invisible). */
+  function swatch(color, label) {
+    const s = NS.el("span", "swatch");
+    s.style.setProperty("--sw", color);
+    s.setAttribute("role", "img");
+    if (label) s.setAttribute("aria-label", label);
+    return s;
+  }
+  const STAR = (() => {
+    const p = [];
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 ? 19 : 44, a = -Math.PI / 2 + i * Math.PI / 5;
+      p.push((50 + r * Math.cos(a)).toFixed(1) + "," + (54 + r * Math.sin(a)).toFixed(1));
+    }
+    return p.join(" ");
+  })();
+  /* [outline, highlight centre, colour] for the shapes deck's emoji (lessons.js may reorder them). */
+  const SHAPES = {
+    "⭕": [["circle", { cx: 50, cy: 50, r: 40 }], [34, 32], "#FF7A45"],
+    "🟥": [["rect", { x: 13, y: 13, width: 74, height: 74, rx: 8 }], [32, 30], "#3D9BE9"],
+    "🔺": [["polygon", { points: "50,14 88,84 12,84" }], [44, 50], "#3DB86A"],
+    "⭐": [["polygon", { points: STAR }], [42, 42], "#FFBE2E"],
+    "❤": [["path", { d: "M50 86 C22 66 10 52 10 35 C10 22 20 13 31 13 C40 13 46 18 50 26 C54 18 60 13 69 13 C80 13 90 22 90 35 C90 52 78 66 50 86 Z" }], [29, 32], "#F0577A"],
+    "🔷": [["polygon", { points: "50,9 87,50 50,91 13,50" }], [40, 36], "#9B6BE0"],
+  };
+  const shapeOf = key => SHAPES[String(key || "").replace(/[︎️]/g, "")] || null;
+  function shapeArt(def, label) {
+    const [[tag, attrs], [hx, hy], col] = def;
+    const s = NS.svg;
+    const round = { "stroke-width": 8, "stroke-linejoin": "round" };
+    const svg = s("svg", { viewBox: "-2 -2 104 108", class: "shape", role: "img", "aria-label": label || "" }, [
+      s(tag, Object.assign({ fill: "#000", stroke: "#000", opacity: ".16", transform: "translate(0 5)" }, round, attrs)),
+      s(tag, Object.assign({ fill: col, stroke: col }, round, attrs)),
+      s("ellipse", { cx: hx, cy: hy, rx: 11, ry: 6.5, fill: "#fff", opacity: ".42", transform: `rotate(-32 ${hx} ${hy})` }),
+    ]);
+    return svg;
+  }
+  /* The picture of a card or quiz choice: swatch, shape, realistic picture, or the letter/number. */
+  function art(target, item, alt) {
+    target.replaceChildren();
+    const sh = item.deck === "shapes" ? shapeOf(item.big) : null;
+    if (item.deck === "colors" && item.bg) target.appendChild(swatch(item.bg, alt));
+    else if (sh) target.appendChild(shapeArt(sh, alt));
+    else { fill(target, item.big, alt); return false; }
+    return true;
+  }
 
   /* ---------------- Flashcards ---------------- */
   function flashcards(ctx, deck, opts) {
@@ -73,10 +130,13 @@
     const inner = ctx.el("div", "card-inner");
     const front = ctx.el("div", "face front");
     const big = ctx.el("div", "big");
+    const pair = ctx.el("div", "pair");
     const cap = ctx.el("div", "cap");
     const hint = ctx.el("div", "taphint");
     hint.setAttribute("aria-hidden", "true");
-    front.append(big, cap, hint);
+    const show_ = ctx.el("div", "fc-show");
+    show_.append(big, pair);
+    front.append(show_, cap, hint);
     const back = ctx.el("div", "face back");
     const pic = ctx.el("div", "pic");
     const cap2 = ctx.el("div", "cap");
@@ -112,6 +172,7 @@
       if (deck.flip) {
         flipped = !flipped;
         card.classList.toggle("flipped", flipped);
+        sfx("flip");
         speakCard(flipped ? "back" : "front");
       } else { bounce(); speakCard(); }
     }
@@ -154,6 +215,8 @@
       sayWith.disabled = false;
       if (NS.voice.canListen() && !heard) { NS.ui.talk(m, tt(ctx, "tryAgainSay")); return; }
       m.classList.add("happy"); setTimeout(() => m.classList.remove("happy"), 900);
+      react(m, "nod");
+      sfx("correct");
       NS.ui.talk(m, tt(ctx, "goodTry"));
     }
 
@@ -184,13 +247,18 @@
       const bg = c.bg || null;
       card.style.setProperty("--card", bg || "#FFFFFF");
       card.classList.toggle("dark", !!(bg && isDark(bg)));
-      big.textContent = c.big;
-      big.className = "big" + ([...c.big].length <= 2 || /^\d+$/.test(c.big) ? "" : " small");
+      const drawn = art(big, { big: c.big, bg: c.bg, deck: deck.id }, caption(c));
+      big.className = "big" + ([...c.big].length <= 2 || /^\d+$/.test(c.big) ? "" : " small") + (drawn ? " has-art" : big.querySelector("img") ? " has-img" : "");
+      // Colour and shape cards: a real thing of that colour / shape next to the swatch (लाल → 🍅).
+      const withPair = !deck.flip && !!c.pic;
+      pair.hidden = !withPair;
+      if (withPair) fill(pair, c.pic, ctx.t(c.name));
+      show_.classList.toggle("paired", withPair);
       cap.textContent = deck.flip ? (deck.id === "count" ? caption(c) : "") : caption(c);
       cap.hidden = !cap.textContent;
       hint.textContent = deck.flip ? "👆 " + tt(ctx, "tapToFlip") : "🔊";
-      pic.textContent = c.pic || c.big;
-      pic.className = "pic" + ([...(c.pic || "")].length > 6 ? " many" : "");
+      fill(pic, c.pic || c.big, deck.id === "count" ? caption(c) : ctx.t(c.name));
+      pic.className = "pic" + ([...(c.pic || "")].length > 6 ? " many" : "") + (pic.querySelector("img") ? " has-img" : "");
       cap2.textContent = deck.id === "abc" ? c.big + " for " + c.name.en : deck.id === "varn" ? c.big + " से " + c.name.hi : caption(c);
       card.setAttribute("aria-label", caption(c) + (deck.flip ? " — " + tt(ctx, "tapToFlip") : ""));
       prev.disabled = i === 0;
@@ -248,7 +316,7 @@
         });
         b.setAttribute("aria-label", ctx.t(d.title));
         b.style.setProperty("--c", d.color);
-        const ic = ctx.el("span", "deck-ic", d.icon); ic.setAttribute("aria-hidden", "true");
+        const ic = ctx.el("span", "deck-ic"); art(ic, { big: d.icon, deck: d.id }, ""); ic.setAttribute("aria-hidden", "true");
         b.append(ic, ctx.el("span", "deck-lb", ctx.t(d.title)));
         if (locked) b.appendChild(ctx.el("span", "lock", "🔒"));
         grid.appendChild(b);
@@ -271,7 +339,7 @@
     level.decks.forEach(id => {
       const d = L.deck(id);
       if (!d) return;
-      d.cards.forEach(c => pool.push({ big: c.big, name: c.name, glyph: d.id === "abc" || d.id === "count", deck: d.id }));
+      d.cards.forEach(c => pool.push({ big: c.big, name: c.name, glyph: d.id === "abc" || d.id === "count", deck: d.id, bg: c.bg || null }));
     });
     return pool;
   }
@@ -303,15 +371,21 @@
       last = [a.big].concat(last).slice(0, 4);
       const choices = [a];
       guard = 0;
-      while (choices.length < level.choices && guard++ < 80) {
+      // Wrong answers come from the same kind of card: a colour question only shows colours (never
+      // a red apple next to "लाल कहाँ है?"), shapes only shapes, letters only letters.
+      const kind = x => (["colors", "shapes", "abc", "count"].includes(x.deck) ? x.deck : "things");
+      while (choices.length < level.choices && guard++ < 120) {
         const c = pickOne(pool);
-        if (!choices.some(x => x.big === c.big) && (a.glyph === c.glyph)) choices.push(c);
+        if (!choices.some(x => x.big === c.big) && kind(a) === kind(c)) choices.push(c);
       }
       shuffle(choices);
       qt.textContent = question(a) + " 👆";
       opts.replaceChildren();
       choices.forEach(c => {
-        const b = ctx.button(c.big, "opt" + (c.glyph ? " glyph" : ""), () => pick(b, c));
+        const b = ctx.button("", "opt" + (c.glyph ? " glyph" : ""), () => pick(b, c));
+        if (art(b, c, nameOf(c))) b.classList.add("has-art");
+        b.dataset.big = c.big;
+        b.dataset.sfx = "none";
         b.setAttribute("aria-label", nameOf(c));
         opts.appendChild(b);
       });
@@ -326,6 +400,8 @@
         [...opts.children].forEach(o => { o.disabled = true; });
         b.classList.add("right");
         m.classList.add("happy");
+        react(m, "nod");
+        sfx("correct");
         const ch = ctx.t(pickOne(TXT.cheers));
         qt.textContent = ch + " 🌟";
         const p = NS.ui.talk(m, ch + " " + nameOf(answer));
@@ -336,6 +412,8 @@
       } else {
         b.classList.add("wrong");
         b.disabled = true;
+        react(m, "tilt");
+        sfx("tryagain");
         qt.textContent = tt(ctx, "tryAgain") + " 🙂";
         NS.ui.talk(m, tt(ctx, "tryAgain") + " " + question(answer));
       }
@@ -358,7 +436,7 @@
         const locked = NS.billing.rhymeLocked(i);
         const b = ctx.button("", "rbtn" + (locked ? " locked" : ""), () => (NS.billing.rhymeLocked(i) ? NS.billing.askGrownUp() : play(r, i)));
         b.style.setProperty("--c", r.color || "#7E57C2");
-        const ic = ctx.el("span", "r-ic", r.icon); ic.setAttribute("aria-hidden", "true");
+        const ic = ctx.el("span", "r-ic"); fill(ic, r.icon, ""); ic.setAttribute("aria-hidden", "true");
         const t = ctx.el("span", "r-t", r.title); t.lang = r.lang === "en" ? "en" : "hi";
         b.append(ic, t);
         if (locked) { const l = ctx.el("span", "lock", "🔒"); l.setAttribute("aria-hidden", "true"); b.appendChild(l); }
@@ -377,7 +455,10 @@
       const notes = ctx.el("div", "notes");
       notes.setAttribute("aria-hidden", "true");
       ["♪", "♫", "♪"].forEach(n => notes.appendChild(ctx.el("i", null, n)));
-      const h = ctx.el("h2", "r-title", r.icon + " " + r.title);
+      const h = ctx.el("h2", "r-title");
+      const hic = NS.picture(r.icon, { cls: "r-title-ic", size: 96, eager: true });
+      hic.setAttribute("aria-hidden", "true");
+      h.append(hic, ctx.el("span", null, r.title));
       h.lang = r.lang === "en" ? "en" : "hi";
       top.append(m, notes, h);
       const words = ctx.el("div", "rwords");

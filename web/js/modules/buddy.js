@@ -1,6 +1,17 @@
 /* नन्हा स्कूल — "बात बडी": chat with मिट्ठू the parrot (activity id "buddy").
 
-   The brain (js/brain/brain.js) decides what to say; this screen shows it and speaks it:
+   Who answers, in this order (safety always first, offline first):
+     1. the offline brain (js/brain/brain.js): safety, feelings, habits, maths, commands (language
+        switch, open an activity) and everything it knows;
+     2. if the brain did not understand (reply.unsure): NS.Knowledge.answer(text, {lang, ageBand}),
+        the offline kid-FAQ (js/brain/knowledge.js), when present;
+     3. if neither knows and a grown-up turned the AI chat on (NS.ai, js/core/ai.js; never for
+        2–3 year olds): the online AI, with a small "सोच रहा हूँ…" animation while waiting;
+     4. otherwise the brain's own "keep the chat going" reply (a curious question, a game, a fact…).
+   Safety-triggered words never reach the AI: the brain answers them first, and NS.ai and the
+   server screen again. AI answers get a small ✨ mark so grown-ups can tell them apart.
+
+   The brain decides what to say; this screen shows it and speaks it:
    a mascot face that changes with the mood, a big 🎤 button, tappable reply bubbles, and an
    optional keyboard for grown-ups. Actions from the brain are applied here:
      setLang  → NS.setLang (after the confirmation is spoken)
@@ -29,6 +40,9 @@
     micOff: L("अभी माइक बंद है 🎤 नीचे वाले बुलबुले दबाओ — या बड़े सेटिंग में माइक चालू कर दें!",
       "The mic is off right now 🎤 Tap the bubbles below — or ask a grown-up to turn it on in settings!",
       "Abhi mic band hai 🎤 Neeche wale bulbule dabao — ya bade settings mein mic chalu kar dein!"),
+    thinking: L("सोच रहा हूँ", "Thinking", "Soch raha hoon"),
+    aiButton: L("बड़ों के लिए: AI बातचीत", "For grown-ups: AI chat", "Bado ke liye: AI baatcheet"),
+    aiMark: L("AI से बना जवाब", "Answer made by AI", "AI se bana jawab"),
   };
   const FACE = { happy: "😄", curious: "🤔", calm: "😌", sleepy: "😴", proud: "🌟", caring: "💛", listening: "👂", thinking: "💭" };
   const REMEMBER_KEYS = ["nickname", "dream", "favColour"];
@@ -82,6 +96,15 @@
   .bd-chips{gap:6px;padding:4px 8px}.bd-bar{padding-top:4px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
   .bd-micwrap{flex-direction:row;gap:8px}}
 @media (min-width:700px){.bd-face{width:96px;height:96px;font-size:58px}.bd-bub{font-size:20px}}
+.bd-bub.ai::after{content:" ✨";font-size:.8em;opacity:.7}
+.bd-think{display:flex;align-items:center;gap:8px;color:#5b6170}
+.bd-dots{display:inline-flex;gap:4px}.bd-dots i{width:8px;height:8px;border-radius:50%;background:#2EAD6B;animation:bd-dot 1s ease-in-out infinite}
+.bd-dots i:nth-child(2){animation-delay:.15s}.bd-dots i:nth-child(3){animation-delay:.3s}
+@keyframes bd-dot{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+@media (prefers-reduced-motion:reduce){.bd-dots i{animation:none;opacity:.8}}
+.bd-ai{margin-left:auto;font:inherit;font-size:13px;font-weight:700;border:1.5px solid #c9ccd6;background:#fff;color:#5b6170;
+  border-radius:999px;padding:6px 10px;min-height:36px;cursor:pointer;opacity:.85}
+.bd-ai[aria-pressed=true]{border-color:#2EAD6B;color:#1d7a4a}
 `;
   function injectStyle() {
     if (document.getElementById("bd-style")) return;
@@ -104,7 +127,7 @@
     const pid = ctx.profile && ctx.profile.id;
     const restore = session && session.pid === pid && Date.now() - session.at < RESTORE_MS ? session : null;
     let lang = restore && restore.lang ? restore.lang : ctx.lang;
-    let alive = true, listening = false, thinkTimer = null;
+    let alive = true, listening = false, thinkTimer = null, turn = 0, thinkEl = null;
     const lastTopics = restore ? restore.lastTopics.slice() : [];
     const msgs = restore ? restore.msgs.slice() : [];
     const brain = NS.Brain.createBrain({ random: Math.random, now });
@@ -122,6 +145,20 @@
     face.appendChild(badge);
     const nameEl = el("div", "bd-name", T(UI.name));
     top.append(face, nameEl);
+    /* Grown-ups only (behind the grown-ups' question): turn the online AI chat on or off. */
+    const ai = NS.ai && typeof NS.ai.configured === "function" && NS.ai.configured() ? NS.ai : null;
+    if (ai && NS.billing && typeof NS.billing.gate === "function") {
+      const aiBtn = el("button", "bd-ai", "✨ AI");
+      aiBtn.type = "button";
+      aiBtn.setAttribute("aria-pressed", String(ai.enabled()));
+      aiBtn.setAttribute("aria-label", T(UI.aiButton));
+      aiBtn.title = T(UI.aiButton);
+      aiBtn.addEventListener("click", () => {
+        ctx.stopVoice();
+        NS.billing.gate(() => ai.consent(() => (typeof NS.open === "function" ? NS.open("buddy") : ctx.home())));
+      });
+      top.appendChild(aiBtn);
+    }
     const log = el("div", "bd-msgs");
     log.setAttribute("role", "log");
     log.setAttribute("aria-live", "polite");
@@ -175,12 +212,28 @@
       face.classList.toggle("talk", on);
       if (svg) svg.classList.toggle("talking", on);
     }
-    function bubble(who, text, keep) {
-      const b = el("div", "bd-bub " + who, text);
-      log.appendChild(b);
+    function bubble(who, text, keep, fromAI) {
+      const b = el("div", "bd-bub " + who + (fromAI ? " ai" : ""), text);
+      if (fromAI) b.setAttribute("aria-description", T(UI.aiMark));
+      log.insertBefore(b, thinkEl && thinkEl.parentNode === log ? thinkEl : null);
       while (log.children.length > 40) log.removeChild(log.firstChild);
       log.scrollTop = log.scrollHeight;
-      if (keep !== false) { msgs.push({ who, text }); if (msgs.length > 40) msgs.shift(); }
+      if (keep !== false) { msgs.push(fromAI ? { who, text, ai: true } : { who, text }); if (msgs.length > 40) msgs.shift(); }
+    }
+    /* "सोच रहा हूँ…" with three bouncing dots while the online AI is asked. */
+    function thinking(on) {
+      if (on && !thinkEl) {
+        thinkEl = el("div", "bd-bub b bd-think");
+        thinkEl.setAttribute("role", "status");
+        const dots = el("span", "bd-dots");
+        dots.append(el("i"), el("i"), el("i"));
+        thinkEl.append(el("span", null, T(UI.thinking)), dots);
+        log.appendChild(thinkEl);
+        log.scrollTop = log.scrollHeight;
+      } else if (!on && thinkEl) {
+        thinkEl.remove();
+        thinkEl = null;
+      }
     }
     function renderChips(list) {
       chips.replaceChildren();
@@ -249,7 +302,7 @@
       });
       const switchTo = later.find(a => a.type === "setLang");
       if (switchTo && NS.LANGS && NS.LANGS.includes(switchTo.lang)) { lang = switchTo.lang; labels(); }
-      bubble("b", res.text);
+      bubble("b", res.text, true, res.ai === true);
       setMood(res.mood);
       renderChips(res.suggestions);
       saveSession();
@@ -264,12 +317,58 @@
     function send(text) {
       text = String(text || "").trim().slice(0, 200);
       if (!text || !alive) return;
+      const mine = ++turn;                 // a newer message makes an older pending answer stale
       ctx.stopVoice();
       talking(false);
+      thinking(false);
       bubble("k", text);
       setMood("thinking");
       clearTimeout(thinkTimer);
-      thinkTimer = setTimeout(() => { if (alive) buddySays(brain.reply(text, context())); }, 350);
+      thinkTimer = setTimeout(() => {
+        if (!alive || mine !== turn) return;
+        respond(text, mine).then(res => { if (res && alive && mine === turn) buddySays(res); }, () => {});
+      }, 350);
+    }
+    /* Brain first; then the offline knowledge base; then (if a grown-up allowed it) the online AI. */
+    async function respond(text, mine) {
+      const c = context();
+      const res = brain.reply(text, c);
+      if (!res.unsure) return res;
+      const known = knowledge(text, c);
+      if (known) {
+        brain.heard(known.text);
+        return Object.assign({}, res, { text: known.text, mood: known.mood || "curious", actions: [], topic: "know:" + (known.topic || "fact"), unsure: false });
+      }
+      if (NS.ai && typeof NS.ai.available === "function" && NS.ai.available({ ageBand: c.ageBand })) {
+        thinking(true);
+        let out = null;
+        try {
+          out = await NS.ai.chat(history(), { lang, ageBand: c.ageBand, daypart: c.daypart, names: childNames() });
+        } catch (e) { out = null; }
+        if (mine === turn) thinking(false);
+        if (!alive || mine !== turn) return null;
+        if (out && typeof out.text === "string" && out.text.trim()) {
+          brain.heard(out.text);
+          const sugg = out.kind === "break" ? brain.greet(context({ seenToday: true })).suggestions : res.suggestions;
+          return { text: out.text, lang, mood: out.mood || "happy", actions: [], suggestions: sugg, topic: "ai:" + (out.kind || "ai"),
+            ai: out.kind === "ai" };
+        }
+      }
+      return res;
+    }
+    function knowledge(text, c) {
+      try {
+        const k = NS.Knowledge && typeof NS.Knowledge.answer === "function" ? NS.Knowledge.answer(text, { lang, ageBand: c.ageBand }) : null;
+        return k && typeof k.text === "string" && k.text.trim() ? { text: k.text.trim().slice(0, 220), topic: k.topic, mood: k.mood } : null;
+      } catch (e) { return null; }
+    }
+    /* The last lines of this chat for the AI (names are removed again by NS.ai before sending). */
+    function history() {
+      return msgs.slice(-8).map(m => ({ role: m.who === "k" ? "child" : "buddy", text: m.text }));
+    }
+    function childNames() {
+      const p = ctx.profile || {};
+      return [ctx.data.get("nickname", ""), p.name].filter(n => typeof n === "string" && n.trim());
     }
     async function listen() {
       if (listening || !alive) return;
@@ -318,7 +417,7 @@
     /* ---------- start ---------- */
     labels();
     if (restore && msgs.length) {
-      msgs.slice().forEach(m => bubble(m.who, m.text, false));
+      msgs.slice().forEach(m => bubble(m.who, m.text, false, m.ai === true));
       setMood("happy");
       renderChips(brain.greet(context({ seenToday: true })).suggestions);
       session = null;
@@ -332,6 +431,7 @@
 
     return function cleanup() {
       alive = false;
+      turn++;
       clearTimeout(thinkTimer);
       try { ctx.stopVoice(); } catch (e) { /* ignore */ }
       ctx.screen.classList.remove("bd-host");

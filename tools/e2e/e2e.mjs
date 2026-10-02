@@ -1,6 +1,7 @@
 // End-to-end check of the web app in real Chromium.
 //
-//   PW_PATH=$(npm root -g)/playwright node tools/e2e/e2e.mjs        (SHOTS=<dir> to save screenshots)
+//   PW_PATH=$(npm root -g)/playwright node tools/e2e/e2e.mjs        (SHOTS=<dir> to save screenshots,
+//                                                                    E2E_PORT=<port> instead of 8766)
 //
 // Covers: the core shell and activities; first-run profiles, the "कौन खेल रहा है?" picker and
 // per-profile data; language switching; voice settings; the session wind-down; night mode and
@@ -22,7 +23,7 @@ const { chromium } = require(process.env.PW_PATH);
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WEB = path.resolve(HERE, '../../web');
-const PORT = 8766;
+const PORT = Number(process.env.E2E_PORT) || 8766;   // E2E_PORT=… when another run holds 8766
 const ORIGIN = `http://localhost:${PORT}`;
 const SHOTS = process.env.SHOTS || '';
 if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
@@ -78,7 +79,7 @@ globalThis.fetch = async (url, init = {}) => {
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
-  '.json': 'application/json', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.png': 'image/png',
+  '.json': 'application/json', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.png': 'image/png', '.webp': 'image/webp',
 };
 const apiBodies = [];                 // every request body that reached /api/*
 const server = http.createServer(async (req, res) => {
@@ -161,8 +162,8 @@ async function instrument(ctx, sink) {
   });
 }
 
-async function open({ payments = true, init, path: at = '/', stub = checkoutStub, sink = csp, profile = ONE, viewport, time, config, sw = 'block', wait = 700 } = {}) {
-  const ctx = await browser.newContext({ serviceWorkers: sw, viewport: viewport || { width: 400, height: 820 } });
+async function open({ payments = true, init, path: at = '/', stub = checkoutStub, sink = csp, profile = ONE, viewport, time, config, sw = 'block', wait = 700, motion } = {}) {
+  const ctx = await browser.newContext({ serviceWorkers: sw, viewport: viewport || { width: 400, height: 820 }, reducedMotion: motion || 'no-preference' });
   await instrument(ctx, sink);
   await ctx.route(u => u.hostname !== 'localhost' && u.hostname !== 'checkout.razorpay.com', r => r.abort());
   await ctx.route('https://checkout.razorpay.com/**', r => r.fulfill({ contentType: 'text/javascript', body: stub }));
@@ -224,22 +225,22 @@ const home = page => page.evaluate(() => NS.home());
   const hdrCsp = (hdrs.match(/^\s+Content-Security-Policy:\s*(.+)$/m) || [])[1];
   check('S CSP identical in index.html, pay.html and _headers (+ frame-ancestors)',
     metaCsp(payHtml) === policy && hdrCsp === policy + "; frame-ancestors 'none'", hdrCsp);
-  check('S _headers applies HSTS, nosniff, DENY, referrer and permissions policies to /* (mic only for this site)',
+  check('S _headers applies HSTS, nosniff, DENY, referrer and permissions policies to /* (camera and mic only for this site)',
     /^\/\*$/m.test(hdrs) &&
     ['Strict-Transport-Security: max-age=31536000; includeSubDomains', 'X-Content-Type-Options: nosniff', 'X-Frame-Options: DENY',
-     'Referrer-Policy: strict-origin-when-cross-origin', 'Permissions-Policy: camera=(), microphone=(self), geolocation=(), interest-cohort=()']
+     'Referrer-Policy: strict-origin-when-cross-origin', 'Permissions-Policy: camera=(self), microphone=(self), geolocation=(), interest-cohort=()']
       .every(h => hdrs.includes('  ' + h)));
   // Script order: config, core, content, brain, modules, ui.js last; all deferred; relative paths.
   const scripts = [...idx.matchAll(/<script\b([^>]*)><\/script>/g)].map(m => ({ src: (m[1].match(/src="([^"]+)"/) || [])[1], defer: /\bdefer\b/.test(m[1]) }));
   const srcs = scripts.map(s => s.src);
   const rank = s => s === 'config.js' ? 0 : s === 'js/core/ns.js' ? 1 : s === 'js/core/store.js' ? 2 : s === 'js/core/voice.js' ? 3 :
-    s === 'js/core/rewards.js' ? 4 : s === 'js/core/billing.js' ? 5 : s.startsWith('js/content/') ? 6 : s.startsWith('js/brain/') ? 7 :
-    s.startsWith('js/modules/') ? 8 : s === 'js/core/ui.js' ? 9 : -1;
+    s === 'js/core/sfx.js' ? 3.5 : s === 'js/core/rewards.js' ? 4 : s === 'js/core/billing.js' ? 5 : s === 'js/core/ai.js' ? 5.5 :
+    s.startsWith('js/content/') ? 6 : s.startsWith('js/brain/') ? 7 : s.startsWith('js/modules/') ? 8 : s === 'js/core/ui.js' ? 9 : -1;
   const ranks = srcs.map(rank);
   check('S index.html loads config → core → content → brain → modules → ui.js, all defer, relative paths',
     scripts.every(s => s.defer) && ranks.every(r => r >= 0) && ranks.every((r, i) => i === 0 || r >= ranks[i - 1]) &&
     srcs[srcs.length - 1] === 'js/core/ui.js' && srcs.every(s => !s.startsWith('/') && !/^https?:/.test(s)) &&
-    ['config.js', 'js/core/ns.js', 'js/core/store.js', 'js/core/voice.js', 'js/core/rewards.js', 'js/core/billing.js', 'js/core/ui.js',
+    ['config.js', 'js/core/ns.js', 'js/core/store.js', 'js/core/voice.js', 'js/core/sfx.js', 'js/core/rewards.js', 'js/core/billing.js', 'js/core/ui.js',
       'js/content/lessons.js', 'js/content/rhymes.js', 'js/modules/learn.js'].every(f => srcs.includes(f) && fs.existsSync(path.join(WEB, f))),
     srcs.join(' '));
   const present = ['js/content', 'js/brain', 'js/modules'].flatMap(d => fs.existsSync(path.join(WEB, d)) ? fs.readdirSync(path.join(WEB, d)).filter(f => f.endsWith('.js')).map(f => d + '/' + f) : []);
@@ -257,13 +258,14 @@ const home = page => page.evaluate(() => NS.home());
   const list = name => [...(sw.match(new RegExp('const ' + name + ' = \\[([\\s\\S]*?)\\];')) || ['', ''])[1].matchAll(/'([^']+)'/g)].map(m => m[1]);
   const shell = list('SHELL');
   const missing = shell.filter(f => !fs.existsSync(path.join(WEB, f === './' ? 'index.html' : f)));
-  const need = ['./index.html', './app.css', './config.js', './js/core/ns.js', './js/core/store.js', './js/core/voice.js', './js/core/rewards.js',
+  const need = ['./index.html', './app.css', './config.js', './js/core/ns.js', './js/core/store.js', './js/core/voice.js', './js/core/sfx.js', './js/core/rewards.js',
     './js/core/billing.js', './js/core/ui.js', './js/content/lessons.js', './js/content/rhymes.js', './js/modules/learn.js', './pay.html', './pay.js',
     './fonts/baloo2-devanagari.woff2', './fonts/baloo2-latin.woff2'];
   const allJs = new Set([...shell, ...list('OPTIONAL')]);
-  check('S sw.js: cache nanha-school-v4, shell has the core/learn/pay/fonts and every listed file exists; every js file is cached',
-    sw.includes("const CACHE = 'nanha-school-v4'") && missing.length === 0 && need.every(f => shell.includes(f)) &&
-    present.every(f => allJs.has('./' + f)) && !shell.some(f => f.includes('audio/') && f.endsWith('.mp3')),
+  check('S sw.js: cache nanha-school-v5, shell has the core/learn/pay/fonts and every listed file exists; every js file is cached; pictures and clips never precached',
+    sw.includes("const CACHE = 'nanha-school-v5'") && missing.length === 0 && need.every(f => shell.includes(f)) &&
+    present.every(f => allJs.has('./' + f)) && !shell.some(f => f.includes('audio/') && f.endsWith('.mp3')) &&
+    ![...shell, ...list('OPTIONAL')].some(f => f.includes('img/real/')) && /\\\/img\\\//.test(sw),
     'missing: ' + missing.join(',') + ' uncached: ' + present.filter(f => !allJs.has('./' + f)).join(','));
   const textFiles = fs.readdirSync(WEB).filter(f => /\.(html|js|css|webmanifest)$|^_headers$/.test(f));
   const google = [...textFiles, ...jsFiles].filter(f => /fonts\.googleapis|fonts\.gstatic/.test(read(f)));
@@ -324,7 +326,7 @@ const home = page => page.evaluate(() => NS.home());
   await page.waitForTimeout(300);
   const question = await page.locator('.qtext').innerText();
   const want = await page.evaluate(() => NS.learn.quiz.answer.big);
-  const right = await page.locator('.opt').evaluateAll((bs, w) => bs.findIndex(b => b.textContent === w), want);
+  const right = await page.locator('.opt').evaluateAll((bs, w) => bs.findIndex(b => (b.dataset.big || b.textContent) === w), want);
   await page.locator('.opt').nth(right).click();
   await page.waitForTimeout(200);
   check('Q quiz (age 4–5): 3 choices, the right one earns a star', (await page.locator('.opt').count()) === 3 && (await page.locator('#prog').innerText()).includes('1'),
@@ -441,7 +443,7 @@ for (const [w, h] of [[320, 568], [390, 844], [768, 1024], [1366, 768], [844, 39
       const a = tiles[i], b = tiles[j];
       if (a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1) overlap++;
     }
-    const small = [...document.querySelectorAll('button')].filter(b => b.offsetParent && !b.classList.contains('plink'))
+    const small = [...document.querySelectorAll('button, a[href]')].filter(b => b.offsetParent)
       .map(b => b.getBoundingClientRect()).filter(r => r.width < 48 || r.height < 48).length;
     const tileSmall = tiles.filter(t => t.width < 56 || t.height < 56).length;
     const unlabelled = [...document.querySelectorAll('button')].filter(b => b.offsetParent && !NS.stripEmoji(b.textContent).replace(/[\s◀▶⏹+✕]/g, '') && !b.getAttribute('aria-label')).length;
@@ -509,7 +511,7 @@ for (const [w, h] of [[320, 568], [390, 844], [768, 1024], [1366, 768], [844, 39
   await page.waitForTimeout(300);
   for (let i = 0; i < 6; i++) { await page.locator('.navbtn.next').click(); await page.waitForTimeout(80); }
   await page.waitForTimeout(400);
-  check('I finishing a set gives a sticker with a celebration', await page.locator('.celebrate .sticker-pop').isVisible() && (await page.locator('.celebrate .sticker-pop').innerText()) === '⭐');
+  check('I finishing a set gives a sticker with a celebration', await page.locator('.celebrate .sticker-pop').isVisible() && (await page.locator('.celebrate .sticker-pop').textContent()).trim() === '⭐');
   await snap(page, 'sticker-celebrate');
   await page.locator('.celebrate').click();
   await home(page);
@@ -520,7 +522,7 @@ for (const [w, h] of [[320, 568], [390, 844], [768, 1024], [1366, 768], [844, 39
   check('I home shows the sticker count on the avatar', (await page.locator('.me-stk').innerText()).includes('1'));
   await page.locator('.me').click();
   await page.waitForTimeout(300);
-  check('I the sticker book (from the avatar) shows the new sticker', (await page.locator('.stk:not(.empty)').count()) === 1 && (await page.locator('.stk-e').first().innerText()) === '⭐');
+  check('I the sticker book (from the avatar) shows the new sticker', (await page.locator('.stk:not(.empty)').count()) === 1 && (await page.locator('.stk-e').first().textContent()).trim() === '⭐');
   await snap(page, 'sticker-book');
   await page.locator('.btn.big', { hasText: 'खिलाड़ी बदलो' }).click();
   await page.locator('.pick-card[data-pid="pb"]').click();
@@ -589,6 +591,25 @@ for (const [w, h] of [[320, 568], [390, 844], [768, 1024], [1366, 768], [844, 39
   await ctx.close();
 }
 
+// AI. The optional AI chat switch (js/core/ai.js) is in the grown-ups' area, before the microphone,
+//     off until a grown-up consents, and only when the app has a server (API_BASE).
+{
+  const withServer = await open({ time: '2026-10-02T11:30:00' });
+  const r = await withServer.page.evaluate(() => {
+    if (!NS.ai) return { absent: true };
+    NS.ui.parents();
+    const cards = [...document.querySelectorAll('.parents > .pcard')];
+    const ai = cards.findIndex(c => c.id === 'aiCard'), mic = cards.findIndex(c => c.querySelector('#micSwitch'));
+    return { configured: NS.ai.configured(), ai, mic, off: document.querySelector('#aiSwitch') && document.querySelector('#aiSwitch').getAttribute('aria-checked') === 'false' };
+  });
+  await withServer.ctx.close();
+  const noServer = await open({ payments: false, time: '2026-10-02T11:30:00' });
+  const none = await noServer.page.evaluate(() => { NS.ui.parents(); return document.querySelectorAll('#aiCard').length; });
+  await noServer.ctx.close();
+  check('AI grown-ups see the AI chat switch (off) before the microphone only when the app has a server',
+    r.absent || (r.configured && r.ai >= 0 && r.ai < r.mic && r.off && none === 0), JSON.stringify({ r, none }));
+}
+
 // WD. The session winds down gently at the limit (no countdown) and only a grown-up continues.
 {
   const { ctx, page } = await open({ payments: false, time: '2026-10-02T10:00:00', init: `localStorage.setItem('ns_settings', JSON.stringify({ sessionMin: 10 }));` });
@@ -629,6 +650,418 @@ for (const [w, h] of [[320, 568], [390, 844], [768, 1024], [1366, 768], [844, 39
   check('N in the morning: day theme, sun, "सुप्रभात", no bedtime tile', (await day.page.evaluate(() => document.documentElement.dataset.daypart)) === 'morning' &&
     (await day.page.locator('.sky .sun').count()) === 1 && (await day.page.locator('.greet-big').innerText()).includes('सुप्रभात') && (await day.page.locator('.bedtime').count()) === 0);
   await day.ctx.close();
+}
+
+// U. Feel and layout. Every screen at phone, tablet, desktop and landscape sizes: no control
+//    overlaps, covers, hides or squeezes another (≥ 8px apart, ≥ 48px, nothing floating over
+//    content, nothing cut off sideways, no words under a control); install only for grown-ups;
+//    sound effects, haptics, expressive voice, realistic pictures, मिट्ठू's reactions, sections,
+//    accessibility (contrast, focus, 130% text, reduced motion).
+const LAYOUT_PROBE = (kid = false) => {
+  const vw = innerWidth, vh = innerHeight;
+  const shown = e => {
+    const closed = e.closest('details:not([open])');
+    if (closed && !(e.closest('summary') && e.closest('summary').parentElement === closed)) return false;   // folded away
+    for (let x = e; x && x.nodeType === 1; x = x.parentElement) {
+      const cs = getComputedStyle(x);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) return false;
+    }
+    return true;
+  };
+  // The part of an element that can actually be seen: its box cut by every clipping ancestor.
+  const seen = e => {
+    const r = e.getBoundingClientRect();
+    let l = r.left, t = r.top, rt = r.right, b = r.bottom;
+    for (let p = e.parentElement; p && p !== document.documentElement; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (/hidden|auto|scroll|clip/.test(cs.overflowX + ' ' + cs.overflowY)) {
+        const q = p.getBoundingClientRect();
+        l = Math.max(l, q.left); t = Math.max(t, q.top); rt = Math.min(rt, q.right); b = Math.min(b, q.bottom);
+      }
+    }
+    l = Math.max(l, 0); t = Math.max(t, 0); rt = Math.min(rt, vw); b = Math.min(b, vh);
+    return { left: l, top: t, right: rt, bottom: b, w: rt - l, h: b - t, raw: r };
+  };
+  const name = e => {
+    const c = typeof e.className === 'string' && e.className.trim() ? '.' + e.className.trim().split(/\s+/).slice(0, 2).join('.') : '';
+    const t = (e.getAttribute('aria-label') || e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 22);
+    return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + c + (t ? ' "' + t + '"' : '');
+  };
+  const hit = (a, b, tol = 1) => a.left < b.right - tol && b.left < a.right - tol && a.top < b.bottom - tol && b.top < a.bottom - tol;
+  const related = (a, b) => a === b || a.contains(b) || b.contains(a);
+  const SEL = 'button, a[href], input, select, textarea, summary, [role=button], [role=radio], [role=switch], [role=tab]';
+  let ctl = [...document.querySelectorAll(SEL)].filter(e => shown(e) && e.getBoundingClientRect().width > 0);
+  ctl = ctl.filter(e => !ctl.some(o => o !== e && o.contains(e)));          // the outermost control only
+  const vis = ctl.map(e => ({ e, s: seen(e) })).filter(x => x.s.w > 1 && x.s.h > 1);
+  const out = { overlap: [], tight: [], covered: [], clipped: [], floating: [], textUnder: [], small: [] };
+  const celebrating = !!document.querySelector('.celebrate');
+  for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
+    const a = vis[i], b = vis[j];
+    if (related(a.e, b.e)) continue;
+    if (hit(a.s, b.s)) { out.overlap.push(name(a.e) + ' × ' + name(b.e)); continue; }
+    const ra = a.s, rb = b.s;
+    const gap = Math.max(Math.max(ra.left, rb.left) - Math.min(ra.right, rb.right), Math.max(ra.top, rb.top) - Math.min(ra.bottom, rb.bottom));
+    if (gap < 7.5 && !a.e.closest('.celebrate') && !b.e.closest('.celebrate')) out.tight.push(name(a.e) + ' ~ ' + name(b.e) + ' ' + Math.round(gap) + 'px');
+  }
+  for (const { e, s } of vis) {
+    const r = s.raw;
+    // cut off sideways (by the screen or by a container) — scrolling up/down is fine
+    if (r.left < -1 || r.right > vw + 1) out.clipped.push(name(e));
+    else {
+      for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) {
+        const cs = getComputedStyle(p);
+        if (/hidden|clip/.test(cs.overflowX)) { const q = p.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1) { out.clipped.push(name(e) + ' in ' + name(p)); break; } }
+      }
+    }
+    // ≥ 48px everywhere (text links too); ≥ 56px on children's screens, except inside the grown-ups' corners.
+    const min = kid && !e.closest('.install-card') ? 55.5 : 47.5;
+    if (r.width < min || r.height < min) out.small.push(name(e) + ' ' + Math.round(r.width) + '×' + Math.round(r.height));
+    if (!celebrating) {
+      const cx = (s.left + s.right) / 2, cy = (s.top + s.bottom) / 2;
+      const t = document.elementFromPoint(cx, cy);
+      if (t && !related(e, t)) out.covered.push(name(e) + ' under ' + name(t));
+    }
+  }
+  // Anything fixed or sticky must not sit on a control (the celebration layer is a full-screen modal).
+  for (const f of document.querySelectorAll('body *')) {
+    const p = getComputedStyle(f).position;
+    if ((p !== 'fixed' && p !== 'sticky') || f.classList.contains('celebrate') || f.closest('.celebrate') || !shown(f)) continue;
+    const rf = f.getBoundingClientRect();
+    for (const { e, s } of vis) if (!related(f, e) && hit(rf, s)) out.floating.push(name(f) + ' over ' + name(e));
+  }
+  // Words under a control (e.g. a greeting under the mascot button).
+  for (const t of document.querySelectorAll('.app h1, .app h2, .app h3, .app p')) {
+    if (!shown(t) || !t.textContent.trim()) continue;
+    const st = seen(t);
+    if (st.w <= 1 || st.h <= 1) continue;
+    for (const { e, s } of vis) if (!related(t, e) && hit(st, s, 3)) out.textUnder.push(name(t) + ' under ' + name(e));
+  }
+  const body = document.getElementById('body');
+  if (document.scrollingElement.scrollWidth > vw + 1 || (body && body.scrollWidth > body.clientWidth + 1)) out.hscroll = true;
+  for (const k in out) if (Array.isArray(out[k]) && !out[k].length) delete out[k];
+  return out;
+};
+// Measure the settled screen: entrance springs (finite animations) are allowed to finish first, so a
+// tile caught mid-bounce is not mistaken for an overlap. Looping animations (breathing) keep running.
+const settle = page => page.evaluate(() => Promise.race([
+  Promise.all(document.getAnimations().filter(a => { const t = a.effect && a.effect.getComputedTiming(); return t && t.iterations !== Infinity && a.playState === 'running'; })
+    .map(a => a.finished.catch(() => {}))),
+  new Promise(r => setTimeout(r, 2500))]));
+const layoutIssues = async (page, kid = false) => { await settle(page); return page.evaluate(LAYOUT_PROBE, kid); };
+const fakeInstallPrompt = page => page.evaluate(() => {
+  const e = new Event('beforeinstallprompt', { cancelable: true });
+  e.prompt = () => { window.__installPrompted = (window.__installPrompted || 0) + 1; };
+  e.userChoice = Promise.resolve({ outcome: 'accepted' });
+  window.dispatchEvent(e);
+});
+const toBottom = page => page.evaluate(() => { const b = document.getElementById('body'); b.scrollTop = b.scrollHeight; });
+const warnings = [];                              // other agents' screens: cramped spacing is reported, not failed
+const CORE_ACTS = ['abc', 'varn', 'count', 'world', 'rhymes', 'quiz', 'sleep'];
+const STICKERS3 = `localStorage.setItem('ns_p_pa_core', JSON.stringify({ stickers: [{ s: '⭐', r: 'x', a: 'abc', t: Date.now() }, { s: '🎵', r: 'x', a: 'rhymes', t: Date.now() }, { s: '🏆', r: 'x', a: 'quiz', t: Date.now() }] }));`;
+{
+  const sizes = [[320, 568], [360, 740], [390, 844], [768, 1024], [1366, 768], [844, 390]];
+  for (const [w, h] of sizes) {
+    const { ctx, page } = await open({ payments: false, viewport: { width: w, height: h }, time: '2026-10-02T12:00:00', init: STICKERS3 });
+    await fakeInstallPrompt(page);
+    const bad = [];
+    let screens = 0;
+    const look = async (what, wait = 550, moduleScreen = false, kid = true) => {
+      await page.waitForTimeout(wait);
+      screens++;
+      const r = await layoutIssues(page, kid);
+      if (SHOTS) await snap(page, `u-${w}x${h}-${String(screens).padStart(2, '0')}-${what.replace(/[^\w]+/g, '-')}`);
+      if (moduleScreen) {
+        const soft = {};
+        for (const k of ['tight', 'small']) if (r[k]) { soft[k] = r[k]; delete r[k]; }
+        if (Object.keys(soft).length) warnings.push(`${w}×${h} ${what} ${JSON.stringify(soft)}`);
+      }
+      if (Object.keys(r).length) bad.push(what + ' ' + JSON.stringify(r));
+    };
+    await home(page); await look('home');
+    await toBottom(page); await look('home (bottom)', 350);
+    const ids = await page.evaluate(() => NS.activities().map(a => a.id));
+    for (const id of ids) { await page.evaluate(i => NS.open(i), id); await look('activity ' + id, 800, !CORE_ACTS.includes(id)); }
+    await page.evaluate(() => NS.open('world')); await page.waitForTimeout(300); await page.locator('.deck').first().click(); await look('picture deck');
+    await page.evaluate(() => NS.open('rhymes')); await page.waitForTimeout(300); await page.locator('.rbtn').first().click(); await look('rhyme player');
+    await page.evaluate(() => NS.open('count')); await page.waitForTimeout(300); await page.locator('.card').click(); await look('counting card (back)', 900);
+    await page.evaluate(() => NS.open('quiz')); await page.waitForTimeout(400);
+    const wrongAt = await page.locator('.opt').evaluateAll(bs => bs.findIndex(b => b.dataset.big !== NS.learn.quiz.answer.big));
+    await page.locator('.opt').nth(wrongAt).click(); await look('quiz (after a wrong answer)');
+    await page.evaluate(() => NS.ui.stickerBook()); await look('sticker book');
+    await page.evaluate(() => NS.ui.parents()); await look('grown-ups', 550, false, false);
+    await toBottom(page); await look('grown-ups (bottom)', 350, false, false);
+    await page.evaluate(() => NS.billing.gate(() => {})); await look('grown-ups question', 550, false, false);
+    await page.evaluate(() => NS.ui.picker()); await look('picker');
+    await page.evaluate(() => NS.ui.onboarding()); await look('first run');
+    await page.locator('#obStart').click(); await look('first run: avatars');
+    await page.locator('.choice.av').first().click(); await page.waitForTimeout(800); await look('first run: name');
+    await page.locator('.ob-stage .btn.secondary').click(); await look('first run: age');
+    await page.locator('[data-age="4-5"]').click(); await page.waitForTimeout(400); await page.locator('[data-voice="female"]').click(); await look('first run: voice');
+    await page.locator('.ob-stage .btn.primary').click(); await page.locator('[data-lang="hi"]').click(); await look('first run: language');
+    await page.evaluate(() => NS.ui.windDown()); await look('wind-down', 550, false, false);
+    check(`U layout ${w}×${h}: ${screens} screens — no overlapping, covered, cramped, clipped or floating controls, no horizontal scroll`, bad.length === 0, bad.join(' | ').slice(0, 3000));
+    await ctx.close();
+  }
+  // Night home, the paywall and the celebration, on a phone and in landscape.
+  for (const [w, h] of [[360, 740], [844, 390]]) {
+    const night = await open({ payments: false, viewport: { width: w, height: h }, time: '2026-10-02T21:00:00' });
+    const n1 = await layoutIssues(night.page, true);
+    await night.page.evaluate(() => NS.open('sleep')); await night.page.waitForTimeout(800);
+    const n2 = await layoutIssues(night.page, true);
+    await night.ctx.close();
+    const pay = await open({ viewport: { width: w, height: h }, init: EXPIRED, time: '2026-10-02T12:00:00' });
+    const p1 = await layoutIssues(pay.page, true);
+    await pay.page.evaluate(() => NS.billing.paywall()); await pay.page.waitForTimeout(700);
+    const p2 = await layoutIssues(pay.page);
+    await pay.page.evaluate(() => NS.rewards.celebrate('🌟')); await pay.page.waitForTimeout(500);
+    const covered = await pay.page.evaluate(() => { const c = document.querySelector('.celebrate').getBoundingClientRect(); return c.left <= 0 && c.top <= 0 && c.right >= innerWidth && c.bottom >= innerHeight; });
+    await pay.ctx.close();
+    check(`U layout ${w}×${h}: night home, bedtime, locked home and paywall are clean; the celebration covers the whole screen`,
+      [n1, n2, p1, p2].every(r => Object.keys(r).length === 0) && covered, JSON.stringify({ n1, n2, p1, p2 }).slice(0, 2000));
+  }
+}
+
+// U. Install: only for grown-ups, never floating, never on activities, the Android shell or once installed.
+{
+  const { ctx, page } = await open({ payments: false, viewport: { width: 390, height: 844 } });
+  check('U install: nothing about installing until the browser offers it (and no floating #installBtn)', (await page.locator('.install-card, #installBtn').count()) === 0);
+  await fakeInstallPrompt(page);
+  const r = await page.evaluate(() => {
+    const c = document.querySelector('.home-content > .install-card');
+    const fixed = [...document.querySelectorAll('body *')].filter(e => getComputedStyle(e).position === 'fixed').length;
+    return { there: !!c, last: !!c && c.parentElement.lastElementChild === c, afterTiles: !!c && !!c.previousElementSibling, pos: c && getComputedStyle(c).position, fixed };
+  });
+  check('U install: a quiet card at the very end of home, below the tiles, in the page flow (nothing fixed)', r.there && r.last && r.afterTiles && r.pos === 'static' && r.fixed === 0, JSON.stringify(r));
+  await page.locator('.install-card .install-go').click();
+  check('U install: the home card asks the grown-ups\' question first', await page.locator('#gateAnswer').isVisible() && !(await page.evaluate(() => window.__installPrompted)));
+  await passGate(page);
+  await page.waitForTimeout(200);
+  check('U install: after the right answer the browser\'s install prompt opens and the card goes away', (await page.evaluate(() => window.__installPrompted)) === 1 && (await page.locator('.install-card').count()) === 0);
+  await fakeInstallPrompt(page);
+  await page.locator('.tile[data-id="abc"]').click();
+  await page.waitForTimeout(300);
+  check('U install: never on an activity screen', (await page.locator('.install-card').count()) === 0);
+  await page.evaluate(() => NS.ui.parents());
+  check('U install: offered in the grown-ups\' area', await page.locator('#installCardParents .install-go').isVisible());
+  await home(page);
+  await page.locator('.home .install-card .install-x').click();
+  await page.reload(); await page.waitForTimeout(500); await fakeInstallPrompt(page);
+  check('U install: "अभी नहीं" hides the home card for good', (await page.locator('.home .install-card').count()) === 0 && (await page.evaluate(() => NS.store.settings().installHide)) === true);
+  await ctx.close();
+}
+{
+  const standalone = `const mm = window.matchMedia.bind(window); window.matchMedia = q => /display-mode:\\s*standalone/.test(q) ? { matches: true, media: q, onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent() { return false; } } : mm(q);`;
+  const { ctx, page } = await open({ payments: false, init: standalone });
+  await fakeInstallPrompt(page);
+  await page.evaluate(() => NS.ui.parents());
+  check('U install: never once the app is installed (standalone)', (await page.locator('.install-card').count()) === 0 && !(await page.evaluate(() => NS.ui.install.available())));
+  await ctx.close();
+}
+
+// U. Sound effects, haptics and expressive speech (Android shell stub records vibrate and speak).
+{
+  const shell = `window.__vib = []; window.__spoken = [];
+    window.NanhaNative = { platform: () => 'android', voices: () => '[]', stop: () => {}, listen: () => {}, openExternal: () => true, secure: () => {},
+      speak: (id, text) => { window.__spoken.push(text); setTimeout(() => window.NS.native.onEvent(JSON.stringify({ type: 'speak-done', id })), 5); },
+      vibrate: k => { window.__vib.push(k); return true; } };`;
+  const { ctx, page } = await open({ payments: false, init: shell });
+  await fakeInstallPrompt(page);
+  await page.evaluate(() => NS.ui.parents());
+  check('U install: never inside the Android shell', (await page.locator('.install-card').count()) === 0 && !(await page.evaluate(() => NS.ui.install.available())));
+  await home(page);
+  const hv = await page.evaluate(() => { window.__vib = []; NS.sfx.play('correct'); NS.sfx.play('tryagain'); return window.__vib.slice(); });
+  await page.locator('.tile[data-id="abc"]').click();
+  const tapV = await page.evaluate(() => window.__vib.slice());
+  await page.evaluate(() => { NS.store.setSetting('sound', false); window.__vib = []; NS.sfx.play('correct'); NS.sfx.haptic('tap'); });
+  const mutedV = await page.evaluate(() => window.__vib.length);
+  await page.evaluate(() => { NS.store.setSetting('sound', true); NS.store.setSetting('sfx', false); window.__vib = []; NS.sfx.play('sparkle'); });
+  const offV = await page.evaluate(() => window.__vib.length);
+  check('U haptics: sounds pair with NanhaNative.vibrate (correct → success, tryagain → soft, a tap → tap); none when muted or switched off',
+    JSON.stringify(hv) === '["success","soft"]' && tapV.includes('tap') && mutedV === 0 && offV === 0, JSON.stringify({ hv, tapV, mutedV, offV }));
+  await page.evaluate(() => NS.store.setSetting('sfx', true));
+  await home(page);
+  await page.evaluate(() => { window.__spoken = []; return NS.voice.say('चलो, खेलें? हाँ, 3 बार! 🎉', { lang: 'hi' }); });
+  const spoken = await page.evaluate(() => window.__spoken.slice());
+  check('U voice: whole sentences go to the engine (commas stay inside), numbers in Hindi words, no emoji',
+    JSON.stringify(spoken) === JSON.stringify(['चलो, खेलें?', 'हाँ, तीन बार!']), JSON.stringify(spoken));
+  await ctx.close();
+}
+{
+  const { ctx, page } = await open({ payments: false });
+  const r = await page.evaluate(() => ({ names: NS.sfx.names, all: NS.sfx.names.map(n => NS.sfx.play(n)), unknown: NS.sfx.play('boom') }));
+  check('U sfx: NS.sfx.play synthesises tap pop correct tryagain sparkle whoosh flip open close (no audio files)',
+    ['tap', 'pop', 'correct', 'tryagain', 'sparkle', 'whoosh', 'flip', 'open', 'close'].every(n => r.names.includes(n)) && r.all.every(Boolean) && r.unknown === false, JSON.stringify(r));
+  const off = await page.evaluate(() => {
+    NS.store.setSetting('sound', false); const a = NS.sfx.play('correct');
+    NS.store.setSetting('sound', true); NS.store.setSetting('sfx', false); const b = NS.sfx.play('sparkle');
+    NS.store.setSetting('sfx', true); return [a, b, NS.sfx.enabled()];
+  });
+  check('U sfx: silent when the 🔊 mute is on or a grown-up turned sound effects off', off[0] === false && off[1] === false && off[2] === true, JSON.stringify(off));
+  await page.evaluate(() => NS.ui.parents());
+  await page.locator('#sfxSwitch').click();
+  check('U sfx: the grown-ups\' "आवाज़ें (sound effects)" switch is saved on the device', (await page.evaluate(() => NS.store.settings().sfx)) === false &&
+    (await page.locator('#sfxCard').innerText()).includes('आवाज़ें') && (await page.locator('#sfxSwitch').getAttribute('aria-checked')) === 'false');
+  await page.locator('#sfxSwitch').click();
+  await home(page);
+  await page.evaluate(() => { window.__sfx = []; const p = NS.sfx.play; NS.sfx.play = n => { window.__sfx.push(n); return p(n); }; });
+  await page.locator('.tile[data-id="quiz"]').click();
+  await page.waitForTimeout(400);
+  const wrongAt = await page.locator('.opt').evaluateAll(bs => bs.findIndex(b => b.dataset.big !== NS.learn.quiz.answer.big));
+  await page.locator('.opt').nth(wrongAt).click();
+  const tilted = await page.evaluate(() => document.querySelector('.mascot-q').classList.contains('r-tilt'));
+  const rightAt = await page.locator('.opt').evaluateAll(bs => bs.findIndex(b => b.dataset.big === NS.learn.quiz.answer.big));
+  await page.locator('.opt').nth(rightAt).click();
+  const nodded = await page.evaluate(() => document.querySelector('.mascot-q').classList.contains('r-nod'));
+  const played = await page.evaluate(() => window.__sfx.slice());
+  check('U sfx + मिट्ठू: a tile pops, the activity whooshes in; a wrong answer gets a soft "hmm" and a head tilt, a right one a chime and a nod',
+    ['pop', 'whoosh', 'tryagain', 'correct'].every(n => played.includes(n)) && tilted && nodded, JSON.stringify({ played, tilted, nodded }));
+  const wrongOpt = await page.evaluate(() => { const o = document.querySelector('.opt.wrong'); return o ? Number(getComputedStyle(o).opacity) : null; });
+  check('U quiz: a wrong choice visibly fades', wrongOpt !== null && wrongOpt < 0.6, String(wrongOpt));
+  const v = await page.evaluate(() => ({
+    a: NS.voice.speakable('तुम्हारे पास 4 स्टिकर हैं! ✓ ▶ 🌟', 'hi'), b: NS.voice.speakable('2–3 साल', 'hi'), c: NS.voice.speakable('You have 26 stickers ★', 'en'),
+    d: [99, 100, 1234, 26].map(n => NS.voice.hindiNumber(n)),
+    q: NS.voice.prosody('क्या खेलें?'), s: NS.voice.prosody('यह एक सेब है।'), p: NS.voice.prosody('शाबाश! बहुत बढ़िया!'), i: NS.voice.prosody('लाल वाला दबाओ।'),
+    steady: NS.voice.prosody('मछली जल की रानी है', { rate: 0.72 }),
+    vary: new Set(Array.from({ length: 8 }, () => NS.voice.prosody('यह एक सेब है।').pitch.toFixed(5))).size,
+  }));
+  check('U voice: symbols never read; ranges and numbers said in Hindi words (4 → चार, 2–3 → दो से तीन, 1234)',
+    v.a === 'तुम्हारे पास चार स्टिकर हैं!' && v.b === 'दो से तीन साल' && v.c === 'You have 26 stickers' &&
+    JSON.stringify(v.d) === JSON.stringify(['निन्यानबे', 'एक सौ', 'एक हज़ार दो सौ चौंतीस', 'छब्बीस']), JSON.stringify(v));
+  check('U voice: questions rise, praise is warmer and quicker, instructions calmer, songs keep a steady rate, repeated lines vary',
+    v.q.kind === 'question' && v.p.kind === 'praise' && v.i.kind === 'instruction' && v.s.kind === 'statement' && v.q.pitch > v.s.pitch &&
+    v.p.rate > v.i.rate && v.p.pitch > v.s.pitch && Math.abs(v.steady.rate - 0.72) < 0.01 && v.vary > 1, JSON.stringify(v));
+  await ctx.close();
+}
+
+// U. Realistic pictures (js/content/images.js), with the emoji as the fallback.
+{
+  const { ctx, page } = await open({ payments: false });
+  const hasImages = await page.evaluate(() => typeof NS.img === 'function' && !!NS.img('🌍') && !!NS.img('🐄') && !!NS.img('🍎'));
+  if (hasImages) {
+    const attrs = sel => page.evaluate(q => { const i = document.querySelector(q); return i && { w: i.getAttribute('width'), h: i.getAttribute('height'), alt: i.alt, loading: i.loading, decoding: i.decoding, src: i.getAttribute('src') }; }, sel);
+    const good = a => a && a.w === '192' && a.h === '192' && a.alt.length > 0 && a.loading === 'lazy' && a.decoding === 'async' && /^img\/real\/[\w-]+\.webp$/.test(a.src);
+    const tile = await attrs('.tile[data-id="world"] .ic img');
+    check('U pictures: home tiles show the realistic picture (width/height, alt, lazy, async, same-origin)', good(tile), JSON.stringify(tile));
+    await page.evaluate(() => NS.open('world'));
+    await page.locator('.deck', { hasText: 'जानवर' }).click();
+    await page.waitForTimeout(500);
+    const front = await attrs('.card .face.front .big img');
+    check('U pictures: picture cards show the realistic image with alt text', good(front), JSON.stringify(front));
+    await page.evaluate(() => NS.open('world'));
+    await page.locator('.deck', { hasText: 'रंग' }).click();
+    await page.waitForTimeout(500);
+    const pair = await attrs('.card .face.front .pair img');
+    check('U pictures: colour cards show a real thing of that colour next to the swatch (लाल → 🍅)', good(pair) && (await page.locator('.card .face.front .pair').textContent()).includes('🍅'), JSON.stringify(pair));
+    await page.evaluate(() => NS.open('count'));
+    await page.waitForTimeout(300);
+    for (let i = 0; i < 2; i++) { await page.locator('.navbtn.next').click(); await page.waitForTimeout(150); }
+    await page.locator('.card').click();
+    await page.waitForTimeout(700);
+    const many = await page.locator('.card .face.back .pic-many img').count();
+    check('U pictures: counting cards show one picture per thing (3 → three pictures)', many === 3, String(many));
+    await page.evaluate(() => NS.open('quiz'));
+    await page.waitForTimeout(400);
+    const q = await page.evaluate(() => {
+      const a = NS.learn.quiz.answer;
+      const opts = [...document.querySelectorAll('.opt')];
+      return { pics: opts.filter(o => o.querySelector('img, .swatch, svg.shape')).length, n: opts.length, kinds: opts.map(o => o.dataset.big) };
+    });
+    check('U pictures: quiz choices show pictures when there are pictures', q.pics > 0 || q.kinds.every(k => !/\p{Extended_Pictographic}/u.test(k)), JSON.stringify(q));
+    const art = await page.evaluate(() => {
+      const out = {};
+      for (let i = 0; i < 80 && Object.keys(out).length < 2; i++) {
+        NS.open('quiz');
+        const a = NS.learn.quiz.answer;
+        if (a.deck !== 'colors' && a.deck !== 'shapes') continue;
+        const opts = [...document.querySelectorAll('.opt')];
+        out[a.deck] = opts.every(o => o.querySelector(a.deck === 'colors' ? '.swatch' : 'svg.shape') && o.getAttribute('aria-label'));
+      }
+      NS.ui.stickerBook();
+      return out;
+    });
+    check('U quiz: colour choices are painted swatches and shape choices drawn shapes (same on every phone), each with a name', art.colors === true && art.shapes === true, JSON.stringify(art));
+    const colourQ = await page.evaluate(() => {
+      const pool = NS.learn.quizPool(NS.learn.quizLevels['6+']);
+      const colours = new Set(pool.filter(x => x.deck === 'colors').map(x => x.big));
+      let mixed = 0;
+      for (let i = 0; i < 60; i++) {
+        NS.open('quiz');
+        const a = NS.learn.quiz.answer;
+        const shown = [...document.querySelectorAll('.opt')].map(o => o.dataset.big);
+        if (colours.has(a.big) && shown.some(b => !colours.has(b))) mixed++;
+        if (!colours.has(a.big) && a.deck !== 'shapes' && shown.some(b => colours.has(b))) mixed++;
+      }
+      return mixed;
+    });
+    check('U quiz: a colour question only shows colours (never a red apple next to "लाल कहाँ है?")', colourQ === 0, String(colourQ));
+    await ctx.close();
+    const broken = await open({ payments: false });
+    await broken.ctx.route('**/img/real/**', r => r.fulfill({ status: 404, body: '' }));
+    await broken.page.evaluate(() => NS.open('world'));
+    await broken.page.locator('.deck', { hasText: 'जानवर' }).click();
+    await broken.page.waitForTimeout(800);
+    const fb = await broken.page.evaluate(() => { const b = document.querySelector('.card .face.front .big'); const e = b.querySelector('.pic-emo'); return { imgs: b.querySelectorAll('img').length, emoji: e && !e.hidden && e.textContent }; });
+    check('U pictures: if a picture cannot load, the emoji shows instead', fb.imgs === 0 && fb.emoji === '🐄', JSON.stringify(fb));
+    await broken.ctx.close();
+  } else {
+    check('U pictures: without js/content/images.js the emoji are shown', (await page.locator('.tile img').count()) === 0);
+    await ctx.close();
+  }
+}
+
+// U. मिट्ठू, sections, accessibility.
+{
+  const { ctx, page } = await open({ payments: false, viewport: { width: 360, height: 740 }, time: '2026-10-02T12:00:00' });
+  const m = await page.evaluate(() => {
+    const svg = document.querySelector('.mascot-home');
+    NS.mascot.react(svg, 'nod'); const nod = svg.classList.contains('r-nod');
+    NS.mascot.react(svg, 'tilt'); const tilt = svg.classList.contains('r-tilt');
+    NS.mascot.look(svg, 0, innerHeight); const lx = parseFloat(svg.style.getPropertyValue('--lx'));
+    return { nod, tilt, lx, anim: getComputedStyle(svg.querySelector('.m-all')).animationName };
+  });
+  check('U मिट्ठू breathes, looks toward a tap and reacts (nod, tilt)', m.nod && m.tilt && m.lx < 0 && /breathe/.test(m.anim), JSON.stringify(m));
+  const secs = await page.evaluate(() => ({ list: NS.SECTIONS.slice(), shown: [...document.querySelectorAll('.home .sect')].map(s => (s.className.match(/sect-(\w+)/) || [])[1]) }));
+  check('U sections: सीखो → अच्छी आदतें → खेलो → कल की दुनिया, in that order',
+    JSON.stringify(secs.list) === '["learn","grow","play","future"]' && secs.shown.every((x, i) => i === 0 || secs.list.indexOf(x) > secs.list.indexOf(secs.shown[i - 1])), JSON.stringify(secs));
+  await page.evaluate(() => NS.registerActivity({ id: 'zzfuture', icon: '🔭', title: { hi: 'कल', en: 'Tomorrow' }, color: '#3D9BE9', section: 'future', open() {} }));
+  check('U a "future" activity gets a tile under कल की दुनिया', await page.locator('.sect-future .tile[data-id="zzfuture"]').isVisible() &&
+    (await page.locator('.sect-future .sect-h').innerText()).includes('कल की दुनिया'));
+  // Contrast (AA) of the words a child or parent reads.
+  const contrast = await page.evaluate(() => {
+    const parse = c => {
+      let m = c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/);
+      if (m) return [m[1] / 255, m[2] / 255, m[3] / 255, m[4] == null ? 1 : +m[4]];
+      m = c.match(/color\(srgb ([\d.e-]+) ([\d.e-]+) ([\d.e-]+)(?: \/ ([\d.]+))?\)/);
+      if (m) return [+m[1], +m[2], +m[3], m[4] == null ? 1 : +m[4]];
+      return null;
+    };
+    const lum = ([r, g, b]) => { const f = v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+    const bgOf = e => { for (let x = e; x; x = x.parentElement) { const c = parse(getComputedStyle(x).backgroundColor); if (c && c[3] > 0.5) return c; } return [1, 1, 1, 1]; };
+    const ratio = e => { const a = lum(parse(getComputedStyle(e).color)), b = lum(bgOf(e)); return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05); };
+    const out = [];
+    const need = (sel, min) => document.querySelectorAll(sel).forEach(e => { if (e.offsetParent && e.textContent.trim()) { const r = ratio(e); if (r < min) out.push(sel + ' "' + e.textContent.trim().slice(0, 16) + '" ' + r.toFixed(2)); } });
+    need('.tile .lb', 4.5); need('.sect-h', 4.5); need('.greet-sub', 4.5); need('.me-name', 4.5);
+    NS.open('abc'); need('.topbar .title-t', 4.5); need('.taphint', 4.5); need('.chip', 4.5); need('.navbtn.next', 3);
+    NS.ui.parents(); need('.psmall', 4.5); need('.plabel', 4.5); need('.pcard-h', 4.5); need('.pbtn', 4.5); need('.seg-b', 4.5);
+    NS.home();
+    return out;
+  });
+  check('U contrast: tile labels, headings, bubbles, hints and grown-ups\' text meet WCAG AA', contrast.length === 0, contrast.join(' | '));
+  await page.keyboard.press('Tab');
+  const focus = await page.evaluate(() => { const a = document.activeElement; const cs = getComputedStyle(a); return { tag: a.tagName, style: cs.outlineStyle, w: parseFloat(cs.outlineWidth) }; });
+  check('U keyboard focus is clearly visible', focus.tag === 'BUTTON' && focus.style === 'solid' && focus.w >= 3, JSON.stringify(focus));
+  await page.evaluate(() => { document.documentElement.style.fontSize = '130%'; NS.home(); });
+  const big1 = await layoutIssues(page, true);
+  await page.evaluate(() => NS.open('abc')); await page.waitForTimeout(600);
+  const big2 = await layoutIssues(page, true);
+  await page.evaluate(() => NS.ui.parents()); await page.waitForTimeout(400);
+  const big3 = await layoutIssues(page);
+  check('U text scaled to 130%: home, flashcards and grown-ups still fit with nothing overlapping', [big1, big2, big3].every(r => Object.keys(r).length === 0), JSON.stringify({ big1, big2, big3 }).slice(0, 1500));
+  await ctx.close();
+  const calm = await open({ payments: false, motion: 'reduce' });
+  const rm = await calm.page.evaluate(() => ({ mascot: getComputedStyle(document.querySelector('.mascot-home .m-all')).animationName, cloud: getComputedStyle(document.querySelector('.cloud')).animationName }));
+  check('U reduced motion: मिट्ठू and the clouds stay still', rm.mascot === 'none' && rm.cloud === 'none', JSON.stringify(rm));
+  await calm.ctx.close();
 }
 
 // B. First day: full access, trial banner.
@@ -912,7 +1345,7 @@ let restoreCode;
     payStorage.every(s => s === JSON.stringify({ local: [], session: [], cookie: '' })), payStorage.join(' '));
 }
 
-// W. Service worker: caches the v4 shell, leaves API calls alone.
+// W. Service worker: caches the v5 shell, leaves API calls alone.
 {
   const ctx = await browser.newContext({ serviceWorkers: 'allow', viewport: { width: 400, height: 820 } });
   await instrument(ctx, csp);
@@ -930,12 +1363,20 @@ let restoreCode;
     const get = await fetch('/api/subscribe');
     const app = await fetch('js/core/ui.js');
     await new Promise(r => setTimeout(r, 300));
-    const cache = await caches.open('nanha-school-v4');
-    return { names: await caches.keys(), urls: (await cache.keys()).map(r => new URL(r.url).pathname), statuses: [post.status, get.status, app.status] };
+    const cache = await caches.open('nanha-school-v5');
+    const before = (await cache.keys()).map(r => new URL(r.url).pathname);
+    const pic = NS.imgUrl('🥭');
+    const got = pic ? await fetch(pic) : null;
+    await new Promise(r => setTimeout(r, 300));
+    const after = (await cache.keys()).map(r => new URL(r.url).pathname);
+    return { names: await caches.keys(), urls: before, statuses: [post.status, get.status, app.status],
+      pic, picOk: !!got && got.ok, picPrecached: before.some(u => u.includes('/img/')), picCached: !!pic && after.includes('/' + pic) };
   });
-  const need = ['/', '/index.html', '/app.css', '/config.js', '/js/core/ns.js', '/js/core/ui.js', '/js/modules/learn.js', '/pay.html', '/pay.js', '/fonts/baloo2-devanagari.woff2', '/fonts/baloo2-latin.woff2'];
-  check('W service worker caches the v4 shell (core, learn, pay page, fonts)',
-    JSON.stringify(info.names) === '["nanha-school-v4"]' && need.every(u => info.urls.includes(u)), JSON.stringify(info));
+  const need = ['/', '/index.html', '/app.css', '/config.js', '/js/core/ns.js', '/js/core/sfx.js', '/js/core/ui.js', '/js/modules/learn.js', '/pay.html', '/pay.js', '/fonts/baloo2-devanagari.woff2', '/fonts/baloo2-latin.woff2'];
+  check('W service worker caches the v5 shell (core, learn, pay page, fonts)',
+    JSON.stringify(info.names) === '["nanha-school-v5"]' && need.every(u => info.urls.includes(u)), JSON.stringify(info));
+  check('W lesson pictures are not precached, and are cached the first time they are shown', info.pic === null || (info.picOk && !info.picPrecached && info.picCached),
+    JSON.stringify({ pic: info.pic, ok: info.picOk, pre: info.picPrecached, cached: info.picCached }));
   check('W service worker never intercepts or caches API calls',
     !info.urls.some(u => u.includes('/api/')) && fromSw['/api/refresh POST'] === false && fromSw['/api/subscribe GET'] === false &&
     fromSw['/js/core/ui.js GET'] === true, JSON.stringify(fromSw));
@@ -955,6 +1396,7 @@ check('zero CSP violations during the whole run', csp.events.length === 0 && csp
   JSON.stringify(csp.events) + ' ' + csp.console.join(' | '));
 check('no page errors anywhere', allErrors.length === 0, allErrors.join(' | '));
 for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok || !r.detail ? '' : '  -> ' + r.detail}`);
+for (const wn of warnings) console.log('WARN  (module screen, controls closer than 8px or smaller than 48px) ' + wn.slice(0, 600));
 const failed = results.filter(r => !r.ok).length;
 console.log(`\n${results.length - failed}/${results.length} passed`);
 process.exit(failed ? 1 : 0);

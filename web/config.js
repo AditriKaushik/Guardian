@@ -40,4 +40,14 @@ window.NS_CONFIG = {
 
   // Default bedtime hour (24-hour clock). Grown-ups can change it in the app.
   BEDTIME_HOUR: 20,
+
+  // Optional AI chat for मिट्ठू the talking buddy (docs/AI_BUDDY.md). It needs API_BASE and an AI
+  // provider on the server, and stays OFF on every phone until a grown-up turns it on (with consent).
+  // Never for 2–3 year olds. ENABLED: false hides the option completely.
+  AI: {
+    ENABLED: true,
+    DAILY_LIMIT: 30,      // AI answers per phone per day (the server also limits: AI_DAILY_LIMIT)
+    SESSION_TURNS: 10,    // after this many AI answers in one sitting, मिट्ठू suggests a break
+    TIMEOUT_MS: 8000,     // no answer in time → मिट्ठू answers offline
+  },
 };

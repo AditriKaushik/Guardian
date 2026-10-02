@@ -111,6 +111,8 @@ strings only; results come back via `window.NS.native.onEvent(jsonString)`):
 | `NanhaNative.stop()` | stop speaking |
 | `NanhaNative.listen(id, lang)` | on-device speech recognition; emits `{"type":"listen-result","id":…,"text":…}` or `{"type":"listen-result","id":…,"text":null}` |
 | `NanhaNative.openExternal(url)` | open an https URL in the phone's browser (used for payment) |
+| `NanhaNative.vibrate(pattern)` | short buzz; `pattern` is exactly `"tap"` (10 ms), `"success"` (two short pulses) or `"soft"` (20 ms, gentler); no other values, no custom lengths. Returns `true` if the phone will buzz, `false` (nothing happens) for any other value, no vibrator, touch feedback off in the phone's settings, phone on silent, or app not in the foreground |
+| camera: `navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})` | not a `NanhaNative` method: standard web API, answered by the shell. Granted only for **video alone** and only to the app origin (`https://appassets.androidplatform.net`). The first time, Android's camera permission is asked; if refused, the promise rejects (`NotAllowedError`). Any request that includes `audio` is refused as a whole, and so are DRM/MIDI requests (speech uses `listen()`). Phones without a camera can still install the app; there `getUserMedia` rejects. Frames stay on the phone (never uploaded or stored). The web app asks only after a grown-up enables the camera; stop the tracks when leaving the activity or when the app goes to the background |
 
 Events also include `{"type":"resume"}` when the app returns to the foreground.
 
@@ -180,3 +182,56 @@ except the subscription.
   must match `audio/…`.
 - An empty manifest (`{"version":1,"clips":{"female":{},"male":{}}}`) means "no clips".
   Clips are cached by the service worker on first play, never precached.
+
+## Core additions (v3: feel, sound, pictures)
+
+| member | what it does |
+|---|---|
+| section `"future"` | a fourth home section, **कल की दुनिया** (Tomorrow's world, 💡). Order: `learn`, `grow`, `play`, `future`. |
+| `NS.sfx.play(name)` | a tiny synthesised sound (WebAudio, no files, no network). Names: `tap pop correct tryagain sparkle whoosh flip open close`. Returns `true` when something played, `false` when the 🔊 mute is on, the grown-ups turned "आवाज़ें (sound effects)" off, or the name is unknown. Quieter and rounder at night. In the Android shell each sound is paired with `NanhaNative.vibrate("tap"|"success"|"soft")`. |
+| `NS.sfx.enabled()`, `NS.sfx.volume(v?)`, `NS.sfx.haptic(kind)` | sound effects on? / session volume 0…1 / the shell's vibration alone (same on/off rules) |
+| automatic sounds | the core plays `tap` on every button press (`pop` for home tiles), `whoosh` when an activity opens, `close` when going home, `sparkle` with every sticker. An element can choose its sound with `data-sfx="<name>"`, or none with `data-sfx="none"` (do this when the button plays its own `correct`/`tryagain`). Modules add meaning: `correct` / `tryagain` for answers, `flip` for cards, `open` / `close` for their own panels. |
+| `NS.mascot.react(svg, kind)` | मिट्ठू reacts once: `nod` (right answer), `tilt` (hmm, try again), `hop` (joy), `wiggle`, `blink`. He also breathes, blinks at random and looks toward every tap by himself. |
+| `NS.mascot.look(svg, x, y)`, `NS.mascot.lookAt(svg, element)` | eyes (and a slight head turn) toward a screen point / an element |
+| `NS.picture(key, {alt, cls, size, eager})` | an element showing the realistic picture for an emoji (`NS.img`, js/content/images.js; `<img>` with width/height, alt, `loading=lazy`, `decoding=async`) or the emoji itself when there is none or the image fails. A string of several emoji (`"🍎🍎🍎"`) shows one picture each. `NS.imgUrl(key)` is the checked URL or `null`. |
+| `NS.voice.speakable(text, lang)` | what the engine actually reads: no emoji/symbols, `2–3` → "2 से 3"/"2 to 3", Hindi numbers as words (`4` → चार) |
+| `NS.voice.prosody(text, opt?)` | `{kind, rate, pitch}` for one sentence: `question` rises a little, `praise` is warmer and a touch faster, `instruction` is calmer, ±3 % natural variation; an explicit `rate` (songs, lullaby) stays steady |
+| `NS.voice.speaking()` | `true` while something is being said |
+| `NS.ui.install` | `{available(), prompt()}` — the browser's install offer. It is shown only to grown-ups: a small dismissible card at the end of home (behind the grown-ups' question) and in the grown-ups' area; never on activity screens, never inside the Android shell, never once installed. |
+
+Settings (`ns_settings`) gain `sfx` (sound effects on/off, default on) and `installHide`.
+Layout rule: the core uses no `position: fixed` element except the full-screen celebration
+layer, and modules should not float controls over content either (a `sticky` dock at the end
+of a module's own scrolling screen is fine). The e2e test checks every screen at phone, tablet,
+desktop and landscape sizes for overlapping, covered or clipped controls.
+Lesson pictures (`img/real/…`) are cached by the service worker the first time they are shown,
+never precached.
+
+Pictures in lessons (learn.js): colour cards and colour quiz choices show a painted swatch of the
+card's `bg` colour, shape cards and shape quiz choices a drawn shape (same on every phone; emoji
+circles differ per phone and ⚪ is nearly invisible); everything else uses `NS.picture`. A colour
+question only ever offers colours, a shape question only shapes. Strings of several emoji
+(`NS.picture("🥭🥭🥭🥭🥭")`, class `pic-many`) also get `--cols`/`--rows` so counting rows sit
+calmly (5 → 3 + 2, 10 → 5 + 5).
+Targets: every control is ≥ 56px on children's screens and ≥ 48px in the grown-ups' screens,
+text links included (`.plink` is a 56px pill; links in `.plegal` are 48px chips), and ≥ 8px
+apart. The e2e layout probe lets entrance animations settle before it measures.
+
+## AI buddy (optional online chat for मिट्ठू, js/core/ai.js — details in docs/AI_BUDDY.md)
+
+Loaded after `billing.js` (`js/core/ai.js`). Off on every device until a grown-up consents; never
+for the `"2-3"` age band; only asked when the offline brain and knowledge base have no answer.
+
+| member | what it does |
+|---|---|
+| `NS.ai.configured()` | the app has a server (`config.API_BASE`) and `config.AI.ENABLED !== false` |
+| `NS.ai.enabled()`, `NS.ai.setEnabled(on)` | the grown-up's choice for this device (`ns_settings.aiChat = {on, v, at}`, `v` = consent version) |
+| `NS.ai.allowedFor(ageBand)` | `false` for `"2-3"` |
+| `NS.ai.available(ctx?)` | configured, enabled, online, not paused (and allowed for `ctx.ageBand`) |
+| `NS.ai.chat(history, ctx)` | `Promise<{text, mood, kind} | null>` — `null` means "answer offline"; sends at most the last 8 short lines (names, long numbers and e-mails removed on the device) to `POST API_BASE/api/chat` |
+| `NS.ai.screen(text)`, `NS.ai.redact(text, names)` | the on-device safety screen and redaction used before anything is sent |
+| `NS.ai.settingsCard()` | the grown-ups' switch; `ui.js` shows it in the grown-ups' area, before the microphone card, only when `configured()` |
+| `NS.ai.consent(onDone)` | the consent / turn-off screen (open it only behind `NS.billing.gate`) |
+
+Storage: `ns_settings.aiChat` (the consent), `ns_ai` (a random per-install id and today's AI answer
+count, for the server's daily limit; renewed on every on/off and removed by "Delete all data").

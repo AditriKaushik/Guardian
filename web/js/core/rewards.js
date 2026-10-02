@@ -3,7 +3,11 @@
    NS.rewards.grant({sticker, reason}, activityId)  saves a sticker for the current profile and
                                                     shows a short sparkle + "शाबाश!" (ctx.reward)
    NS.rewards.list()                                [{s, r, a, t}] of the current profile
-   NS.rewards.celebrate(emoji, text?)               the sparkle alone (no sticker saved) */
+   NS.rewards.celebrate(emoji, text?)               the sparkle alone (no sticker saved)
+
+   A celebration is soft on purpose: a sticker (its realistic picture when there is one) drops
+   in with a little confetti, a "sparkle" sound (and a haptic tick in the Android app), every
+   मिट्ठू on screen hops, and the "शाबाश!" waits for the current sentence. Tap anywhere closes it. */
 (function () {
   "use strict";
   const NS = window.NS;
@@ -22,18 +26,23 @@
     layer.setAttribute("role", "status");
     layer.setAttribute("aria-live", "polite");
     const burst = NS.el("div", "burst");
-    const colors = ["#FFD54F", "#FF8A65", "#4FC3F7", "#81C784", "#BA68C8", "#F06292"];
-    for (let i = 0; i < 18; i++) {
-      const s = NS.el("i", "spark" + (i % 3 === 0 ? " star" : ""));
-      const ang = (i / 18) * Math.PI * 2;
-      const dist = 90 + (i % 4) * 28;
+    burst.setAttribute("aria-hidden", "true");
+    const colors = ["#FFC94D", "#FF9A76", "#7CC7F2", "#8FD694", "#C49BE8", "#F59BC0"];
+    const N = 22;
+    for (let i = 0; i < N; i++) {
+      const kind = i % 4 === 0 ? " star" : i % 4 === 1 ? " ribbon" : "";
+      const s = NS.el("i", "spark" + kind);
+      const ang = (i / N) * Math.PI * 2 + (i % 3) * 0.12;
+      const dist = 96 + (i % 5) * 24;
       s.style.setProperty("--dx", Math.round(Math.cos(ang) * dist) + "px");
-      s.style.setProperty("--dy", Math.round(Math.sin(ang) * dist) + "px");
+      s.style.setProperty("--dy", Math.round(Math.sin(ang) * dist * 0.85) + "px");
       s.style.setProperty("--c", colors[i % colors.length]);
-      s.style.setProperty("--d", (i % 5) * 40 + "ms");
+      s.style.setProperty("--d", (i % 6) * 35 + "ms");
+      s.style.setProperty("--r", ((i * 47) % 360) + "deg");
       burst.appendChild(s);
     }
-    const st = NS.el("div", "sticker-pop", emoji);
+    const st = NS.el("div", "sticker-pop");
+    st.appendChild(NS.picture(emoji, { cls: "sticker-pic", eager: true }));
     st.setAttribute("aria-hidden", "true");
     const label = NS.el("div", "celebrate-text", text || NS.tr("shabash"));
     const card = NS.el("div", "celebrate-card");
@@ -43,6 +52,8 @@
     layer.addEventListener("click", close);
     document.body.appendChild(layer);
     hideTimer = setTimeout(close, 2600);
+    if (NS.sfx) NS.sfx.play("sparkle");
+    if (NS.mascot && NS.mascot.react) document.querySelectorAll(".app .mascot").forEach(m => NS.mascot.react(m, "hop"));
     if (spoken !== false) NS.voice.sayAfter(spoken || (text || NS.tr("shabash")));
   }
 

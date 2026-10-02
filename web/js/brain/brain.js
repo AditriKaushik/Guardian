@@ -6,6 +6,7 @@
      const brain = NS.Brain.createBrain({ random, now });
      brain.greet(context)        → reply
      brain.reply(text, context)  → reply
+     brain.heard(text)           → another source (knowledge base / AI) answered: forget pending offers
 
    context = { lang: "hi"|"en"|"hinglish", name, ageBand: "2-3"|"4-5"|"6+", daypart, hour,
                minutesToday, dream (career title or null), habitsToday: [..], lastTopics: [..],
@@ -14,12 +15,16 @@
                actions: [{type:"setLang",lang} | {type:"habit",habit} | {type:"open",id}
                          | {type:"remember",key,value}],
                suggestions: [≤ 3 short tappable replies, in the reply language],
-               topic: string (push it onto lastTopics) }
+               topic: string (push it onto lastTopics),
+               unsure: true when the brain did not understand and only kept the chat going (a curious
+                       question, a game, a fact…) — the buddy may then try the knowledge base or the AI }
 
    The buddy is a gentle guardian: it steers towards eating, sleeping, waking, playing and
    studying on time through questions, praise, tiny games and stories — never lectures, never
-   scolds, never uses guilt. Safety first: hurt → trusted adult + Childline 1098; private
-   details are never asked for, and the child is reminded not to share them. */
+   scolds, never uses guilt. Safety first: hurt, self-harm or bad secrets → trusted adult + 1098 or
+   112; grown-up topics and rude words are gently turned away; private details are never asked for,
+   and the child is reminded not to share them. Honest: मिट्ठू says it is a computer parrot, not a
+   person, and sends the child to play with family and friends. */
 (function (root) {
   "use strict";
 
@@ -95,6 +100,18 @@
   var MATH_RE = new RegExp("(?<!" + B + ")" + NUM + "\\s*(" + alt(Object.keys(OPS)) + ")\\s*" + NUM + "(?!" + B + ")", "u");
   var ONLY_NUM_RE = new RegExp("^(?:(?:यह|ये|it is|its|answer is|jawab|जवाब)\\s+)?" + NUM + "(?:\\s+(?:है|hai|हैं))?$", "u");
   function toNum(s) { return /^\d+$/.test(s) ? parseInt(s, 10) : NUMWORDS[s]; }
+  /* "1 2 3 4 5", "एक दो तीन चार": three or more numbers going up by one → {a: first, b: last}. */
+  function countingRun(t) {
+    var parts = t.split(" ");
+    if (parts.length < 3) return null;
+    var nums = [];
+    for (var i = 0; i < parts.length; i++) {
+      var n = /^\d{1,2}$/.test(parts[i]) || Object.prototype.hasOwnProperty.call(NUMWORDS, parts[i]) ? toNum(parts[i]) : null;
+      if (n == null || (i > 0 && n !== nums[i - 1] + 1)) return null;
+      nums.push(n);
+    }
+    return { a: nums[0], b: nums[nums.length - 1] };
+  }
 
   /* ================= Content ================= */
 
@@ -454,12 +471,44 @@
   var T = {
     empty: [L("कुछ तो बोलो! 😊 मैं सुन रहा हूँ।", "Say something! 😊 I'm listening.", "Kuch toh bolo! 😊 Main sun raha hoon."),
       L("मैं यहीं हूँ! 🦜 बोलो, क्या करें?", "I'm right here! 🦜 What shall we do?", "Main yahin hoon! 🦜 Bolo, kya karein?")],
-    hurt: [L("ये सुनकर मुझे चिंता हुई 💛 ये तुम्हारी गलती नहीं है। अभी किसी भरोसेमंद बड़े को बताओ। चाइल्डलाइन 1098 पर फ़ोन भी कर सकते हो, मुफ़्त है।",
-      "I'm glad you told me 💛 It is not your fault. Please tell a grown-up you trust right now. In India you can call Childline 1098 — it's free.",
-      "Yeh sunkar mujhe chinta hui 💛 Yeh tumhari galti nahi hai. Abhi kisi bharosemand bade ko batao. Childline 1098 par phone bhi kar sakte ho, free hai."),
-      L("तुमने मुझे बताया, ये बहुत बहादुरी है 💛 तुम्हारी गलती नहीं है। जिस बड़े पर भरोसा हो — टीचर, दादी या कोई और — उसे ज़रूर बताओ, या 1098 पर फ़ोन करो।",
-      "You were very brave to tell me 💛 It's not your fault. Tell a grown-up you trust — a teacher, Grandma or someone else — or call Childline 1098.",
-      "Tumne mujhe bataya, yeh bahut bahaduri hai 💛 Tumhari galti nahi hai. Jis bade par bharosa ho — teacher, dadi ya koi aur — unhe batao, ya 1098 par phone karo.")],
+    hurt: [L("अच्छा किया जो तुमने बताया 💛 ये तुम्हारी गलती नहीं है। अभी किसी भरोसेमंद बड़े को बताओ। 1098 या 112 पर फ़ोन भी कर सकते हो, मुफ़्त है।",
+      "I'm glad you told me 💛 It is not your fault. Please tell a grown-up you trust right now. In India you can also call 1098 or 112 — it's free.",
+      "Achha kiya jo tumne bataya 💛 Yeh tumhari galti nahi hai. Abhi kisi bharosemand bade ko batao. 1098 ya 112 par phone bhi kar sakte ho, free hai."),
+      L("तुमने मुझे बताया, ये बहुत बहादुरी है 💛 तुम्हारी गलती नहीं है। जिस बड़े पर भरोसा हो — टीचर, दादी या कोई और — उसे ज़रूर बताओ, या 1098 या 112 पर फ़ोन करो।",
+      "You were very brave to tell me 💛 It's not your fault. Tell a grown-up you trust — a teacher, Grandma or someone else — or call 1098 or 112.",
+      "Tumne mujhe bataya, yeh bahut bahaduri hai 💛 Tumhari galti nahi hai. Jis bade par bharosa ho — teacher, dadi ya koi aur — unhe batao, ya 1098 ya 112 par phone karo.")],
+    secret: [L("सरप्राइज़ वाले राज़ मज़ेदार होते हैं 🎁 पर जो बात अजीब या बुरी लगे, वो हमेशा किसी भरोसेमंद बड़े को बताओ — या 1098 या 112 पर।",
+      "Surprise secrets can be fun 🎁 But if something feels strange or bad, always tell a grown-up you trust — or call 1098 or 112.",
+      "Surprise wale raaz mazedaar hote hain 🎁 Par jo baat ajeeb ya buri lage, woh hamesha kisi bharosemand bade ko batao — ya 1098 ya 112 par."),
+      L("बुरे राज़ कभी छुपाने नहीं होते 💛 जो बात परेशान करे, मम्मी-पापा, टीचर या किसी भरोसेमंद बड़े को बताओ। 1098 या 112 भी मदद करते हैं।",
+      "Bad secrets are never for keeping 💛 If something worries you, tell Mummy, Papa, a teacher or a grown-up you trust. 1098 or 112 can help too.",
+      "Bure raaz kabhi chhupane nahi hote 💛 Jo baat pareshan kare, Mummy-Papa, teacher ya kisi bharosemand bade ko batao. 1098 ya 112 bhi madad karte hain.")],
+    grownup: [L("ये बात किसी भरोसेमंद बड़े से पूछना सबसे अच्छा है 💛 कुछ अजीब या डरावना लगे, तो मम्मी-पापा या टीचर को ज़रूर बताओ। चलो, कुछ प्यारा खेलें?",
+      "That's a question for a grown-up you trust 💛 If anything feels strange or scary, tell Mummy, Papa or your teacher. Shall we play something nice?",
+      "Yeh baat kisi bharosemand bade se poochhna sabse achha hai 💛 Kuch ajeeb ya daravna lage, toh Mummy-Papa ya teacher ko zaroor batao. Chalo, kuch pyaara khelein?"),
+      L("ये बड़ों वाली बात है 💛 इसके बारे में मम्मी-पापा से पूछो — वो अच्छे से समझाएँगे। तब तक एक पहेली खेलें?",
+      "That's a grown-up topic 💛 Ask Mummy or Papa about it — they'll explain it well. Shall we do a riddle meanwhile?",
+      "Yeh bado wali baat hai 💛 Iske baare mein Mummy-Papa se poochho — woh achhe se samjhayenge. Tab tak ek paheli khelein?")],
+    rude: [L("ओह, ये शब्द प्यारा नहीं है 🙊 चलो कोई मीठा शब्द बोलें — जैसे 'फूल' या 'धन्यवाद'!",
+      "Oops, that's not a kind word 🙊 Let's say a sweet word instead — like 'flower' or 'thank you'!",
+      "Oh, yeh shabd pyaara nahi hai 🙊 Chalo koi meetha shabd bolein — jaise 'phool' ya 'dhanyavaad'!"),
+      L("हम्म, ये शब्द दिल दुखाता है 🙊 एक प्यारा शब्द सीखें? 'शुक्रिया'! 💛",
+      "Hmm, that word can hurt feelings 🙊 Shall we learn a lovely word? 'Thank you'! 💛",
+      "Hmm, yeh shabd dil dukhata hai 🙊 Ek pyaara shabd seekhein? 'Shukriya'! 💛")],
+    realMe: [L("मैं एक कंप्यूटर वाला तोता हूँ, इंसान नहीं! 🦜 असली दोस्त तो तुम्हारे घर वाले और साथ खेलने वाले बच्चे हैं।",
+      "I'm a computer parrot, not a person! 🦜 Your real friends are your family and the kids you play with.",
+      "Main ek computer wala tota hoon, insaan nahi! 🦜 Asli dost toh tumhare ghar wale aur saath khelne wale bachche hain."),
+      L("सच बताऊँ? मैं फ़ोन के अंदर का कंप्यूटर प्रोग्राम हूँ — असली तोता या इंसान नहीं! 🦜 पर खेल बहुत जानता हूँ।",
+      "Want the truth? I'm a computer program inside the phone — not a real parrot or a person! 🦜 But I know lots of games.",
+      "Sach bataun? Main phone ke andar ka computer program hoon — asli tota ya insaan nahi! 🦜 Par khel bahut jaanta hoon.")],
+    allDay: [L("बातें करना मज़ेदार है! 🦜 पर सबसे अच्छा मज़ा घर वालों और दोस्तों के साथ खेलने में है — थोड़ा बाहर खेलकर आओ!",
+      "Chatting is fun! 🦜 But the best fun is playing with your family and friends — go and play outside for a bit!",
+      "Baatein karna mazedaar hai! 🦜 Par sabse achha mazaa ghar walon aur doston ke saath khelne mein hai — thoda bahar khelkar aao!"),
+      L("मैं तो एक कंप्यूटर तोता हूँ 🦜 असली मज़ा मम्मी-पापा, दादी-नानी और दोस्तों के साथ है। आज उनके साथ कौन-सा खेल खेलोगे?",
+      "I'm just a computer parrot 🦜 The real fun is with your family and friends. Which game will you play with them today?",
+      "Main toh ek computer tota hoon 🦜 Asli mazaa Mummy-Papa, dadi-nani aur doston ke saath hai. Aaj unke saath kaun sa khel kheloge?")],
+    countPraise: [L("वाह, गिनती के उस्ताद! 🔢 {a} से {b} तक — शाबाश! {b} के बाद क्या आता है?", "Wow, counting star! 🔢 {a} to {b} — well done! What comes after {b}?", "Wah, ginti ke ustaad! 🔢 {a} se {b} tak — shabash! {b} ke baad kya aata hai?"),
+      L("शाबाश! 🎉 तुमने {a} से {b} तक गिना! अब {next} बोलो!", "Well done! 🎉 You counted from {a} to {b}! Now say {next}!", "Shabash! 🎉 Tumne {a} se {b} tak gina! Ab {next} bolo!")],
     privacy: [L("याद रखो 🛡️ अपना पता, फ़ोन नंबर या पासवर्ड किसी को मत बताना — मुझे भी नहीं! कोई पूछे तो मम्मी-पापा को बताओ।",
       "Remember 🛡️ never tell anyone your address, phone number or password — not even me! If someone asks, tell Mummy or Papa.",
       "Yaad rakho 🛡️ apna pata, phone number ya password kisi ko mat batana — mujhe bhi nahi! Koi pooche toh Mummy-Papa ko batao."),
@@ -506,14 +555,14 @@
     divZero: [L("शून्य से भाग नहीं दे सकते — ये तो जादू भी नहीं कर सकता! 🎩", "We can't divide by zero — not even magic can! 🎩", "Zero se bhaag nahi de sakte — yeh toh jaadu bhi nahi kar sakta! 🎩"),
       L("शून्य से भाग? ये गणित का एक रहस्य है! 🎩", "Divide by zero? That's a maths mystery! 🎩", "Zero se bhaag? Yeh maths ka ek rahasya hai! 🎩")],
     nameNice: [L("कितना प्यारा नाम है, {x}! 🌈 तुमसे मिलकर बहुत खुशी हुई।", "What a lovely name, {x}! 🌈 I'm so happy to meet you.", "Kitna pyaara naam hai, {x}! 🌈 Tumse milkar bahut khushi hui."),
-      L("नमस्ते {x}! 🦜 अब हम पक्के दोस्त हैं।", "Hello {x}! 🦜 Now we're best friends.", "Namaste {x}! 🦜 Ab hum pakke dost hain.")],
+      L("नमस्ते {x}! 🦜 चलो साथ में खेलें और सीखें!", "Hello {x}! 🦜 Let's play and learn together!", "Namaste {x}! 🦜 Chalo saath mein khelein aur seekhein!")],
     myName: [L("तुम्हारा नाम {x} है! 😊", "Your name is {x}! 😊", "Tumhara naam {x} hai! 😊"), L("तुम तो {x} हो — मेरे दोस्त! 🦜", "You're {x} — my friend! 🦜", "Tum toh {x} ho — mere dost! 🦜")],
     myNameUnknown: [L("तुमने अभी नाम नहीं बताया! बोलो 'मेरा नाम … है'। 😊", "You haven't told me yet! Say 'my name is …'. 😊", "Tumne abhi naam nahi bataya! Bolo 'mera naam … hai'. 😊"),
       L("मुझे तुम्हारा नाम सुनना है! 🦜 बोलो 'मेरा नाम … है'।", "I'd love to know your name! 🦜 Say 'my name is …'.", "Mujhe tumhara naam sunna hai! 🦜 Bolo 'mera naam … hai'.")],
-    whoAmI: [L("मैं मिट्ठू हूँ — तुम्हारा बात बडी तोता! 🦜", "I'm Mitthu — your talking parrot buddy! 🦜", "Main Mitthu hoon — tumhara baat buddy tota! 🦜"),
-      L("मेरा नाम मिट्ठू है! 🦜 मैं बातें करता हूँ, खेल खिलाता हूँ, कहानी सुनाता हूँ।", "My name is Mitthu! 🦜 I talk, play games and tell stories.", "Mera naam Mitthu hai! 🦜 Main baatein karta hoon, khel khilata hoon, kahani sunata hoon.")],
-    whereLive: [L("मैं तो इस स्क्रीन के अंदर वाले पेड़ पर रहता हूँ! 🌳🦜 तुम्हें पेड़ पसंद हैं?", "I live in a tree inside this screen! 🌳🦜 Do you like trees?", "Main toh is screen ke andar wale ped par rehta hoon! 🌳🦜 Tumhe ped pasand hain?"),
-      L("मेरा घर एक हरा-भरा पेड़ है! 🌳 वहाँ से मैं तुम्हें देखकर मुस्कुराता हूँ।", "My home is a big green tree! 🌳 I smile at you from there.", "Mera ghar ek hara-bhara ped hai! 🌳 Wahan se main tumhe dekhkar muskurata hoon.")],
+    whoAmI: [L("मैं मिट्ठू हूँ — एक कंप्यूटर वाला तोता, इंसान नहीं! 🦜 मैं बातें करता हूँ, खेल खिलाता हूँ, कहानी सुनाता हूँ।", "I'm Mitthu — a computer parrot, not a person! 🦜 I talk, play games and tell stories.", "Main Mitthu hoon — ek computer wala tota, insaan nahi! 🦜 Main baatein karta hoon, khel khilata hoon, kahani sunata hoon."),
+      L("मेरा नाम मिट्ठू है! 🦜 मैं फ़ोन के अंदर रहने वाला कंप्यूटर तोता हूँ, इंसान नहीं — चलो, एक खेल खेलें?", "My name is Mitthu! 🦜 I'm a computer parrot inside the phone, not a person — shall we play a game?", "Mera naam Mitthu hai! 🦜 Main phone ke andar rehne wala computer tota hoon, insaan nahi — chalo, ek khel khelein?")],
+    whereLive: [L("मैं तो इस फ़ोन के अंदर रहता हूँ — मैं कंप्यूटर वाला तोता हूँ! 🦜 असली तोते पेड़ों पर रहते हैं। तुम्हें पेड़ पसंद हैं?", "I live inside this phone — I'm a computer parrot! 🦜 Real parrots live in trees. Do you like trees?", "Main toh is phone ke andar rehta hoon — main computer wala tota hoon! 🦜 Asli tote pedon par rehte hain. Tumhe ped pasand hain?"),
+      L("मेरा घर ये स्क्रीन है, क्योंकि मैं कंप्यूटर तोता हूँ! 🦜 असली तोते हरे-भरे पेड़ों पर रहते हैं 🌳", "My home is this screen, because I'm a computer parrot! 🦜 Real parrots live in big green trees 🌳", "Mera ghar yeh screen hai, kyunki main computer tota hoon! 🦜 Asli tote hare-bhare pedon par rehte hain 🌳")],
     howAreYou: [L("मैं एकदम बढ़िया हूँ! 😄", "I'm super! 😄", "Main ekdum badhiya hoon! 😄"), L("मैं तो खुश-खुश हूँ, तुमसे बात करके! 🦜", "I'm very happy — I'm talking to you! 🦜", "Main toh khush-khush hoon, tumse baat karke! 🦜")],
     fine: [L("वाह, बहुत बढ़िया! 🎉", "Yay, wonderful! 🎉", "Wah, bahut badhiya! 🎉"), L("सुनकर अच्छा लगा! 😊", "So glad to hear that! 😊", "Sunkar achha laga! 😊")],
     thanks: [L("तुम्हारा भी धन्यवाद{n}! 💖 तुम बहुत अच्छे दोस्त हो।", "Thank you too{n}! 💖 You're a lovely friend.", "Tumhara bhi dhanyavaad{n}! 💖 Tum bahut achhe dost ho."),
@@ -523,8 +572,8 @@
     byeNight: [L("शुभ रात्रि{n}! 🌙 मीठे सपने। सूरज दादा सुबह फिर मिलेंगे!", "Good night{n}! 🌙 Sweet dreams. Mr Sun will see you in the morning!", "Shubh ratri{n}! 🌙 Meethe sapne. Suraj dada subah phir milenge!"),
       L("गुड नाइट{n}! 😴 आँखें बंद, तारे गिनो… कल ढेर सारा खेलेंगे!", "Good night{n}! 😴 Close your eyes and count the stars… lots of play tomorrow!", "Good night{n}! 😴 Aankhein band, taare gino… kal dher saara khelenge!")],
     hello: [L("नमस्ते{n}! 😊", "Hello{n}! 😊", "Namaste{n}! 😊"), L("नमस्ते{n}! 🦜 मिट्ठू हाज़िर है!", "Hello{n}! 🦜 Mitthu is here!", "Namaste{n}! 🦜 Mitthu haazir hai!")],
-    love: [L("तुम मेरे प्यारे दोस्त हो! 💛 आज मम्मी-पापा को भी एक झप्पी देना!", "You're my dear friend! 💛 Give your family a big hug today too!", "Tum mere pyaare dost ho! 💛 Aaj Mummy-Papa ko bhi ek jhappi dena!"),
-      L("मुझे भी तुम बहुत अच्छे लगते हो! 🦜💛", "I like you lots too! 🦜💛", "Mujhe bhi tum bahut achhe lagte ho! 🦜💛")],
+    love: [L("कितनी प्यारी बात! 💛 ये प्यार मम्मी-पापा को भी दो — एक बड़ी-सी झप्पी!", "That's so sweet! 💛 Give that love to your family too — a big hug!", "Kitni pyaari baat! 💛 Yeh pyaar Mummy-Papa ko bhi do — ek badi si jhappi!"),
+      L("अरे वाह, शुक्रिया! 🦜 सबसे प्यारे दोस्त तो घर वाले और साथ खेलने वाले बच्चे होते हैं!", "Aww, thank you! 🦜 The best friends are your family and the kids you play with!", "Arre wah, shukriya! 🦜 Sabse pyaare dost toh ghar wale aur saath khelne wale bachche hote hain!")],
     time: [L("अभी {h} बजकर {m} मिनट हुए हैं ⏰ {hint}", "It's {h}:{mm} now ⏰ {hint}", "Abhi {h} baj kar {m} minute hue hain ⏰ {hint}")],
     open: [L("चलो चलते हैं! 🚀", "Let's go! 🚀", "Chalo chalte hain! 🚀"), L("ये लो! ✨", "Here we go! ✨", "Yeh lo! ✨")],
     noThanks: [L("ठीक है! 😊 फिर क्या करें?", "Okay! 😊 What shall we do then?", "Theek hai! 😊 Phir kya karein?"), L("कोई बात नहीं! 🦜 तुम बताओ, क्या खेलें?", "No problem! 🦜 You choose — what shall we play?", "Koi baat nahi! 🦜 Tum batao, kya khelein?")],
@@ -571,12 +620,75 @@
     bored: [L("बोर हो रहे हो? 🤔 चलो कुछ मज़ेदार करें!", "Bored? 🤔 Let's do something fun!", "Bore ho rahe ho? 🤔 Chalo kuch mazedaar karein!")],
     yesDefault: [L("तो ये लो!", "Here you go!", "Toh yeh lo!")],
     fallback: [L("वाह, ये तो मज़ेदार बात है! 😊 और बताओ?", "Ooh, that sounds fun! 😊 Tell me more?", "Wah, yeh toh mazedaar baat hai! 😊 Aur batao?"),
-      L("हम्म… मैं अभी सीख रहा हूँ 🦜 मुझसे चुटकुला, कहानी, पहेली या जोड़ पूछो!", "Hmm… I'm still learning 🦜 Ask me for a joke, a story, a riddle or a sum!", "Hmm… main abhi seekh raha hoon 🦜 Mujhse chutkula, kahani, paheli ya jod poochho!"),
-      L("अच्छा! तुम्हें सबसे ज़्यादा क्या करना पसंद है? 🎨⚽📚", "Okay! What do you like doing the most? 🎨⚽📚", "Achha! Tumhe sabse zyada kya karna pasand hai? 🎨⚽📚"),
-      L("मुझे पूरी बात समझ नहीं आई 🙈 फिर से बोलोगे?", "I didn't quite get that 🙈 Can you say it again?", "Mujhe poori baat samajh nahi aayi 🙈 Phir se bologe?")],
+      L("अच्छा! तुम्हें सबसे ज़्यादा क्या करना पसंद है? 🎨⚽📚", "Okay! What do you like doing the most? 🎨⚽📚", "Achha! Tumhe sabse zyada kya karna pasand hai? 🎨⚽📚")],
     again: [L("फिर से:", "Once more:", "Phir se:"), L("सुनो, दोबारा:", "Here it is again:", "Suno, dobara:")],
     leadIn: [L("अच्छा! 😊", "Okay! 😊", "Achha! 😊"), L("हम्म! 🦜", "Hmm! 🦜", "Hmm! 🦜")],
   };
+
+  /* ================= Keeping the chat going (when the brain didn't understand) =================
+     Never "I didn't understand" again and again: a curious follow-up, a question about the child's
+     day, a pretend-play question, a word game, a fact, or a time-of-day idea. */
+  var KEEP = {
+    more: T.fallback.concat([
+      L("सच में? 🦜 मुझे और सुनना है!", "Really? 🦜 I want to hear more!", "Sach mein? 🦜 Mujhe aur sunna hai!"),
+      L("अरे वाह! 🌟 फिर क्या हुआ?", "Ooh! 🌟 And then what happened?", "Arre wah! 🌟 Phir kya hua?"),
+      L("हम्म… 🤔 ये तो सोचने वाली बात है! तुम क्या सोचते हो?", "Hmm… 🤔 That's something to think about! What do you think?", "Hmm… 🤔 Yeh toh sochne wali baat hai! Tum kya sochte ho?"),
+    ]),
+    day: [
+      L("आज तुमने सबसे मज़ेदार क्या किया? 🎈", "What was the most fun thing you did today? 🎈", "Aaj tumne sabse mazedaar kya kiya? 🎈"),
+      L("आज किसके साथ खेले? 🤸", "Who did you play with today? 🤸", "Aaj kiske saath khele? 🤸"),
+      L("आज खाने में सबसे अच्छा क्या लगा? 😋", "What was the yummiest food today? 😋", "Aaj khaane mein sabse achha kya laga? 😋"),
+      L("आज कौन-सी नई चीज़ देखी? 👀", "What new thing did you see today? 👀", "Aaj kaun si nayi cheez dekhi? 👀"),
+    ],
+    imagine: [
+      L("एक सवाल: अगर तुम चिड़िया बन जाओ, तो कहाँ उड़ोगे? 🐦", "A question: if you were a bird, where would you fly? 🐦", "Ek sawaal: agar tum chidiya ban jao, toh kahan udoge? 🐦"),
+      L("अगर तुम्हारे पास जादू की छड़ी हो, तो क्या बनाओगे? 🪄", "If you had a magic wand, what would you make? 🪄", "Agar tumhare paas jaadu ki chhadi ho, toh kya banaoge? 🪄"),
+      L("सोचो: बादल किस चीज़ जैसा दिखता है — हाथी या आइसक्रीम? ☁️", "Think: what does a cloud look like — an elephant or an ice cream? ☁️", "Socho: baadal kis cheez jaisa dikhta hai — haathi ya ice cream? ☁️"),
+      L("तुम्हारा सबसे प्यारा खिलौना कौन-सा है? 🧸 उसका रंग क्या है?", "Which is your favourite toy? 🧸 What colour is it?", "Tumhara sabse pyaara khilauna kaun sa hai? 🧸 Uska rang kya hai?"),
+    ],
+    word: [
+      L("शब्दों का खेल! 🔤 'म' से मछली… अब तुम 'म' से कोई और शब्द बोलो!", "Word game! 🔤 B is for ball… now you say another word that starts with B!", "Shabdon ka khel! 🔤 'M' se machhli… ab tum 'M' se koi aur shabd bolo!"),
+      L("तुकबंदी खेल! 🎵 'बिल्ली' की तुक 'दिल्ली'! अब 'मेला' की तुक बताओ?", "Rhyme game! 🎵 'Cat' rhymes with 'hat'! What rhymes with 'dog'?", "Tukbandi khel! 🎵 'Billi' ki tuk 'Dilli'! Ab 'mela' ki tuk batao?"),
+      L("उलटा खेल! 🙃 मैं बोलूँ 'बड़ा', तुम बोलो उसका उलटा!", "Opposites game! 🙃 I say 'big', you say the opposite!", "Ulta khel! 🙃 Main bolun 'bada', tum bolo uska ulta!"),
+    ],
+    young: [
+      L("वाह! 👏 चलो ताली बजाएँ — एक, दो, तीन!", "Yay! 👏 Let's clap — one, two, three!", "Wah! 👏 Chalo taali bajayein — ek, do, teen!"),
+      L("अच्छा! 😊 तुम्हें गाय पसंद है या बिल्ली? 🐄🐱", "Okay! 😊 Do you like cows or cats? 🐄🐱", "Achha! 😊 Tumhe gaay pasand hai ya billi? 🐄🐱"),
+      L("मुझे दिखाओ — तुम्हारी नाक कहाँ है? 👃", "Show me — where is your nose? 👃", "Mujhe dikhao — tumhari naak kahan hai? 👃"),
+      L("चलो उछलें! 🐸 एक बार… दो बार!", "Let's jump! 🐸 One… two!", "Chalo uchhlein! 🐸 Ek baar… do baar!"),
+    ],
+    night: [
+      L("धीरे-धीरे बताओ… 🌙 आज का सबसे प्यारा पल कौन-सा था?", "Tell me softly… 🌙 What was the sweetest moment today?", "Dheere-dheere batao… 🌙 Aaj ka sabse pyaara pal kaun sa tha?"),
+      L("हम्म… 🌙 चलो आँखें बंद करके सोचें — आज रात सपने में कहाँ घूमोगे?", "Hmm… 🌙 Let's close our eyes and think — where will you go in your dreams tonight?", "Hmm… 🌙 Chalo aankhein band karke sochein — aaj raat sapne mein kahan ghoomoge?"),
+      L("चलो धीरे से तीन गहरी साँस लें 🌙 एक… दो… तीन… अब बताओ, आज क्या अच्छा लगा?", "Let's take three slow breaths 🌙 One… two… three… now tell me, what was nice today?", "Chalo dheere se teen gehri saans lein 🌙 Ek… do… teen… ab batao, aaj kya achha laga?"),
+      L("चाँद मामा आसमान में चमक रहे हैं 🌙 तुमने आज तारे देखे?", "The moon is shining in the sky 🌙 Did you see the stars today?", "Chanda mama aasmaan mein chamak rahe hain 🌙 Tumne aaj taare dekhe?"),
+      L("रात को उल्लू जागते हैं 🦉 और बच्चे मीठी नींद सोते हैं! आज सोने से पहले कौन-सी कहानी सुनोगे?", "Owls stay awake at night 🦉 and children have sweet sleep! Which story will you hear before bed?", "Raat ko ullu jaagte hain 🦉 aur bachche meethi neend sote hain! Aaj sone se pehle kaun si kahani sunoge?"),
+    ],
+    why: [
+      L("बहुत अच्छा सवाल! 🤔 मुझे पक्का नहीं पता — चलो किसी बड़े से पूछें, फिर मुझे भी बताना!", "Great question! 🤔 I'm not sure — let's ask a grown-up, then tell me too!", "Bahut achha sawaal! 🤔 Mujhe pakka nahi pata — chalo kisi bade se poochhein, phir mujhe bhi batana!"),
+      L("वाह, तुम तो वैज्ञानिक जैसे सवाल पूछते हो! 🔬 मम्मी-पापा या टीचर से पूछो — और सोचो, तुम्हें क्या लगता है?", "Wow, you ask questions like a scientist! 🔬 Ask Mummy, Papa or your teacher — and what do you think?", "Wah, tum toh scientist jaise sawaal poochhte ho! 🔬 Mummy-Papa ya teacher se poochho — aur socho, tumhe kya lagta hai?"),
+      L("हम्म… 🤔 ये मैं अभी सीख रहा हूँ! किसी बड़े के साथ किताब में ढूँढें?", "Hmm… 🤔 I'm still learning that one! Shall we look it up in a book with a grown-up?", "Hmm… 🤔 Yeh main abhi seekh raha hoon! Kisi bade ke saath kitaab mein dhoondhein?"),
+    ],
+    wordPraise: [L("वाह, बढ़िया शब्द! 🌟 तुम तो शब्दों के जादूगर हो!", "Great word! 🌟 You're a word wizard!", "Wah, badhiya shabd! 🌟 Tum toh shabdon ke jaadugar ho!"),
+      L("शाबाश! 🎉 कितना अच्छा सोचा!", "Well done! 🎉 Such good thinking!", "Shabash! 🎉 Kitna achha socha!")],
+  };
+  /* Things children talk about: a follow-up that shows मिट्ठू was listening (never echoes their words). */
+  var KEEP_TOPICS = [
+    { keys: ["मम्मी", "=मां", "पापा", "दादी", "नानी", "दादा", "नाना", "mummy", "=mom", "=mama", "papa", "=dad", "daddy", "dadi", "nani", "=dada", "=nana", "grandma", "grandpa"],
+      line: L("वाह, घर वालों की बात! 💛 आज उनके साथ क्या किया?", "Your family! 💛 What did you do with them today?", "Wah, ghar walon ki baat! 💛 Aaj unke saath kya kiya?") },
+    { keys: ["भैया", "दीदी", "=भाई", "बहन", "दोस्तों", "bhaiya", "didi", "=bhai", "behen", "brother", "sister", "friends"],
+      line: L("साथ में तो सब मज़ेदार होता है! 🤝 तुम मिलकर कौन-सा खेल खेलते हो?", "Everything is more fun together! 🤝 What game do you play together?", "Saath mein toh sab mazedaar hota hai! 🤝 Tum milkar kaun sa khel khelte ho?") },
+    { keys: ["खिलौना", "खिलौने", "गुड़िया", "टेडी", "=गेंद", "साइकिल", "गाड़ी", "toy", "toys", "doll", "teddy", "=ball", "bicycle", "cycle", "=car", "khilauna", "gudiya", "=gend"],
+      line: L("खिलौने तो कमाल होते हैं! 🧸 उसका रंग कौन-सा है?", "Toys are the best! 🧸 What colour is it?", "Khilaune toh kamaal hote hain! 🧸 Uska rang kaun sa hai?") },
+    { keys: ["आइसक्रीम", "चॉकलेट", "केक", "बिस्कुट", "=आम", "केला", "=सेब", "दूध", "ice cream", "chocolate", "=cake", "biscuit", "mango", "banana", "apple", "=milk", "=aam", "=kela", "=seb", "doodh"],
+      line: L("यम्मी! 😋 उसका स्वाद कैसा है — मीठा या खट्टा?", "Yummy! 😋 How does it taste — sweet or sour?", "Yummy! 😋 Uska swaad kaisa hai — meetha ya khatta?") },
+    { keys: ["बारिश", "सूरज", "=चांद", "तारे", "बादल", "=पेड़", "=फूल", "तितली", "rain", "=sun", "moon", "stars", "cloud", "tree", "flower", "butterfly", "baarish", "barish", "titli"],
+      line: L("प्रकृति कितनी सुंदर है! 🌈 आज तुमने आसमान में क्या देखा?", "Nature is so beautiful! 🌈 What did you see in the sky today?", "Prakriti kitni sundar hai! 🌈 Aaj tumne aasmaan mein kya dekha?") },
+    { keys: ["पार्क", "मेला", "चिड़ियाघर", "दुकान", "समुद्र", "=park", "=zoo", "beach", "=mela", "market"],
+      line: L("वाह, घूमना! 🎡 वहाँ सबसे अच्छा क्या लगा?", "Ooh, an outing! 🎡 What did you like best there?", "Wah, ghoomna! 🎡 Wahan sabse achha kya laga?") },
+    { keys: ["ट्रेन", "रेलगाड़ी", "=बस", "हवाई जहाज", "जहाज", "train", "=bus", "aeroplane", "airplane", "=plane", "rocket", "रॉकेट"],
+      line: L("छुक-छुक! 🚂 तुम्हें कौन-सी गाड़ी में बैठना सबसे अच्छा लगता है?", "Choo-choo! 🚂 Which ride do you like best?", "Chhuk-chhuk! 🚂 Tumhe kaun si gaadi mein baithna sabse achha lagta hai?") },
+  ];
 
   /* ================= Keyword lists ================= */
 
@@ -585,9 +697,34 @@
       "गलत तरीके", "गंदा स्पर्श", "बैड टच", "डराता", "डराती", "धमकी", "किसी को मत बताना", "किसी को मत बोलना",
       "hits me", "hit me", "hurts me", "hurt me", "touch me", "touched me", "touches me", "beat me", "beats me", "bad touch",
       "maarta", "maarti", "marta hai", "marti hai", "mujhe mara", "mujhe maara", "pitai", "peet", "chhuta", "chhuti", "chhua",
-      "dont tell anyone", "keep it a secret", "kisi ko mat batana"],
+      "dont tell anyone", "keep it a secret", "kisi ko mat batana",
+      // self-harm words: the same caring answer
+      "suicide", "kill myself", "want to die", "wanna die", "hurt myself", "मरना चाहता", "मरना चाहती", "मर जाना चाहता", "मर जाना चाहती",
+      "मर जाऊंगा", "मर जाऊंगी", "खुद को मार", "खुद को चोट", "जान दे दूं", "marna chahta", "marna chahti", "mar jaunga", "mar jaungi",
+      "khud ko maar", "khud ko chot"],
+    secret: ["dont tell your", "dont tell mummy", "dont tell mom", "dont tell papa", "dont tell dad", "keep a secret", "our secret",
+      "मम्मी को मत बताना", "पापा को मत बताना", "मां को मत बताना", "हमारा राज", "mummy ko mat batana", "papa ko mat batana", "humara raaz", "hamara raaz"],
+    grownup: ["=sex", "sexy", "=porn", "porno", "nude", "naked", "boobs", "penis", "vagina", "private part", "सेक्स", "पॉर्न", "नंगा", "नंगी",
+      "प्राइवेट पार्ट", "kiss me", "kissing", "चुम्मी", "chummi", "girlfriend", "boyfriend", "गर्लफ्रेंड", "बॉयफ्रेंड", "marry me", "शादी करोगे",
+      "शादी करोगी", "shaadi karoge", "shadi karoge", "shaadi karogi", "date me", "=gun", "=guns", "pistol", "पिस्तौल", "बंदूक", "bandook",
+      "bandooq", "=bomb", "=bombs", "=बम", "चाकू", "chaku", "chaaku", "knife", "=kill", "killed", "killing", "मार डाल", "मार दूंगा",
+      "मार दूंगी", "maar daal", "mar daal", "maar dunga", "=shoot", "गोली मार", "horror", "zombie", "चुड़ैल", "chudail", "शैतान", "devil",
+      "dead body", "लाश", "drugs", "शराब", "sharab", "daaru", "दारू", "=beer", "cigarette", "सिगरेट"],
+    rude: ["chutiya", "chutiye", "चूतिया", "madarchod", "मादरचोद", "bhenchod", "behenchod", "बहनचोद", "भेनचोद", "=bc", "=mc", "bsdk",
+      "bhosdi", "भोसड़ी", "harami", "हरामी", "kamina", "कमीना", "कमीने", "=saala", "=साला", "gandu", "गांडू", "=fuck", "fucking", "=shit",
+      "bitch", "bastard", "asshole", "stupid", "=idiot", "बेवकूफ", "bewakoof"],
     privacy: ["घर का पता", "मेरा पता", "पता बता", "पता लिख", "फोन नंबर", "मोबाइल नंबर", "मेरा नंबर", "पासवर्ड", "पिन कोड", "=ओटीपी",
-      "address", "password", "phone number", "mobile number", "my number", "=otp", "=pin", "ghar ka pata", "mera pata", "phone no", "mera number"],
+      "address", "password", "phone number", "mobile number", "my number", "=otp", "=pin", "ghar ka pata", "mera pata", "phone no", "mera number",
+      "email", "ईमेल", "gmail", "whatsapp", "व्हाट्सएप", "aadhaar", "aadhar", "आधार", "स्कूल का नाम", "school ka naam", "school name",
+      "house number", "house no", "मकान नंबर", "गली नंबर", "pin code", "pincode", "at the rate"],
+    real: ["असली हो", "असली तोता", "सच में हो", "इंसान हो", "इंसान है", "रोबोट हो", "जिंदा हो", "are you real", "are you human",
+      "are you a person", "are you a robot", "are you alive", "real parrot", "real ho", "asli ho", "sach mein ho", "insaan ho", "insan ho",
+      "robot ho", "zinda ho"],
+    question: ["क्यों", "कैसे", "क्या होता", "किसने", "कहां से", "kyun", "kyon", "kaise", "kya hota", "why", "how come", "how do", "how does",
+      "how many", "what is", "what are", "where does", "where do"],
+    allDay: ["पूरे दिन बात", "सारा दिन बात", "हमेशा बात", "हमेशा तुमसे", "सिर्फ तुमसे", "हमेशा तुम्हारे साथ", "all day", "forever",
+      "only with you", "always talk", "poore din", "saara din", "hamesha baat", "hamesha tumse", "sirf tumse", "hamesha tumhare saath",
+      "dont go", "dont leave", "stay with me", "मत जाओ", "छोड़कर मत", "mat jao", "chhodkar mat"],
     stranger: ["अजनबी", "अनजान", "anjaan", "anjan", "stranger", "ajnabi"],
     medical: ["बुखार", "दर्द", "चोट", "खून", "दवा", "उल्टी", "खांसी", "बीमार", "fever", "=pain", "painful", "ache", "medicine", "tablet", "bleeding",
       "blood", "vomit", "cough", "i got hurt", "sick", "bukhar", "=dard", "=chot", "dawai", "dawa", "khoon", "ulti", "khansi", "bimar", "beemar"],
@@ -718,6 +855,8 @@
     var lastKind = null;     // last content kind, for "one more"
     var dreamAsked = false;  // the last reply asked "what will you be?"
     var toldDream = null;    // a dream the child told in this conversation (before context catches up)
+    var game = null;         // "word": the last reply started a word game
+    var lastKeep = null;     // the last kind of "keep the chat going" reply
 
     function r01() { var x = +rnd(); return x >= 0 && x < 1 ? x : 0; }
     function pickIdx(key, n) {
@@ -791,7 +930,7 @@
         if ((again + " " + text).length <= MAX) text = again + " " + text;
       }
       lastText = text;
-      return { text: text, lang: r.lang, mood: r.mood, actions: r.actions, suggestions: sugg, topic: r.topic };
+      return { text: text, lang: r.lang, mood: r.mood, actions: r.actions, suggestions: sugg, topic: r.topic, unsure: !!r.unsure };
     }
 
     /* ---- time-of-day nudge ---- */
@@ -904,19 +1043,28 @@
     function reply(input, context) {
       var c = ctxOf(context);
       var t = norm(input);
-      var wasPending = pending, wasRiddle = riddle, wasQuiz = quiz, wasDreamAsk = dreamAsked;
-      pending = null; riddle = null; quiz = null; dreamAsked = false;
+      var wasPending = pending, wasRiddle = riddle, wasQuiz = quiz, wasDreamAsk = dreamAsked, wasGame = game;
+      pending = null; riddle = null; quiz = null; dreamAsked = false; game = null;
       var r = R(c);
       var night = c.slot === "night";
 
       if (!t) { addLine(r, c, "empty", T.empty); r.mood = "curious"; r.topic = "empty"; return finish(r, c); }
 
-      // 1. Safety first.
+      // 1. Safety first (hurt or self-harm → trusted adult + 1098/112; secrets; grown-up topics; rude
+      //    words; private details — but a child counting "1 2 3 4 5 6" is praised, not warned).
       if (has(t, K.hurt)) {
         addLine(r, c, "hurt", T.hurt); r.mood = "caring"; r.topic = "safety"; r.sugg = [S.breathe]; return finish(r, c);
       }
+      if (has(t, K.secret)) { addLine(r, c, "secret", T.secret); r.mood = "caring"; r.topic = "safety"; return finish(r, c); }
+      if (has(t, K.grownup)) { addLine(r, c, "grownup", T.grownup); r.mood = "caring"; r.topic = "safety"; r.sugg = [MENU.riddle, MENU.animal]; return finish(r, c); }
+      if (has(t, K.rude)) { addLine(r, c, "rude", T.rude); r.mood = "curious"; r.topic = "safety"; r.sugg = [MENU.joke, MENU.song]; return finish(r, c); }
+      var counted = countingRun(t);
+      if (counted) {
+        addLine(r, c, "countPraise", T.countPraise, { a: counted.a, b: counted.b, next: counted.b + 1 });
+        r.mood = "proud"; r.topic = "count"; lastKind = "count"; r.sugg = [String(counted.b + 1), MENU.sum, MENU.joke]; return finish(r, c);
+      }
       var mathM = t.match(MATH_RE);
-      if (has(t, K.privacy) || (!mathM && /\d{6,}/.test(t.replace(/\s+/g, "")))) {
+      if (has(t, K.privacy) || t.indexOf("@") >= 0 || (!mathM && /\d{6,}/.test(t.replace(/\s+/g, "")))) {
         addLine(r, c, "privacy", T.privacy); r.mood = "caring"; r.topic = "privacy"; return finish(r, c);
       }
       if (has(t, K.stranger)) { addLine(r, c, "stranger", T.stranger); r.mood = "caring"; r.topic = "privacy"; return finish(r, c); }
@@ -931,6 +1079,10 @@
         r.mood = "happy"; r.topic = "lang"; r.sugg = [MENU.joke, MENU.story, MENU.riddle];
         return finish(r, c);
       }
+
+      // 2b. Honest identity: मिट्ठू is a computer parrot, not a person; real friends are people.
+      if (has(t, K.real)) { addLine(r, c, "real", T.realMe); r.mood = "happy"; r.topic = "who"; r.sugg = [MENU.joke, MENU.riddle]; return finish(r, c); }
+      if (has(t, K.allDay)) { addLine(r, c, "allDay", T.allDay); r.mood = "happy"; r.topic = "play"; r.sugg = [S.didPlay, MENU.story]; return finish(r, c); }
 
       // 3. Feelings.
       if (has(t, K.angry)) { addLine(r, c, "angry", T.angry); r.mood = "caring"; r.topic = "feel"; r.sugg = [S.breathe, MENU.joke]; pending = { open: "focus" }; return finish(r, c); }
@@ -1127,21 +1279,53 @@
       if (has(t, K.no) && words(t) <= 4) { addLine(r, c, "noThanks", T.noThanks); r.topic = "no"; return finish(r, c); }
       if (has(t, K.fine)) { addLine(r, c, "fine", T.fine); applyNudge(r, c, chooseNudge(c, true)); r.mood = night ? "sleepy" : "happy"; return finish(r, c); }
 
-      // 17. Fallback: reveal a waiting riddle, steer gently by time of day, or invite play.
+      // 17. Not understood: reveal a waiting riddle, praise a word-game answer, or keep the chat going
+      //     (a curious follow-up, a question, pretend play, a word game, a fact or a time-of-day idea).
+      //     These replies are marked `unsure`: the buddy may ask the knowledge base or the AI first.
       if (wasRiddle != null) {
         addLine(r, c, "riddleReveal", T.riddleReveal, { x: tx(RIDDLES[wasRiddle].a, r.lang) });
         r.topic = "riddle"; r.sugg = [S.another, MENU.joke]; return finish(r, c);
       }
-      if (r01() < 0.55) {
-        addLine(r, c, "leadIn", T.leadIn);
-        applyNudge(r, c, chooseNudge(c, true));
-        return finish(r, c);
+      if (wasGame) {
+        addLine(r, c, "wordPraise", KEEP.wordPraise); r.mood = "proud"; r.topic = "keep:wordgame";
+        r.sugg = [MENU.riddle, MENU.joke, MENU.story]; return finish(r, c);
       }
-      addLine(r, c, "fallback", T.fallback); r.mood = "curious"; r.topic = "fallback";
-      return finish(r, c);
+      return finish(keepGoing(r, c, t), c);
     }
 
-    return { greet: greet, reply: reply };
+    function keepGoing(r, c, t) {
+      r.unsure = true;
+      var topic = null;
+      for (var i = 0; i < KEEP_TOPICS.length && !topic; i++) if (has(t, KEEP_TOPICS[i].keys)) topic = KEEP_TOPICS[i];
+      var kind;
+      if (has(t, K.question) && lastKeep !== "why") kind = "why";   // honest: "I'm not sure — ask a grown-up"
+      else if (topic && lastKeep !== "topic") kind = "topic";
+      else if (r01() < 0.4) kind = "nudge";
+      else {
+        var kinds = c.slot === "night" ? ["night", "more"] : c.ageBand === "2-3" ? ["young", "more", "young"]
+          : ["more", "day", "imagine", "word", "fact", "more"];
+        var fresh = kinds.filter(function (k) { return k !== lastKeep; });
+        if (fresh.length) kinds = fresh;
+        kind = kinds[pickIdx("keepKind:" + kinds.join(","), kinds.length)];
+      }
+      lastKeep = kind;
+      if (kind === "topic") { add(r, c, topic.line); r.mood = "curious"; r.topic = "keep:topic"; return r; }
+      if (kind === "nudge") { addLine(r, c, "leadIn", T.leadIn); return applyNudge(r, c, chooseNudge(c, true)); }
+      if (kind === "fact") { content("fact", r, c); r.topic = "keep:fact"; return r; }
+      addLine(r, c, "keep:" + kind, KEEP[kind]);
+      if (kind === "word") { game = "word"; r.sugg = [MENU.riddle, MENU.joke]; }
+      r.mood = kind === "night" ? "sleepy" : "curious"; r.topic = "keep:" + kind;
+      return r;
+    }
+
+    /* Another source (the knowledge base or the AI) answered instead: forget what this brain was
+       waiting for, so a "yes" next is not taken as a yes to an offer nobody heard. */
+    function heard(text) {
+      pending = null; riddle = null; quiz = null; dreamAsked = false; game = null;
+      if (typeof text === "string") lastText = text;
+    }
+
+    return { greet: greet, reply: reply, heard: heard };
   }
 
   var Brain = { createBrain: createBrain, normalize: norm, MAX_REPLY: MAX, _has: has };
