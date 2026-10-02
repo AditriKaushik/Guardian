@@ -12,7 +12,8 @@
 // ID plus a short MAC made with the server secret. It contains no personal data.
 //
 // Routes (all POST, Content-Type: application/json, body at most 4096 bytes):
-//   /api/subscribe  { trial_days_left }                 -> { subscription_id, key_id, restore_code }
+//   /api/subscribe  { trial_days_left,
+//                     plan?: "monthly" | "yearly" }     -> { subscription_id, key_id, restore_code }
 //   /api/verify     { razorpay_payment_id,
 //                     razorpay_subscription_id,
 //                     razorpay_signature }             -> { token, exp }
@@ -21,7 +22,7 @@
 //   /api/cancel     { token }                           -> { cancelled: true, ends_at }
 //
 // Errors are { "error": code } and never echo the request back:
-//   400 bad_request | bad_signature    401 bad_token          402 not_active
+//   400 bad_request | bad_signature | plan_unavailable   401 bad_token   402 not_active
 //   403 forbidden_origin               404 not_found          413 payload_too_large
 //   415 unsupported_media_type         429 too_many_requests  500 server_error
 //   502 payment_provider_error
@@ -110,10 +111,25 @@ async function handle(request, env, headers) {
 
 // ---- Routes ---------------------------------------------------------------
 
+/** The Razorpay plan for the parent's choice. No plan means monthly (older apps send none). */
+function choosePlan(plan, env) {
+  if (plan === undefined || plan === null || plan === 'monthly') {
+    return { planId: env.RAZORPAY_PLAN_ID, totalCount: Number(env.TOTAL_COUNT || 120) };
+  }
+  if (plan === 'yearly') {
+    if (typeof env.RAZORPAY_PLAN_ID_YEARLY !== 'string' || !env.RAZORPAY_PLAN_ID_YEARLY.trim()) {
+      throw new HttpError(400, 'plan_unavailable');   // the owner hasn't set up a yearly plan
+    }
+    return { planId: env.RAZORPAY_PLAN_ID_YEARLY.trim(), totalCount: Number(env.TOTAL_COUNT_YEARLY || 10) };
+  }
+  throw new HttpError(400, 'bad_request');
+}
+
 async function subscribe(body, env) {
+  const { planId, totalCount } = choosePlan(body.plan, env);
   const request = {
-    plan_id: env.RAZORPAY_PLAN_ID,
-    total_count: Number(env.TOTAL_COUNT || 120),
+    plan_id: planId,
+    total_count: totalCount,
     customer_notify: 1,
     notes: { app: 'nanha-school' },            // no personal data, ever
   };

@@ -6,13 +6,22 @@ compatibility_date = "2025-01-01"
 
 [vars]
 # Where the web app is hosted (comma-separated). Only these sites may call the API
-# from a browser; any other site gets 403. The Android app sends no Origin and is allowed.
-ALLOWED_ORIGINS = "https://aditrikaushik.github.io"
+# from a browser; any other site gets 403. Native code that sends no Origin is allowed.
+# https://appassets.androidplatform.net is the Android shell's origin: the shell's WebView
+# serves the bundled web app from that address (offline, never over the network), so its
+# requests carry that Origin and must be allowed here.
+ALLOWED_ORIGINS = "https://aditrikaushik.github.io,https://appassets.androidplatform.net"
 # From the Razorpay dashboard (these two are not secret).
 RAZORPAY_KEY_ID = "rzp_live_REPLACE_ME"
 RAZORPAY_PLAN_ID = "plan_REPLACE_ME"
 # How many billing cycles a subscription can run for (120 monthly cycles = 10 years).
 TOTAL_COUNT = "120"
+# Optional yearly plan (POST /api/subscribe {"plan":"yearly"}). Create a yearly plan in the
+# Razorpay dashboard, then remove the leading "# " below. While it is not set, asking for
+# "yearly" gets 400 {"error":"plan_unavailable"} and the app should offer monthly only.
+# RAZORPAY_PLAN_ID_YEARLY = "plan_REPLACE_ME_YEARLY"
+# How many yearly cycles a yearly subscription can run for (10 yearly cycles = 10 years).
+TOTAL_COUNT_YEARLY = "10"
 # Free trial length; a parent who subscribes during it is first charged when it ends.
 TRIAL_DAYS = "7"
 
