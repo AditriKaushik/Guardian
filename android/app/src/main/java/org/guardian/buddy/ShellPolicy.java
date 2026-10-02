@@ -8,8 +8,9 @@ import java.util.Locale;
 /**
  * The shell's security and plumbing rules, kept free of Android classes so they can be unit
  * tested on the JVM: which bundled file a URL maps to (and its MIME type), which addresses stay
- * inside the WebView, which may go to the browser, which bridge arguments are acceptable, and
- * how events are written into JavaScript.
+ * inside the WebView, which may go to the browser, which bridge arguments are acceptable (and
+ * which vibrations), which web permission requests are granted (the camera only), and how
+ * events are written into JavaScript.
  */
 final class ShellPolicy {
 
@@ -211,6 +212,19 @@ final class ShellPolicy {
         return false;
     }
 
+    /**
+     * True for the app origin itself, as WebView reports a requesting page's origin:
+     * "https://appassets.androidplatform.net" with nothing after it but an optional "/".
+     */
+    static boolean isAppOrigin(String origin) {
+        URI uri = parseHttps(origin);
+        if (uri == null || !isAppHost(uri) || uri.getRawQuery() != null || uri.getRawFragment() != null) {
+            return false;
+        }
+        String path = uri.getRawPath();
+        return path == null || path.isEmpty() || "/".equals(path);
+    }
+
     /** Parses a plain https URL (host present, default port, no user info), else null. */
     private static URI parseHttps(String url) {
         if (url == null || url.isEmpty() || url.length() > MAX_URL_CHARS) {
@@ -330,6 +344,76 @@ final class ShellPolicy {
             end--;
         }
         return s.substring(0, end);
+    }
+
+    // ---- Web permissions (the camera) ---------------------------------------------------------
+
+    /** android.webkit.PermissionRequest.RESOURCE_VIDEO_CAPTURE (same text; no Android import). */
+    static final String VIDEO_CAPTURE = "android.webkit.resource.VIDEO_CAPTURE";
+
+    /**
+     * Decides a web permission request (WebChromeClient.onPermissionRequest): true only when
+     * the bundled app (its exact origin) asks for the camera alone — every requested resource
+     * is {@link #VIDEO_CAPTURE}. Everything else is refused as a whole: the microphone (speech
+     * uses the phone's own recogniser, NanhaNative.listen), protected media (DRM), MIDI,
+     * resources unknown to this version, any other origin, and mixed requests such as camera +
+     * microphone (WebView cannot grant only part of a request).
+     */
+    static boolean allowsCamera(String origin, String[] resources) {
+        if (!isAppOrigin(origin) || resources == null || resources.length == 0) {
+            return false;
+        }
+        for (String resource : resources) {
+            if (!VIDEO_CAPTURE.equals(resource)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ---- Haptics ------------------------------------------------------------------------------
+
+    /** VibrationEffect.DEFAULT_AMPLITUDE: the phone's normal strength. */
+    static final int DEFAULT_AMPLITUDE = -1;
+
+    /**
+     * One of the few short vibrations NanhaNative.vibrate may play. {@code timings} alternate
+     * pause/pulse in milliseconds, starting with the pause before the first pulse (the layout
+     * of VibrationEffect.createWaveform and the old Vibrator.vibrate(long[], -1));
+     * {@code amplitudes} has one strength per segment: 0 for pauses, 1–255 or
+     * {@link #DEFAULT_AMPLITUDE} for pulses.
+     */
+    static final class Haptic {
+        final long[] timings;
+        final int[] amplitudes;
+
+        Haptic(long[] timings, int[] amplitudes) {
+            this.timings = timings;
+            this.amplitudes = amplitudes;
+        }
+    }
+
+    /**
+     * The vibration for a NanhaNative.vibrate pattern name, or null for anything else — the
+     * page picks a name, never a length, so it cannot make the phone buzz for long:
+     * "tap" (10 ms), "soft" (20 ms, gentler where the phone can vary the strength) and
+     * "success" (two short pulses).
+     */
+    static Haptic haptic(String pattern) {
+        if (pattern == null) {
+            return null;
+        }
+        switch (pattern) {
+            case "tap":
+                return new Haptic(new long[] {0, 10}, new int[] {0, DEFAULT_AMPLITUDE});
+            case "soft":
+                return new Haptic(new long[] {0, 20}, new int[] {0, 96});
+            case "success":
+                return new Haptic(new long[] {0, 20, 80, 20},
+                        new int[] {0, DEFAULT_AMPLITUDE, 0, DEFAULT_AMPLITUDE});
+            default:
+                return null;
+        }
     }
 
     // ---- Events into JavaScript --------------------------------------------------------------

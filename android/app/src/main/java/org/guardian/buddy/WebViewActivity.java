@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
 import android.graphics.Insets;
 import android.net.Uri;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
+import android.webkit.PermissionRequest;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.ServiceWorkerClient;
 import android.webkit.ServiceWorkerController;
@@ -44,12 +46,13 @@ import java.util.Map;
 /**
  * The whole Android app: one full-screen WebView showing the web app from web/ (bundled as
  * assets and served from https://appassets.androidplatform.net/), plus the NanhaNative bridge
- * for the phone's voices, speech recognition and the browser (for payments).
+ * for the phone's voices, speech recognition, short vibrations and the browser (for payments).
  *
  * <p>Security: only the bundled app runs inside the WebView. Other https links open in the
  * browser; every other kind of address is ignored. No file or content access, no mixed content,
  * no third-party frames (Razorpay is blocked here — in the app it runs in the browser), and
- * the bridge works only while the bundled app is showing.
+ * the bridge works only while the bundled app is showing. The only web permission ever granted
+ * is the camera (video only) to the bundled app, for the "जादुई खिड़की" activity (WebPermissions).
  */
 public class WebViewActivity extends Activity {
 
@@ -62,10 +65,14 @@ public class WebViewActivity extends Activity {
     private WebView webView;
     private NativeSpeech speech;
     private NativeListener listener;
+    private NativeHaptics haptics;
+    private WebPermissions webPermissions;
     private AssetManager assets;
 
     /** True while the WebView's current page is on the app origin (set on the UI thread). */
     private volatile boolean onAppPage;
+    /** True between onResume and onPause. */
+    private volatile boolean inForeground;
     private boolean backPending;
     private final Runnable backTimeout = () -> backPending = false;
 
@@ -96,6 +103,8 @@ public class WebViewActivity extends Activity {
 
         speech = new NativeSpeech(this, this::emit);
         listener = new NativeListener(this, this::emit);
+        haptics = new NativeHaptics(this);
+        webPermissions = new WebPermissions(this);
 
         configureWebView();
         webView.loadUrl(Config.START_URL);
@@ -228,7 +237,7 @@ public class WebViewActivity extends Activity {
         cookies.setAcceptThirdPartyCookies(webView, false);
 
         webView.setWebViewClient(new ShellClient());
-        webView.setWebChromeClient(new WebChromeClient());   // default: denies all web permissions
+        webView.setWebChromeClient(new ShellChrome());       // camera for the app only; all else denied
         webView.addJavascriptInterface(new NanhaBridge(this), NanhaBridge.NAME);
 
         // Service workers fetch through their own client: serve them the same bundled files.
@@ -342,6 +351,35 @@ public class WebViewActivity extends Activity {
         }
     }
 
+    /**
+     * Web permission requests go to WebPermissions (the camera, video only, for the bundled app;
+     * everything else is denied). Also gives video elements a blank poster, so the camera
+     * preview doesn't show WebView's grey "play" picture before its first frame.
+     */
+    private final class ShellChrome extends WebChromeClient {
+
+        @Override
+        public void onPermissionRequest(PermissionRequest request) {
+            if (webPermissions == null) {
+                request.deny();
+                return;
+            }
+            webPermissions.onRequest(request);
+        }
+
+        @Override
+        public void onPermissionRequestCanceled(PermissionRequest request) {
+            if (webPermissions != null) {
+                webPermissions.onCanceled(request);
+            }
+        }
+
+        @Override
+        public Bitmap getDefaultVideoPoster() {
+            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);   // one transparent pixel
+        }
+    }
+
     // ---- Used by the bridge --------------------------------------------------------------------
 
     boolean isOnAppPage() {
@@ -354,6 +392,15 @@ public class WebViewActivity extends Activity {
 
     NativeListener listener() {
         return listener;
+    }
+
+    NativeHaptics haptics() {
+        return haptics;
+    }
+
+    /** True while the app is on screen (resumed). Any thread. */
+    boolean isInForeground() {
+        return inForeground;
     }
 
     /** Sends one event (JSON) to the page, on the UI thread. Any thread. */
@@ -399,6 +446,7 @@ public class WebViewActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        inForeground = true;
         if (webView != null) {
             webView.onResume();
             emit(ShellPolicy.resumeEvent());
@@ -407,8 +455,10 @@ public class WebViewActivity extends Activity {
 
     @Override
     protected void onPause() {
-        // Nothing speaks or listens while the app is in the background. (A listen() waiting for
-        // the microphone permission dialog — which itself pauses this activity — is kept.)
+        // Nothing speaks, listens or vibrates while the app is in the background. (A listen() or
+        // camera request waiting for its permission dialog — which itself pauses this activity —
+        // is kept.)
+        inForeground = false;
         if (listener != null) {
             listener.cancel(false);
         }
@@ -430,6 +480,9 @@ public class WebViewActivity extends Activity {
         if (speech != null) {
             speech.shutdown();
         }
+        if (webPermissions != null) {
+            webPermissions.cancel();
+        }
         if (webView != null) {
             webView.removeJavascriptInterface(NanhaBridge.NAME);
             root.removeView(webView);
@@ -441,10 +494,13 @@ public class WebViewActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // An empty result means the dialog was dismissed or interrupted: treated as "no".
+        boolean granted = grantResults != null && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED;
         if (requestCode == NativeListener.PERMISSION_REQUEST && listener != null) {
-            boolean granted = grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED;
             listener.onPermissionResult(granted);
+        } else if (requestCode == WebPermissions.PERMISSION_REQUEST && webPermissions != null) {
+            webPermissions.onPermissionResult(granted);
         }
     }
 

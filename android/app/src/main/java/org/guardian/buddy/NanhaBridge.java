@@ -8,7 +8,8 @@ import android.webkit.JavascriptInterface;
  * nothing unless the WebView is showing the bundled app (https://appassets.androidplatform.net),
  * and hands the work to the UI thread. Results come back as events via NS.native.onEvent.
  *
- * <p>Parameters are strings (the page passes String(n) for numbers), except secure().
+ * <p>Every parameter is a String: the page passes String(x) for numbers and flags. (WebView
+ * turns a JavaScript string passed to a Java boolean parameter into false, whatever it says.)
  */
 final class NanhaBridge {
 
@@ -95,14 +96,32 @@ final class NanhaBridge {
     }
 
     /**
-     * secure(true) while a grown-ups' screen is showing (payment, restore code): the screen
-     * can't be captured in screenshots, recordings or the recent-apps preview. secure(false)
-     * when leaving it.
+     * secure("true") while a grown-ups' screen is showing (payment, restore code): the screen
+     * can't be captured in screenshots, recordings or the recent-apps preview. secure("false")
+     * when leaving it. (A String, not a boolean: see the class comment.)
      */
     @JavascriptInterface
-    public void secure(boolean on) {
+    public void secure(String on) {
         if (shell.isOnAppPage()) {
-            shell.runOnUiThread(() -> shell.setSecure(on));
+            boolean flag = "true".equals(on);
+            shell.runOnUiThread(() -> shell.setSecure(flag));
         }
+    }
+
+    /**
+     * A short buzz: "tap" (10 ms), "success" (two short pulses) or "soft" (20 ms, gentler).
+     * Returns true when the phone will vibrate; false — and nothing happens — for any other
+     * value, when the phone has no vibrator, touch feedback is off in its settings, it is on
+     * silent, or the app is not in the foreground.
+     */
+    @JavascriptInterface
+    public boolean vibrate(String pattern) {
+        ShellPolicy.Haptic haptic = ShellPolicy.haptic(pattern);
+        if (haptic == null || !shell.isOnAppPage() || !shell.isInForeground()
+                || !shell.haptics().canVibrate()) {
+            return false;
+        }
+        shell.runOnUiThread(() -> shell.haptics().play(haptic));
+        return true;
     }
 }
