@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- The window shows the app's cream background while the web app loads (no white flash).
+         The system bars are made transparent in code (WebViewActivity) for edge-to-edge. -->
     <style name="BuddyTheme" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:colorPrimary">@color/header</item>
-        <item name="android:colorAccent">@color/mic</item>
-        <item name="android:statusBarColor">@color/header</item>
+        <item name="android:colorAccent">@color/header</item>
         <item name="android:windowBackground">@color/bg</item>
     </style>
 </resources>

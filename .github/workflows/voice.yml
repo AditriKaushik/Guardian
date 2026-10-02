@@ -1,0 +1,169 @@
+name: Neural voice clips
+
+# Makes a female and a male neural voice for every fixed line (tools/voice/lines.csv) and
+# uploads web/audio as an artifact to download, listen to, and commit by hand if it sounds
+# good. It never commits or deploys anything itself. A recorded human voice is still the
+# better choice for small children — see docs/VOICE.md.
+#
+# Only engines whose licence permits commercial use are offered (docs/VOICE.md, "Licences"):
+#   indic-parler-tts  ai4bharat/indic-parler-tts, Apache-2.0 — Hindi + Indian English
+#   kokoro            hexgrad/Kokoro-82M, Apache-2.0 — Hindi (+ American English)
+# Models download from huggingface.co. If a model ever becomes gated, add a read-only
+# token as the repository secret HF_TOKEN (optional otherwise).
+
+on:
+  workflow_dispatch:
+    inputs:
+      engine:
+        description: "Voice engine"
+        type: choice
+        options:
+          - indic-parler-tts
+          - kokoro
+        default: indic-parler-tts
+      voices:
+        description: "Which voices"
+        type: choice
+        options:
+          - both
+          - female
+          - male
+        default: both
+      limit:
+        description: "Lines per job (0 = all; try 5 for a quick listening test)"
+        type: string
+        default: "0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: voice-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lines:
+    name: Extract lines
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Extract every fixed spoken line
+        run: node tools/voice/extract-lines.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voice-lines
+          path: |
+            tools/voice/lines.csv
+            tools/voice/RECORDING_SCRIPT.md
+          retention-days: 7
+
+  synth:
+    name: Synthesise (${{ matrix.voice }}, part ${{ matrix.shard }})
+    needs: lines
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        voice: ${{ fromJSON(inputs.voices == 'both' && '["female","male"]' || format('["{0}"]', inputs.voices)) }}
+        shard: [0, 1, 2, 3]
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      ENGINE: ${{ inputs.engine }}
+      LIMIT: ${{ inputs.limit }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: voice-lines
+          path: tools/voice
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ inputs.engine }}-v1
+
+      - name: Install indic-parler-tts (CPU)
+        if: inputs.engine == 'indic-parler-tts'
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install git+https://github.com/huggingface/parler-tts.git soundfile
+
+      - name: Install kokoro
+        if: inputs.engine == 'kokoro'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends espeak-ng
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install "kokoro>=0.9.4" soundfile
+
+      - name: Synthesise
+        run: |
+          case "$LIMIT" in ''|*[!0-9]*) echo "limit must be a whole number"; exit 1;; esac
+          python tools/voice/synth.py --engine "$ENGINE" --voice "${{ matrix.voice }}" \
+            --shard "${{ matrix.shard }}" --shards 4 --limit "$LIMIT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recordings-${{ matrix.voice }}-${{ matrix.shard }}
+          path: tools/voice/recordings/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  build:
+    name: Build web/audio
+    needs: synth
+    if: ${{ !cancelled() && needs.synth.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ENGINE: ${{ inputs.engine }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/download-artifact@v4
+        with:
+          name: voice-lines
+          path: tools/voice
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: recordings-*
+          merge-multiple: true
+          path: tools/voice/recordings
+      - name: Install ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+      - name: Convert to MP3 and write the manifest
+        run: node tools/voice/build-manifest.mjs
+      - name: Record where the voice came from (licence attribution)
+        run: |
+          case "$ENGINE" in
+            indic-parler-tts) model="ai4bharat/indic-parler-tts (https://huggingface.co/ai4bharat/indic-parler-tts), Apache-2.0. Speakers: Divya, Rohit (Hindi); Mary, Thoma (English)." ;;
+            kokoro) model="hexgrad/Kokoro-82M (https://huggingface.co/hexgrad/Kokoro-82M), Apache-2.0. Voices: hf_alpha, hm_omega (Hindi); af_heart, am_michael (English)." ;;
+          esac
+          {
+            echo "Voice clips in this folder were generated with a neural text-to-speech model:"
+            echo "$model"
+            echo "Generated by the 'Neural voice clips' workflow on $(date -u +%Y-%m-%d) from commit $GITHUB_SHA."
+            echo "See docs/VOICE.md for licences and attribution."
+          } > web/audio/CREDITS.txt
+          cat web/audio/CREDITS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-audio-${{ inputs.engine }}
+          path: web/audio/
+          retention-days: 30

@@ -1,0 +1,104 @@
+name: Web app
+
+on:
+  push:
+    paths:
+      - "web/**"
+      - "tools/**"
+      - ".github/workflows/web.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - "tools/**"
+      - ".github/workflows/web.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Unit tests (tools/test, tools/voice/test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # `node --test <directory>` does not search a directory on Node 22 (it tries to run
+      # the directory as one file), so the test files are passed as a glob that Node expands.
+      - name: tools/test
+        run: |
+          if compgen -G "tools/test/**/*.test.mjs" > /dev/null || compgen -G "tools/test/*.test.mjs" > /dev/null; then
+            node --test "tools/test/**/*.test.mjs"
+          else
+            echo "::notice::No tools/test/*.test.mjs yet — skipped."
+          fi
+
+      - name: Voice tools
+        run: |
+          if compgen -G "tools/voice/test/*.test.mjs" > /dev/null; then
+            node --test "tools/voice/test/*.test.mjs"
+          else
+            echo "::notice::No voice tool tests — skipped."
+          fi
+
+      # The manifest must be valid JSON in the documented shape whenever clips are committed.
+      - name: Voice manifest
+        run: |
+          if [ -f web/audio/manifest.json ]; then
+            node -e '
+              const fs = require("fs");
+              const m = JSON.parse(fs.readFileSync("web/audio/manifest.json", "utf8"));
+              if (m.version !== 1 || !m.clips || typeof m.clips !== "object") throw new Error("bad manifest shape");
+              let n = 0;
+              for (const [voice, clips] of Object.entries(m.clips)) {
+                if (!/^(female|male)$/.test(voice)) throw new Error("unknown voice " + voice);
+                for (const [key, file] of Object.entries(clips)) {
+                  if (!/^[a-z]{2,8}\|\S/.test(key)) throw new Error("bad key " + key);
+                  if (!new RegExp("^audio/" + voice + "/[a-z]{2,8}/[A-Za-z0-9_-]+\\.mp3$").test(file)) throw new Error("bad path " + file);
+                  if (!fs.existsSync("web/" + file)) throw new Error("missing clip web/" + file);
+                  n++;
+                }
+              }
+              console.log("manifest ok: " + n + " clip(s)");
+            '
+          else
+            echo "::notice::No web/audio/manifest.json — the app uses the phone/browser voice."
+          fi
+
+  e2e:
+    name: End-to-end (Playwright, Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Look for the end-to-end test
+        id: e2e
+        run: |
+          if [ -f tools/e2e/e2e.mjs ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::tools/e2e/e2e.mjs not found yet — end-to-end test skipped."
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.e2e.outputs.present == 'true'
+        with:
+          node-version: "22"
+
+      - name: Install Playwright and Chromium
+        if: steps.e2e.outputs.present == 'true'
+        run: |
+          npm i -g playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: Run tools/e2e/e2e.mjs
+        if: steps.e2e.outputs.present == 'true'
+        run: |
+          PW_PATH="$(npm root -g)/playwright"
+          export PW_PATH
+          node tools/e2e/e2e.mjs

@@ -18,9 +18,26 @@ window.NS_CONFIG = {
   // Shown on the payment screen. Keep it the same as your Razorpay plan.
   PRICE_TEXT: "₹99 / महीना",
 
-  // Tiles that stay free forever after the trial (use the tile names).
+  // Plans shown on the payment screen. "yearly" appears only when it is here (and the server
+  // has a yearly Razorpay plan). Remove the yearly line to offer the monthly plan alone.
+  PLANS: {
+    monthly: { price: "₹99 / महीना" },
+    yearly: { price: "₹599 / साल", note: "सबसे किफ़ायती — ₹50 / महीना" },
+  },
+
+  // The checkout page the Android app opens in the phone's browser (your hosted pay.html).
+  PAY_PAGE_URL: "https://aditrikaushik.github.io/Guardian/pay.html",
+
+  // Tiles that stay free forever after the trial (use the tile names or activity ids).
   FREE: ["ABC", "अक्षर", "गिनती"],
 
   // How many rhymes stay free forever after the trial.
   FREE_RHYMES: 2,
+
+  // Default minutes per session before the gentle "time for a break" screen (10, 15, 20 or 30).
+  // Grown-ups can change it in the app.
+  SESSION_MINUTES: 15,
+
+  // Default bedtime hour (24-hour clock). Grown-ups can change it in the app.
+  BEDTIME_HOUR: 20,
 };

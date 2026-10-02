@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">नन्हा स्कूल</string>
-    <string name="hint">यहाँ लिखो…</string>
-    <string name="send">भेजो</string>
-    <string name="speak">🎤 बोलो</string>
-    <string name="no_speech">इस फ़ोन में बोलकर लिखने की सुविधा नहीं मिली। लिखकर बात करो!</string>
-    <string name="sound_on">🔊</string>
-    <string name="sound_off">🔇</string>
+    <string name="no_browser">इस फ़ोन में कोई ब्राउज़र नहीं मिला।</string>
+    <string name="no_webview">ऐप खोलने के लिए फ़ोन में \"Android System WebView\" चालू और अपडेट होना चाहिए। Play Store से इसे अपडेट करके फिर से खोलें।</string>
 </resources>

@@ -1,35 +1,59 @@
 <!doctype html>
-<html lang="hi">
+<html lang="hi" data-daypart="noon">
 <head>
 <meta charset="utf-8">
-<!-- Keep this policy identical in index.html, pay.html and _headers (which also adds frame-ancestors). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://checkout.razorpay.com https://cdn.razorpay.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://*.workers.dev https://*.razorpay.com; frame-src https://*.razorpay.com; form-action 'self' https://*.razorpay.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'">
+<!-- Keep this policy identical in index.html, pay.html, _headers (which also adds frame-ancestors)
+     and the Android shell (android Config.CONTENT_SECURITY_POLICY). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://checkout.razorpay.com https://cdn.razorpay.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.razorpay.com; media-src 'self'; connect-src 'self' https://*.workers.dev https://*.razorpay.com; frame-src https://*.razorpay.com; form-action 'self' https://*.razorpay.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>नन्हा स्कूल</title>
-<meta name="description" content="छोटे बच्चों के लिए तस्वीर और आवाज़ से सीखने वाला ऐप — ABC, वर्णमाला, गिनती, रंग, जानवर, कविताएँ और खेल।">
-<meta name="theme-color" content="#FF8A3D">
+<meta name="description" content="छोटे बच्चों के लिए तस्वीर और आवाज़ से सीखने वाला ऐप — ABC, वर्णमाला, गिनती, रंग, जानवर, कविताएँ, कहानियाँ, अच्छी आदतें और खेल।">
+<meta name="theme-color" content="#4FB8F0">
+<meta name="color-scheme" content="light">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="नन्हा स्कूल">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preload" href="fonts/baloo2-devanagari.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="app.css">
+<script src="config.js" defer></script>
+<script src="js/core/ns.js" defer></script>
+<script src="js/core/store.js" defer></script>
+<script src="js/core/voice.js" defer></script>
+<script src="js/core/rewards.js" defer></script>
+<script src="js/core/billing.js" defer></script>
+<script src="js/content/lessons.js" defer></script>
+<script src="js/content/rhymes.js" defer></script>
+<script src="js/content/routine.js" defer></script>
+<script src="js/content/stories.js" defer></script>
+<script src="js/content/careers.js" defer></script>
+<script src="js/content/focus.js" defer></script>
+<script src="js/brain/brain.js" defer></script>
+<script src="js/modules/learn.js" defer></script>
+<script src="js/modules/routine.js" defer></script>
+<script src="js/modules/garden.js" defer></script>
+<script src="js/modules/stories.js" defer></script>
+<script src="js/modules/dreams.js" defer></script>
+<script src="js/modules/focus.js" defer></script>
+<script src="js/modules/buddy.js" defer></script>
+<script src="js/core/ui.js" defer></script>
 </head>
 <body>
-<div class="screen">
-  <div class="topbar">
-    <button class="roundbtn" id="backBtn" hidden aria-label="वापस">🏠</button>
-    <div class="title" id="scrTitle">😊 नन्हा स्कूल</div>
-    <div class="prog" id="prog"></div>
-    <button class="roundbtn" id="soundBtn" aria-label="आवाज़">🔊</button>
-  </div>
-  <div class="body" id="body"></div>
+<div class="app" id="app" data-state="boot">
+  <header class="topbar" id="topbar">
+    <button type="button" class="roundbtn" id="backBtn" hidden aria-label="घर">🏠</button>
+    <h1 class="title" id="scrTitle">नन्हा स्कूल</h1>
+    <div class="prog" id="prog" aria-live="polite"></div>
+    <button type="button" class="roundbtn" id="soundBtn" aria-label="आवाज़" aria-pressed="true">🔊</button>
+  </header>
+  <main class="body" id="body">
+    <noscript><p class="plead">नन्हा स्कूल चलाने के लिए ब्राउज़र में JavaScript चालू करें।</p></noscript>
+  </main>
 </div>
-<button class="install" id="installBtn" hidden>📲 ऐप इंस्टॉल करें</button>
-<script src="config.js"></script>
-<script src="app.js"></script>
+<button type="button" class="install" id="installBtn" hidden>📲 ऐप इंस्टॉल करें</button>
 </body>
 </html>

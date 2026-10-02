@@ -676,3 +676,103 @@ test('nothing is logged and no error echoes the request back', async () => {
     assert.ok(!text.includes(marker), text);
   }
 });
+
+// ---- 7. Plan choice ----------------------------------------------------------
+
+const YEARLY = { ...env, RAZORPAY_PLAN_ID_YEARLY: 'plan_year456', TOTAL_COUNT_YEARLY: '12' };
+const subscribeWith = (body, environment = env) => send('/api/subscribe', {
+  headers: { Origin: ORIGIN, 'Content-Type': 'application/json' }, body: JSON.stringify(body), environment,
+});
+
+test('no plan, null or "monthly" uses the monthly plan and TOTAL_COUNT', async () => {
+  for (const body of [{}, { plan: null }, { plan: 'monthly' }, { trial_days_left: 2, plan: 'monthly' }]) {
+    calls = [];
+    const res = await subscribeWith(body, YEARLY);
+    assert.equal(res.status, 200, JSON.stringify(body));
+    const sent = JSON.parse(calls[0].init.body);
+    assert.equal(sent.plan_id, 'plan_test123');
+    assert.equal(sent.total_count, 120);
+  }
+});
+
+test('"yearly" uses RAZORPAY_PLAN_ID_YEARLY and TOTAL_COUNT_YEARLY, with the same response shape', async () => {
+  const res = await subscribeWith({ trial_days_left: 3, plan: 'yearly' }, YEARLY);
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.deepEqual(Object.keys(data).sort(), ['key_id', 'restore_code', 'subscription_id']);
+  assert.equal(data.restore_code, restoreCode(data.subscription_id));
+  const sent = JSON.parse(calls[0].init.body);
+  assert.equal(sent.plan_id, 'plan_year456');
+  assert.equal(sent.total_count, 12);
+  assert.deepEqual(sent.notes, { app: 'nanha-school' });
+  assert.ok(sent.start_at > Math.floor(Date.now() / 1000) + 2 * 86400);   // trial still honoured
+});
+
+test('TOTAL_COUNT_YEARLY defaults to 10', async () => {
+  const { TOTAL_COUNT_YEARLY, ...noCount } = YEARLY;
+  assert.equal((await subscribeWith({ plan: 'yearly' }, noCount)).status, 200);
+  assert.equal(JSON.parse(calls[0].init.body).total_count, 10);
+});
+
+test('"yearly" without a configured yearly plan is 400 plan_unavailable and never reaches Razorpay', async () => {
+  for (const environment of [env, { ...env, RAZORPAY_PLAN_ID_YEARLY: '' }, { ...env, RAZORPAY_PLAN_ID_YEARLY: '   ' }]) {
+    const res = await subscribeWith({ plan: 'yearly' }, environment);
+    assert.equal(res.status, 400);
+    assert.deepEqual(await res.json(), { error: 'plan_unavailable' });
+    assert.equal(res.headers.get('Access-Control-Allow-Origin'), ORIGIN);
+    assert.equal(res.headers.get('X-Content-Type-Options'), 'nosniff');
+  }
+  assert.equal(calls.length, 0);
+});
+
+test('any other plan value is 400 bad_request, never echoed, and never reaches Razorpay', async () => {
+  const marker = 'ZQXPLAN';
+  for (const plan of ['weekly', 'Yearly', 'MONTHLY', ' monthly', 'yearly ', '', 0, 1, true, false, [], ['yearly'],
+    { yearly: true }, 'plan_year456', marker, '__proto__', 'constructor']) {
+    const res = await subscribeWith({ plan }, YEARLY);
+    assert.equal(res.status, 400, JSON.stringify(plan));
+    const text = await res.text();
+    assert.deepEqual(JSON.parse(text), { error: 'bad_request' });
+    assert.ok(!text.includes(marker));
+  }
+  assert.equal(calls.length, 0);
+});
+
+test('the Android app can choose a plan with or without an Origin header', async () => {
+  const shellEnv = { ...YEARLY, ALLOWED_ORIGINS: `${ORIGIN},https://appassets.androidplatform.net` };
+  const noOrigin = await send('/api/subscribe', {
+    headers: { 'Content-Type': 'application/json' }, body: '{"plan":"yearly"}', environment: shellEnv,
+  });
+  assert.equal(noOrigin.status, 200);
+  const shell = await send('/api/subscribe', {
+    headers: { Origin: 'https://appassets.androidplatform.net', 'Content-Type': 'application/json' },
+    body: '{"plan":"monthly"}', environment: shellEnv,
+  });
+  assert.equal(shell.status, 200);
+  assert.equal(shell.headers.get('Access-Control-Allow-Origin'), 'https://appassets.androidplatform.net');
+});
+
+// ---- 8. wrangler.toml --------------------------------------------------------
+
+test('wrangler.toml allows the web app and the Android shell origins, and nothing else', async () => {
+  const { readFileSync } = await import('node:fs');
+  const toml = readFileSync(new URL('./wrangler.toml', import.meta.url), 'utf8');
+  const line = toml.split('\n').find(l => /^ALLOWED_ORIGINS\s*=/.test(l));
+  const value = JSON.parse(line.split('=').slice(1).join('=').trim());
+  const configured = { ...env, ALLOWED_ORIGINS: value };
+  assert.deepEqual(value.split(',').map(s => s.trim()).sort(),
+      ['https://aditrikaushik.github.io', 'https://appassets.androidplatform.net']);
+  for (const origin of ['https://aditrikaushik.github.io', 'https://appassets.androidplatform.net']) {
+    const pre = await send('/api/subscribe', { method: 'OPTIONS', headers: { Origin: origin }, environment: configured });
+    assert.equal(pre.status, 204, origin);
+    assert.equal(pre.headers.get('Access-Control-Allow-Origin'), origin);
+  }
+  for (const origin of ['http://appassets.androidplatform.net', 'https://appassets.androidplatform.net.evil.example',
+    'https://evil.androidplatform.net', 'file://']) {
+    const pre = await send('/api/subscribe', { method: 'OPTIONS', headers: { Origin: origin }, environment: configured });
+    assert.equal(pre.status, 403, origin);
+  }
+  // The yearly plan ships switched off until the owner sets it up.
+  assert.doesNotMatch(toml, /^RAZORPAY_PLAN_ID_YEARLY\s*=/m);
+  assert.match(toml, /^TOTAL_COUNT_YEARLY = "10"$/m);
+});
