@@ -25,10 +25,26 @@ TOTAL_COUNT_YEARLY = "10"
 # Free trial length; a parent who subscribes during it is first charged when it ends.
 TRIAL_DAYS = "7"
 
+# ---- Optional AI conversation for मिट्ठू (POST /api/chat) — see docs/AI_BUDDY.md ----
+# It stays off (503 ai_unavailable) until you choose a provider:
+#   * Cloudflare Workers AI (cheapest; free daily allocation): remove the "# " from the
+#     `[ai]` and `binding = "AI"` lines at the end of this file, then `npx wrangler deploy`.
+#   * Claude (Anthropic, paid per message): `npx wrangler secret put ANTHROPIC_API_KEY`.
+#     When the key is set it is used; the AI binding (if any) then only runs the Llama Guard check.
+# AI replies per phone per day, and for the whole app per day. Both are counted in memory by
+# each Cloudflare server instance (no database), so treat them as approximate safety nets.
+AI_DAILY_LIMIT = "60"
+AI_GLOBAL_DAILY_LIMIT = "300"
+# Optional model choices (the defaults are shown; leave them commented to use the defaults).
+# AI_MODEL = "@cf/google/gemma-4-26b-a4b-it"
+# AI_GUARD_MODEL = "@cf/meta/llama-guard-3-8b"
+# ANTHROPIC_MODEL = "claude-haiku-4-5"
+
 # Secrets — never put these in this file. Set them once with:
 #   npx wrangler secret put RAZORPAY_KEY_SECRET
 #   npx wrangler secret put SIGNING_KEY_JWK      (the private key printed by `npm run genkeys`)
 #   npx wrangler secret put RESTORE_SECRET       (any long random text; set it once, never change it)
+#   npx wrangler secret put ANTHROPIC_API_KEY    (optional: only if मिट्ठू's AI chat should use Claude)
 # RESTORE_SECRET makes the parents' restore codes. Keeping it separate means you can rotate the
 # Razorpay secret after a leak without breaking every restore code. If it is not set, the
 # Razorpay secret is used instead (and changing that would then break every restore code).
@@ -44,3 +60,18 @@ TRIAL_DAYS = "7"
 # [ratelimits.simple]
 # limit = 30
 # period = 60
+
+# Optional burst limit for the AI chat (same kind of binding): `limit` AI messages per 60 seconds
+# for each phone and for each visitor IP. Remove the leading "# " from the six lines below.
+# [[ratelimits]]
+# name = "AI_RATE_LIMITER"
+# namespace_id = "1002"
+# [ratelimits.simple]
+# limit = 12
+# period = 60
+
+# Optional Cloudflare Workers AI for मिट्ठू's AI chat (docs/AI_BUDDY.md). Remove the leading "# "
+# from the two lines below and deploy. Free plan: 10,000 Neurons per day, then it stops until
+# 00:00 UTC; Workers Paid: the same free amount, then $0.011 per 1,000 Neurons.
+# [ai]
+# binding = "AI"

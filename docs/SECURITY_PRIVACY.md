@@ -8,6 +8,10 @@
 
 - **बच्चे का कोई खाता नहीं।** बच्चे का नाम, आवाज़ या बातचीत कहीं जमा या भेजी नहीं जाती। "बात करो" में बच्चा नाम बताए
   तो वह सिर्फ़ उसी सेशन में memory में रहता है।
+- **एक वैकल्पिक अपवाद — मिट्ठू से खुली बातचीत (AI):** हर फ़ोन पर बंद। माता-पिता बड़ों वाले सवाल और सहमति स्क्रीन के बाद
+  चालू करें, तो (सिर्फ़ 4–6 साल के बच्चों के लिए, और सिर्फ़ जब offline मिट्ठू को जवाब न आए) बातचीत की आख़िरी ≤ 8 लाइनें —
+  नाम, नंबर और ईमेल फ़ोन पर ही हटाकर — हमारे Worker से होकर AI सेवा तक जाती हैं। हम न कुछ जमा करते हैं, न log।
+  पूरा ब्योरा: [AI_BUDDY.md](AI_BUDDY.md)।
 - **ऐप और backend कभी ईमेल, फ़ोन नंबर या कोई निजी जानकारी नहीं माँगते, भेजते या रखते।** माता-पिता संपर्क और भुगतान
   की जानकारी सिर्फ़ Razorpay के hosted checkout पेज पर भरते हैं; वह Razorpay (payment processor) के पास रहती है।
   हम Razorpay subscription के `notes` में भी कुछ निजी नहीं डालते (सिर्फ़ `{ "app": "nanha-school" }`)।
@@ -25,7 +29,10 @@
 | डेटा | कहाँ रहता है | कौन देख सकता है | कितने समय तक | क्यों |
 |------|--------------|------------------|---------------|-------|
 | बच्चे का नाम ("बात करो" में बताया) | सिर्फ़ ऐप की memory (RAM) | कोई नहीं (सिर्फ़ उसी फ़ोन पर ऐप) | उसी सेशन तक; ऐप/टैब बंद होते ही ख़त्म | बडी नाम लेकर जवाब दे सके |
-| बातचीत के शब्द | सिर्फ़ memory; जवाब फ़ोन पर ही बनते हैं | कोई नहीं | उसी सेशन तक | जवाब देना |
+| बातचीत के शब्द | सिर्फ़ memory; जवाब फ़ोन पर ही बनते हैं (AI बातचीत चालू हो तो नीचे वाली लाइन) | कोई नहीं | उसी सेशन तक | जवाब देना |
+| AI बातचीत की लाइनें (सिर्फ़ जब माता-पिता चालू करें; 2–3 साल वालों के लिए कभी नहीं) | फ़ोन से हमारे Worker (memory में, एक request भर) → AI सेवा (Cloudflare Workers AI या Anthropic Claude) | AI सेवा, अपनी नीति के अनुसार (दोनों API डेटा पर ट्रेन नहीं करतीं; Anthropic flag हुई बातचीत 2 साल तक रख सकता है) | हम: कभी नहीं रखते, log नहीं; Workers AI: सेव नहीं; Anthropic: 30 दिन के भीतर अपने-आप मिटाता है (ZDR पर बिल्कुल नहीं) | जब offline मिट्ठू को जवाब न आए |
+| AI बातचीत की सहमति (`ns_settings.aiChat` = `{on, v, at}`) | सिर्फ़ डिवाइस | — | बंद करने / "सारा डेटा मिटाएँ" तक | माता-पिता की पसंद याद रखना |
+| AI per-install ID + आज की गिनती (`ns_ai`) | डिवाइस; ID हर request के साथ Worker को (AI सेवा को कभी नहीं) | Worker की memory (गिनती, दिन बदलते ही ख़त्म) | ID हर चालू/बंद पर नई | रोज़ की सीमा गिनना |
 | बच्चे की आवाज़ (Android, बोलकर बात) | ऐप नहीं रखता; फ़ोन की speech-recognition सेवा प्रोसेस करती है (on-device को प्राथमिकता) | फ़ोन की speech सेवा (जैसे Google), अपनी नीति के अनुसार | ऐप में कभी सेव नहीं | बोलकर बात करना |
 | बोलकर सुनाया जाने वाला टेक्स्ट | फ़ोन/ब्राउज़र की text-to-speech; वेब ऐप पहले on-device आवाज़ चुनता है | online आवाज़ हो तो वह speech सेवा | — | पढ़कर सुनाना |
 | ट्रायल शुरू होने का समय | web: `localStorage` `ns_trial`; Android: private `SharedPreferences` (`nanha_school` → `trial_start`) | सिर्फ़ उसी डिवाइस पर ऐप | डेटा मिटाने/अनइंस्टॉल तक | 7 दिन का ट्रायल गिनना |
@@ -44,12 +51,15 @@ cloud backup और नए फ़ोन पर device transfer में नह�
 
 ## 2. नेटवर्क फ़्लो (Network flows)
 
-सब कुछ HTTPS पर। Backend सिर्फ़ `api.razorpay.com` से बात करता है (15 सेकंड timeout)।
+सब कुछ HTTPS पर। Backend `api.razorpay.com` से बात करता है (15 सेकंड timeout), और सिर्फ़ AI बातचीत के लिए (अगर मालिक ने सेट की हो)
+`api.anthropic.com` या Cloudflare Workers AI (`env.AI`) से (6 सेकंड timeout)।
 
 **वेब ऐप**
 
 1. Browser → GitHub Pages / Cloudflare Pages: HTML, JS, CSS, fonts (self-hosted)। Service worker offline के लिए cache करता है।
 2. पाठ, खेल, बातचीत, बोलकर सुनाना: कोई network call नहीं (सिवाय browser की online TTS आवाज़ के, अगर on-device आवाज़ न हो)।
+   **अपवाद, सिर्फ़ जब माता-पिता AI बातचीत चालू करें:** browser → Worker `POST /api/chat {messages ≤ 8, lang, ageBand, daypart,
+   device}` → (screening) → `api.anthropic.com/v1/messages` या Workers AI (`env.AI`, Gemma 4 + Llama Guard 3) → `{text, mood, kind}`।
 3. सब्सक्राइब: browser → Worker `POST /api/subscribe {trial_days_left}` → Worker → Razorpay `POST /v1/subscriptions`
    (`plan_id`, `total_count`, ट्रायल बाकी हो तो `start_at`, `notes: {app}`) → browser को `{subscription_id, key_id, restore_code}`।
 4. Browser → `checkout.razorpay.com/v1/checkout.js` → Razorpay checkout (iframe)। माता-पिता संपर्क और भुगतान की जानकारी
@@ -62,7 +72,8 @@ cloud backup और नए फ़ोन पर device transfer में नह�
 **Android ऐप**
 
 1. पाठ, बातचीत, बोलकर सुनाना: offline। बोलकर बात: फ़ोन की speech सेवा, on-device को प्राथमिकता।
-   `INTERNET` permission सिर्फ़ भुगतान के लिए।
+   `INTERNET` permission भुगतान के लिए, और (सिर्फ़ जब माता-पिता चालू करें) AI बातचीत के लिए — वेब जैसा ही `/api/chat`
+   (Origin `https://appassets.androidplatform.net`)।
 2. सब्सक्राइब: app → Worker `POST /api/subscribe {trial_days_left}` (कोई `Origin` header नहीं) →
    `{subscription_id, key_id, restore_code}`; ऐप pending subscription ID और रिस्टोर कोड सेव करता है।
 3. App फ़ोन का browser खोलता है: `PAY_PAGE_URL#s=<subscription_id>&k=<key_id>`। `#` के बाद वाला हिस्सा कभी server
@@ -120,6 +131,15 @@ cloud backup और नए फ़ोन पर device transfer में नह�
 - Optional **rate limiting** (`wrangler.toml` में commented `[[ratelimits]]` binding) — हर IP + route पर; limiter में दिक़्क़त हो तो
   भुगतान न रुके, इसलिए fail-open।
 - Secrets सिर्फ़ `wrangler secret put` से — `wrangler.toml` या git में कभी नहीं।
+- **`/api/chat` (AI बातचीत, docs/AI_BUDDY.md):** body ≤ 8 KB (सिर्फ़ इसी route के लिए); सिर्फ़ `messages, lang, ageBand,
+  daypart, device` — कोई और key (जैसे `name`) → 400; ≤ 8 लाइनें, हर एक ≤ 300 अक्षर; `ageBand` "2-3" → 403
+  `ai_not_for_age`। बच्चे की आख़िरी लाइन में आत्म-हानि/चोट/बुरे राज़/निजी जानकारी/अनजान लोग/बड़ों वाली या डरावनी
+  बातें/दवा/गंदे शब्द हों तो **मॉडल को बुलाए बिना** तय जवाब (1098 या 112 के साथ)। पुरानी ऐसी लाइनें हटती हैं, "मेरा नाम …"
+  redact होता है; `device` ID और IP कभी AI सेवा को नहीं जाते। जवाब: markdown/लिंक हटाकर ≤ 220 अक्षर, गलत लिपि → 502,
+  word-list जाँच + (binding हो तो) Llama Guard 3 → unsafe पर प्यारा redirect; Guard फ़ेल → 502 (fail closed, ऐप offline
+  जवाब देता है)। सीमाएँ: हर device/दिन `AI_DAILY_LIMIT`, पूरे ऐप/दिन `AI_GLOBAL_DAILY_LIMIT` (memory में, हर instance),
+  optional `AI_RATE_LIMITER` binding (हर device और IP पर burst) → 429 `ai_limit`। provider timeout 6 सेकंड; बातचीत का
+  कोई log नहीं।
 
 ### भुगतान (Razorpay)
 
@@ -143,6 +163,10 @@ cloud backup और नए फ़ोन पर device transfer में नह�
 - **GitHub Pages custom headers नहीं भेजता:** `_headers` सिर्फ़ Cloudflare Pages पर चलता है। GitHub Pages पर सिर्फ़ `<meta>` CSP लागू
   होता है — `frame-ancestors` (clickjacking से बचाव) meta में काम नहीं करता।
 - **Speech/TTS सेवाएँ तीसरे पक्ष की हैं** — on-device को प्राथमिकता है, पर फ़ोन में न हो तो ये online प्रोसेस कर सकती हैं।
+- **AI बातचीत (अगर चालू की):** AI गलती कर सकता है और छँटाई की सूचियाँ हर ख़तरा नहीं पकड़तीं; बातचीत की लाइनें AI सेवा
+  (Cloudflare या Anthropic) तक जाती हैं और उनकी नीति लागू होती है। रोज़ की सीमाएँ हर Cloudflare instance की memory में
+  हैं (database नहीं), इसलिए अनुमानित — पक्की सीमा Claude Console spend limit / Workers Free plan की 10,000 Neurons।
+  `ANTHROPIC_API_KEY` लीक हो तो कोई आपके ख़र्च पर Claude चला सकता है: Console में key revoke करें, नई `wrangler secret put` करें।
 - **Root किया हुआ या malware वाला फ़ोन** कुछ भी पढ़ सकता है। `FLAG_SECURE` सिर्फ़ "बड़ों के लिए" वाली screens पर है।
 - **`RESTORE_SECRET` बदलने पर सारे रिस्टोर कोड बदल जाते हैं** (भाग 5.4)। इसे डाला ही न हो, तो कोड `RAZORPAY_KEY_SECRET` पर
   टिके होते हैं और वह बदलने पर बदल जाते हैं (भाग 5.2) — इसलिए `RESTORE_SECRET` ज़रूर डालें।
@@ -166,6 +190,7 @@ cloud backup और नए फ़ोन पर device transfer में नह�
 | `RAZORPAY_KEY_SECRET` | Worker secret | **गंभीर:** Razorpay API का पूरा access (payments/subscriptions/customer records पढ़ना, subscriptions रद्द करना, refunds)। `RESTORE_SECRET` न डाला हो तो कोई भी रिस्टोर कोड बनाना भी। |
 | `RESTORE_SECRET` | Worker secret | कोई भी रिस्टोर कोड बना सकता है → किसी भी चालू सब्सक्रिप्शन का प्रीमियम मुफ़्त खोलना (और उसका नवीनीकरण रद्द करना)। पैसा या निजी डेटा नहीं जाता। |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_PLAN_ID` | `wrangler.toml` (public) | अकेले कोई ख़तरा नहीं। |
+| `ANTHROPIC_API_KEY` (optional) | Worker secret | कोई आपके ख़र्च पर Claude चला सकता है (कोई बच्चे का डेटा नहीं — हम कुछ रखते ही नहीं)। Console में revoke करें, नई key डालें, spend limit रखें। |
 | Android keystore + passwords | मालिक का backup + GitHub secrets | कोई आपकी पहचान से APK update sign कर सकता है। |
 | GitHub / Cloudflare / Razorpay accounts | — | सब कुछ। 2FA ज़रूरी। |
 
@@ -242,4 +267,7 @@ cloud backup और नए फ़ोन पर device transfer में नह�
 - [ ] खोए रिस्टोर कोड के लिए support तरीका तय: कोड भेजने से पहले भुगतान की जानकारी से पक्का करें; secret shell history में न जाए
       (`read -rs RESTORE_SECRET && export RESTORE_SECRET`)।
 - [ ] असली फ़ोन पर: पाठ offline चलते हैं; parent gate; "बड़ों के लिए" screens का screenshot नहीं बनता; भुगतान के बाद "ऐप पर वापस जाएँ" ऐप खोलता है।
+- [ ] AI बातचीत (अगर देनी है): provider चुना (`[ai]` binding या `ANTHROPIC_API_KEY`), Claude Console में spend limit,
+      `AI_DAILY_LIMIT`/`AI_GLOBAL_DAILY_LIMIT` तय, `AI_RATE_LIMITER` चालू; असली बच्चों जैसे सवालों पर हिंदी/English/Hinglish जवाब
+      जाँचे; गोपनीयता नीति का AI हिस्सा वकील से जँचवाया (DPDP Rule 10, COPPA); US के लिए ज़रूरत हो तो `AI.ENABLED: false`।
 - [ ] कविताओं/सामग्री के अधिकार जाँचे। Play Store पर डालना हो तो Google Play के billing और Families नियम पहले देखें।
