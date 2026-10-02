@@ -1,5 +1,7 @@
 # Guardian
 
+> **नन्हा स्कूल (बच्चों का ऐप) सँभाल रहे हैं?** शुरुआत [docs/HANDOVER.md](docs/HANDOVER.md) से करें।
+
 A small, **consent-first** toolkit for keeping track of the people you look
 after — children, parents, or any group. It gives you one simple method that
 can **listen**, **view**, or **locate** a single person or a whole group.
