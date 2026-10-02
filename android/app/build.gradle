@@ -21,8 +21,27 @@ android {
         applicationId 'org.guardian.buddy'
         minSdk 24
         targetSdk 35
-        versionCode 2
-        versionName '1.1'
+        versionCode 3
+        versionName '2.0'
+    }
+
+    buildFeatures {
+        // BuildConfig.DEBUG switches WebView remote debugging on for debug builds only.
+        buildConfig true
+    }
+
+    // The app IS the web app: the repository's web/ folder is bundled as the APK's assets and
+    // served inside the WebView from https://appassets.androidplatform.net/ (see WebViewActivity).
+    sourceSets {
+        main {
+            assets.srcDir '../../web'
+        }
+    }
+
+    androidResources {
+        // Android's default ignore list, plus web/ files that don't belong in the app: hosting
+        // headers, docs, the service worker (the shell serves files itself) and any tests.
+        ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!_headers:!*.md:!sw.js:!*.test.js:!*.spec.js:<dir>test:<dir>tests:<dir>node_modules'
     }
 
     signingConfigs {
@@ -41,7 +60,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             if (hasReleaseSigning) {
                 signingConfig signingConfigs.release
             }

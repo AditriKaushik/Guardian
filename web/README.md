@@ -7,7 +7,7 @@ Works in any modern browser on phone, tablet or computer, anywhere in the world.
   (or the browser's *Add to Home screen*). It then opens full-screen like an app.
 - **Works offline:** after the first visit, a service worker (`sw.js`) caches the app.
 - **Speaks:** uses the browser's built-in text-to-speech, in Hindi or English per item.
-- **No tracking, nothing personal:** everything runs in the child's browser. The app never asks for
+- **No tracking, nothing personal:** everything runs in the child's browser; child profiles and progress stay on the device. The app never asks for
   or stores an email or phone number; fonts are self-hosted (no Google requests); speech prefers
   the phone's on-device voices.
 - **Optional subscription:** a 7-day free trial, then a Razorpay subscription checked by the
@@ -20,19 +20,21 @@ Works in any modern browser on phone, tablet or computer, anywhere in the world.
 
 ## Files
 
-| File | Purpose |
+The app is plain HTML/CSS/JS with no build step. See [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)
+for the module contract.
+
+| Path | Purpose |
 |------|---------|
-| `index.html` | The app's page (no inline code) |
-| `app.js` | The app: lessons, rhymes, game, chat, trial and paywall |
-| `app.css` | Styles for `index.html` and `pay.html`, plus the self-hosted font |
-| `config.js` | Payment settings, price text, which lessons stay free |
-| `pay.html`, `pay.js` | Checkout page the Android app opens in the browser (`pay.html#s=<sub_id>&k=<key_id>`) |
-| `fonts/` | Baloo 2 (devanagari + latin, woff2) and its licence, `OFL.txt` |
-| `legal/` | Privacy policy, terms, refunds and contact pages |
-| `manifest.webmanifest` | App name, colours and icons for installing |
-| `sw.js` | Offline cache (never caches API calls or Razorpay) |
-| `_headers` | Security headers for Cloudflare Pages (GitHub Pages ignores it) |
-| `icon.svg`, `icon-maskable.svg` | App icons |
+| `index.html` | The page (no inline code); loads the scripts below in order |
+| `app.css` | Design system and responsive layout (320px phones to 4K screens), self-hosted font |
+| `config.js` | Payment settings, plans, which lessons stay free |
+| `js/core/` | Framework: registry and events (`ns.js`), on-device storage and profiles (`store.js`), voice (`voice.js`), stickers (`rewards.js`), trial and subscription (`billing.js`), screens and grown-ups' area (`ui.js`) |
+| `js/modules/` | Activities: learn (ABC, अक्षर, गिनती, दुनिया देखो, कविताएँ, खेल), routine (मेरा दिन), garden (मेरा बगीचा), stories (कहानी समय), dreams (बड़े होकर), focus (ध्यान), buddy (मिट्ठू से बात) |
+| `js/content/` | Lesson, rhyme, story, career, routine and focus data |
+| `js/brain/brain.js` | The talking buddy's brain (pure logic, tested in `tools/test/`) |
+| `audio/manifest.json` | Recorded voice clips, if any (see [docs/VOICE.md](../docs/VOICE.md)) |
+| `pay.html`, `pay.js` | Checkout page the Android app opens in the browser |
+| `fonts/`, `legal/`, `manifest.webmanifest`, `sw.js`, `_headers`, icons | Font, legal pages, install info, offline cache, Cloudflare Pages headers |
 
 ## Run locally
 

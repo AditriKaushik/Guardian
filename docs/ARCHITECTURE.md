@@ -124,3 +124,59 @@ never touches the network), so the app has a real HTTPS origin.
 - In the Android shell: the app opens `pay.html#s=…&k=…` with `NanhaNative.openExternal`,
   stores the pending restore code on the device, and confirms with `/api/restore` when the
   `resume` event arrives (or the parent taps "मैंने भुगतान कर दिया").
+
+## Core additions (v2.1, backward compatible)
+
+Everything above still holds; the core also provides:
+
+| member | what it does |
+|---|---|
+| `ctx.habitsToday()` | names of the habits this profile reported today (from `habit:done`) |
+| `ctx.canListen()` | `true` when a grown-up turned the mic on **and** speech recognition exists |
+| `ctx.profile` | also the read-only fields above; `name` may be `""` (the name is optional) |
+| `ctx.reward({sticker, reason})` | `reason` may be a string or `{hi, en}`; the "शाबाश!" waits for the current sentence to finish |
+| activity `hidden: true` | registered but no home tile (e.g. `sleep`, opened by the night-time bedtime card) |
+| activity `relang: true` | the core re-opens the activity when the language changes; without it only the header title updates and the module may listen to `lang:changed` |
+| `NS.activeData(id)` | the same get/set store as `ctx.data` of activity `id`, for the current profile (e.g. the garden counting habits while closed, the buddy reading `NS.activeData("dreams").get("dream")`) |
+| `NS.now()`, `NS.dayKey(date?)` | the clock in one place (tests fake it) and the local day as `"YYYY-MM-DD"` |
+| `NS.setLang(lang)` | saves the current profile's language, re-renders, emits `lang:changed {lang}` (no event if unchanged) |
+| `NS.back()` | Android back button: closes the current screen; returns `false` on home so the app may close |
+| `NS.mascot(mood, cls)` | मिट्ठू the parrot as inline SVG; moods `idle happy sleepy curious calm proud caring`; `NS.mascot.mood(svg, mood)` switches; `NS.ui.talk(svg, text)` moves the beak while speaking |
+| `NS.voice.sayAfter(text)` | speak after the current sentence (dropped if something else starts speaking first) |
+
+Events (additions): `habit:done` habits are `brush bath eat play read sleep water help`;
+`dream:chosen {id, title: {hi, en}, icon}` (dreams.js; the stored `ctx.data` "dream" is
+`{id, title: {hi, en}, icon, at}` — read titles with `NS.t(title)`); `reward:granted
+{sticker, reason, activity}`; `session:wind-down {minutes}`; `settings:changed {key, value}`;
+`activity:registered {id}`; `native:<type>` for every bridge event.
+
+Native bridge (additions, see android/): all arguments are strings; request ids match
+`[A-Za-z0-9._:-]{1,64}`; `lang` is `hi-IN` or `en-IN` (Hinglish → `hi-IN`); `voices()` returns
+`[]` until the engine is ready and then the shell sends `{"type":"voices"}`;
+`NanhaNative.secure("true"|"false")` is called when the grown-ups' screens (gate, paywall,
+restore code) open and close; `openExternal(url)` returns `true`/`false`. The service worker is
+never registered inside the shell.
+
+Storage (all `localStorage`, on the device only): `ns_profiles`, `ns_settings`,
+`ns_p_<profileId>_core` (stickers, minutes per day, habits, activities opened),
+`ns_p_<profileId>_a_<activityId>` (`ctx.data`), `ns_session`, and the family's subscription
+`ns_trial ns_seen ns_pass ns_sub ns_restore ns_pending`. "Delete all data" removes everything
+except the subscription.
+
+## Voice clips (`web/audio/manifest.json`)
+
+```json
+{"version":1,"clips":{"female":{"hi|अ से अनार":"audio/female/hi/0001.mp3"},"male":{"hi|अ से अनार":"audio/male/hi/0001.mp3"}}}
+```
+
+- Key = `<speech lang>|<normalized text>`. Speech lang is `hi` or `en` (`NS.speechLang`:
+  Hinglish text is spoken with the Hindi voice, so its key starts with `hi|`).
+- Normalized text = `NS.stripEmoji(text)`: emoji, skin-tone modifiers, regional indicators,
+  VS15/VS16, ZWJ and keycap marks replaced by a space, whitespace runs collapsed to one space,
+  trimmed. Punctuation and letter case are kept.
+- The voice looks up the whole text first, then each phrase (text split after `। ॥ . ! ? ; : ,`
+  and line breaks), and plays any clip it finds (wanted gender first, then the other gender)
+  before falling back to the native or browser voice. Paths are relative to `index.html` and
+  must match `audio/…`.
+- An empty manifest (`{"version":1,"clips":{"female":{},"male":{}}}`) means "no clips".
+  Clips are cached by the service worker on first play, never precached.

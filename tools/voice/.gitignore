@@ -1,0 +1,5 @@
+# Raw recordings are large and may be covered by the voice artist's contract —
+# keep them out of git (back them up privately). Only the compact clips in web/audio are committed.
+recordings/
+*.tmp.wav
+*.tmp.mp3

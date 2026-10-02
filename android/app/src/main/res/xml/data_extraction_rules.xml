@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android 12+: nothing from this app goes into cloud backups or phone-to-phone transfers
-     (older Android versions are covered by allowBackup="false" in the manifest). The trial
-     and subscription data stay on this phone; premium moves to a new phone only with the
-     parent's restore code. -->
+     (older Android versions are covered by allowBackup="false" in the manifest). The child
+     profiles, progress and subscription data (kept in the WebView's storage under the app's
+     data folder) stay on this phone; premium moves to a new phone only with the parent's
+     restore code. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="root" path="." />

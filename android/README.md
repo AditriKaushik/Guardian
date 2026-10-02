@@ -47,6 +47,26 @@ https://github.com/AditriKaushik/Guardian/releases/download/baat-buddy-latest/Ba
 बोलकर बात करने के लिए फ़ोन में Google ऐप (वॉइस टाइपिंग) और हिंदी text-to-speech होना
 चाहिए; न हो तो बच्चा लिखकर या तस्वीर छूकर सीख सकता है।
 
+## यह ऐप कैसे बना है (v2)
+
+ऐप अब एक पतला Android "खोल" (shell) है: पूरा ऐप `web/` फ़ोल्डर वाला वेब-ऐप है, जो APK के
+अंदर assets के रूप में आता है और WebView में `https://appassets.androidplatform.net/` से
+(बिना इंटरनेट के) खुलता है। वही वेब-ऐप iPhone, Windows और ब्राउज़र में भी चलता है।
+Android खोल सिर्फ़ ये जोड़ता है (`window.NanhaNative`, देखें `docs/ARCHITECTURE.md`):
+
+- फ़ोन की हिंदी/अंग्रेज़ी आवाज़ें (text-to-speech, फ़ोन में मौजूद आवाज़ें पहले),
+- फ़ोन में ही बोली पहचानना (माइक की अनुमति सिर्फ़ पहली बार सुनते समय माँगी जाती है),
+- भुगतान पेज को फ़ोन के ब्राउज़र में खोलना, और `nanhaschool://open` से ऐप पर लौटना,
+- बड़ों की स्क्रीन पर स्क्रीनशॉट रोकना (`secure(true)`).
+
+| फ़ाइल | काम |
+|------|-----|
+| `WebViewActivity.java` | इकलौती स्क्रीन: WebView, assets परोसना, सुरक्षा नियम, Back बटन |
+| `NanhaBridge.java` | `window.NanhaNative` के तरीके (हर इनपुट की जाँच) |
+| `NativeSpeech.java` / `NativeListener.java` | आवाज़ बोलना / बोली सुनना |
+| `ShellPolicy.java`, `VoiceCatalog.java` | शुद्ध नियम (URL, MIME, भाषा, आवाज़) — यूनिट टेस्ट वाले |
+| `Config.java` | ऐप का origin, भुगतान पेज का host, CSP |
+
 ## ख़ुद बनाना
 
 Android Studio में `android/` फ़ोल्डर खोलें, या:
@@ -54,11 +74,10 @@ Android Studio में `android/` फ़ोल्डर खोलें, य�
 ```bash
 cd android
 ./gradlew assembleDebug        # APK: app/build/outputs/apk/debug/app-debug.apk
-./gradlew testDebugUnitTest    # बात करने वाले हिस्से के टेस्ट
+./gradlew testDebugUnitTest    # खोल के नियमों के टेस्ट
 ```
 
 ## नई चीज़ें कैसे जोड़ें
 
-- **नए पाठ / शब्द / जानवर / फल:** `app/src/main/java/org/guardian/buddy/Syllabus.java`
-- **नई कविताएँ:** उसी फ़ाइल में `rhymes()` में जोड़ें
-- **बातचीत के नए जवाब:** `app/src/main/java/org/guardian/buddy/BuddyBrain.java`
+पाठ, कविताएँ, खेल और बातचीत अब `web/` में जुड़ते हैं (देखें `docs/ARCHITECTURE.md`)।
+अगला APK अपने-आप नया वेब-ऐप ले लेता है।

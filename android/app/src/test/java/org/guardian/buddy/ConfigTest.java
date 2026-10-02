@@ -1,36 +1,55 @@
 package org.guardian.buddy;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
-/** Payments switch on only with an https server address and a valid P-256 public key. */
+/** The shell's settings agree with the bundled web app. */
 public class ConfigTest {
 
-    private static final String API = "https://nanha-school-api.example.workers.dev";
-    private static final String PAY = "https://example.github.io/Guardian/pay.html";
-
-    @Test
-    public void paymentsNeedHttpsAndAKey() {
-        assertTrue(Config.paymentsOn(API, PAY, PassVerifierTest.SPKI));
-        assertFalse(Config.paymentsOn("", PAY, PassVerifierTest.SPKI));
-        assertFalse(Config.paymentsOn(API, PAY, ""));
-        assertFalse(Config.paymentsOn(API, PAY, "not a key"));
-        assertFalse(Config.paymentsOn("http://nanha-school-api.example.workers.dev", PAY, PassVerifierTest.SPKI));
-        assertFalse(Config.paymentsOn(API, "http://example.github.io/pay.html", PassVerifierTest.SPKI));
+    /** web/index.html, found from the module folder (Gradle) or the repository root. */
+    private static File indexHtml() {
+        for (String path : new String[] {"../../web/index.html", "../web/index.html", "web/index.html"}) {
+            File f = new File(path);
+            if (f.isFile()) {
+                return f;
+            }
+        }
+        return null;
     }
 
     @Test
-    public void httpsUrlCheck() {
-        assertTrue(Config.isHttpsUrl(API));
-        assertTrue(Config.isHttpsUrl(API + "/api/restore"));
-        assertFalse(Config.isHttpsUrl(null));
-        assertFalse(Config.isHttpsUrl(""));
-        assertFalse(Config.isHttpsUrl("https://"));
-        assertFalse(Config.isHttpsUrl("https:///path"));
-        assertFalse(Config.isHttpsUrl("HTTP://example.com"));
-        assertFalse(Config.isHttpsUrl("https://exa mple.com"));
-        assertFalse(Config.isHttpsUrl("ftp://example.com"));
+    public void cspHeaderMatchesTheWebAppsMetaTag() throws IOException {
+        File index = indexHtml();
+        assertNotNull("web/index.html not found", index);
+        String html = new String(Files.readAllBytes(index.toPath()), StandardCharsets.UTF_8);
+        Matcher m = Pattern.compile(
+                "<meta\\s+http-equiv=\"Content-Security-Policy\"\\s+content=\"([^\"]*)\"",
+                Pattern.CASE_INSENSITIVE).matcher(html);
+        assertTrue("no CSP <meta> in web/index.html", m.find());
+        assertEquals("Config.CONTENT_SECURITY_POLICY must equal the CSP <meta> in web/index.html",
+                m.group(1), Config.CONTENT_SECURITY_POLICY);
+    }
+
+    @Test
+    public void originAndStartPage() {
+        assertEquals("https://appassets.androidplatform.net", Config.APP_ORIGIN);
+        assertEquals("https://appassets.androidplatform.net/index.html", Config.START_URL);
+        assertEquals("index.html", ShellPolicy.assetPath(Config.START_URL));
+    }
+
+    @Test
+    public void payPageIsAnAllowedExternalPage() {
+        assertTrue(ShellPolicy.isAllowedExternal(Config.PAY_PAGE_URL));
+        assertTrue(ShellPolicy.isAllowedExternal(Config.PAY_PAGE_URL + "#s=sub_ABC123&k=rzp_test_ABC123"));
     }
 }

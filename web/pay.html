@@ -2,8 +2,8 @@
 <html lang="hi">
 <head>
 <meta charset="utf-8">
-<!-- Keep this policy identical in index.html, pay.html and _headers (which also adds frame-ancestors). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://checkout.razorpay.com https://cdn.razorpay.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.razorpay.com; connect-src 'self' https://*.workers.dev https://*.razorpay.com; frame-src https://*.razorpay.com; form-action 'self' https://*.razorpay.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'">
+<!-- Keep this policy identical in index.html, pay.html, _headers (which also adds frame-ancestors) and the Android shell. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://checkout.razorpay.com https://cdn.razorpay.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.razorpay.com; media-src 'self'; connect-src 'self' https://*.workers.dev https://*.razorpay.com; frame-src https://*.razorpay.com; form-action 'self' https://*.razorpay.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">

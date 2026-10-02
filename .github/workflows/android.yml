@@ -4,10 +4,14 @@ on:
   push:
     paths:
       - "android/**"
+      # The APK bundles the web app (web/ is the app's assets), so web changes rebuild it too.
+      - "web/**"
       - ".github/workflows/android.yml"
   pull_request:
     paths:
       - "android/**"
+      # The APK bundles the web app (web/ is the app's assets), so web changes rebuild it too.
+      - "web/**"
       - ".github/workflows/android.yml"
   workflow_dispatch:
 
@@ -82,6 +86,6 @@ jobs:
         with:
           tag_name: baat-buddy-latest
           name: Baat Buddy (latest)
-          body: बच्चों के लिए बात करने वाला ऐप। BaatBuddy.apk डाउनलोड करके फ़ोन में इंस्टॉल करें।
+          body: नन्हा स्कूल — छोटे बच्चों के लिए सीखने वाला ऐप। BaatBuddy.apk डाउनलोड करके फ़ोन में इंस्टॉल करें।
           files: android/BaatBuddy.apk
           make_latest: true
