@@ -112,3 +112,7 @@ Each computer reports with `python -m guardian.reporter ...`; phones report with
 a no-code Apple Shortcut (iOS) or the HTTP Shortcuts app (Android). Full
 step-by-step for Windows, macOS, Android and iOS — plus why silent mic/camera
 capture is not supported — is in [docs/USAGE_DEVICES.md](docs/USAGE_DEVICES.md).
+
+## Also in this repo: Market Compass
+
+`market-compass/` is a separate, standalone web app for the Indian stock market (macro scorecard, smart-money tracker, stock probability, event calendar). See [market-compass/HANDOVER.md](market-compass/HANDOVER.md).
