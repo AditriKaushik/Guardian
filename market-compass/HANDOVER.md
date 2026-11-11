@@ -77,8 +77,8 @@ GitHub's scheduler sometimes runs 5–30 minutes late. The top of the app always
 
 ### Reading the numbers honestly
 
-- **"62% chance UP"**: in situations like now, the price rose after your horizon about 62 times in
-  100. The other 38 times it didn't, so a stop-loss is mandatory.
+- **"62% chance UP"**: in situations like now, the price rose after your horizon about 62 times
+  in 100. The other 38 times it didn't, so a stop-loss is mandatory.
 - **Model trust:** each stock's model is tested on the newest 30% of its history, which it never
   saw during training. Trust stays low unless it beat both a coin flip and "always guess the most
   common outcome". Low trust shows as **NO PROVEN EDGE**: don't trade on that number.
@@ -179,6 +179,7 @@ app republishes itself within a few minutes.
 
   The new link becomes `https://<new-owner>.github.io/<repo-name>/market-compass/`. Also update
   the HANDOVER link in `web/app.js`.
+
 - **Note:** GitHub pauses scheduled jobs in a repo with no activity for 60 days. If the "data
   updated" time stops moving, open Actions and click **Enable workflow**, or make any small commit.
 
