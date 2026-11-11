@@ -1,13 +1,14 @@
-"""Run with:  python -m pytest tests -q   (uses synthetic data, no internet needed)."""
-import os
+"""Offline logic tests:  python -m pytest tests -q
+They use a synthetic series so the maths can be checked without internet.
+Live tests against real market data are in test_live.py."""
 from datetime import date
 
-os.environ["COMPASS_DEMO"] = "1"
+import numpy as np
+import pandas as pd
 
-import numpy as np  # noqa: E402
-
-from compass import data as D, events as E, scorecard as S, stock_model as M  # noqa: E402
-from compass.stocks import to_yahoo  # noqa: E402
+from compass import events as E, scorecard as S, stock_model as M
+from compass.stocks import to_yahoo
+from synthetic import synthetic_history as H
 
 
 def test_symbol_mapping():
@@ -27,16 +28,19 @@ def test_sector_tilt_crude_high_hurts_paints():
     assert tilts["Paints"] == -1 and tilts["Oil upstream (ONGC, Oil India)"] == 1
 
 
-def test_auto_scores_from_snapshot():
-    snap = D.macro_snapshot()
-    for f in S.FACTORS:
-        if f.auto:
-            s, reason = S.auto_score(f.key, snap, D.fii_dii())
-            assert s in (-1, 0, 1, None) and reason
+def test_auto_score_rules():
+    snap = {"brent": {"ok": True, "last": 95.0, "chg5": 0.0},
+            "vix": {"ok": True, "last": 12.0, "chg5": 0.0},
+            "usdinr": {"ok": True, "last": 90.0, "chg5": 0.01}}
+    assert S.auto_score("brent", snap)[0] == -1
+    assert S.auto_score("vix", snap)[0] == 1
+    assert S.auto_score("usdinr", snap)[0] == -1
+    assert S.auto_score("fii", snap, {"FII": -5000, "date": "x"})[0] == -1
+    assert S.auto_score("dxy", snap)[0] is None
 
 
 def test_labels_never_cross_days():
-    df = D.history("TEST.NS", "60d", "60m")
+    df = H("TEST.NS", "60d", "60m")
     y, fwd = M.make_labels(df, 3)
     day = np.array(df.index.date)
     for i in np.where(fwd.notna().to_numpy())[0][:200]:
@@ -44,7 +48,7 @@ def test_labels_never_cross_days():
 
 
 def test_features_have_no_lookahead():
-    df = D.history("TEST.NS", "200d", "60m")
+    df = H("TEST.NS", "200d", "60m")
     full = M.build_features(df)
     part = M.build_features(df.iloc[:-50])
     common = part.index[-100:]
@@ -53,8 +57,8 @@ def test_features_have_no_lookahead():
 
 
 def test_prediction_is_sane():
-    df = D.history("RELIANCE.NS", "730d", "60m")
-    idx = D.history("^NSEI", "730d", "60m")
+    df = H("RELIANCE.NS", "730d", "60m")
+    idx = H("^NSEI", "730d", "60m")
     for h in (1, 2, "close"):
         p = M.predict(df, idx, h)
         assert p.ok and 0.05 <= p.p_up <= 0.95 and 0 <= p.reliability <= 1
@@ -62,10 +66,30 @@ def test_prediction_is_sane():
 
 
 def test_short_history_is_refused():
-    df = D.history("RELIANCE.NS", "20d", "60m")
+    df = H("RELIANCE.NS", "20d", "60m")
     assert not M.predict(df, None, 2).ok
 
 
 def test_calendar():
     up = E.upcoming(date(2026, 11, 11), 30)
     assert len(up) > 5 and up["date"].min() >= date(2026, 11, 11)
+
+
+def test_track_record_resolves_against_prices():
+    from compass import build_site as B
+
+    df = H("TEST.NS", "60d", "60m")
+    bar = df.index[-10]
+    while bar.hour > 12:  # pick a bar with 2 hours left in its day
+        bar = df.index[df.index.get_loc(bar) - 1]
+    target = bar + pd.Timedelta(hours=2)
+    rec = {"sym": "X", "h": "2", "bar": str(bar), "made": bar.isoformat(), "target": str(target),
+           "price": float(df.loc[bar, "Close"]), "p": 0.7, "rel": 0.6}
+    track = {"open": [rec], "resolved": [], "totals": {}}
+    now = df.index[-1].to_pydatetime() + pd.Timedelta(days=1)
+    out = B.update_track(track, {}, {"X": df}, now, is_open=False)
+    assert not out["open"] and len(out["resolved"]) == 1
+    r = out["resolved"][0]
+    assert r["exit"] == round(float(df.loc[target, "Close"]), 2)
+    assert r["up"] == int(df.loc[target, "Close"] > rec["price"])
+    assert out["totals"]["all"]["n"] == 1

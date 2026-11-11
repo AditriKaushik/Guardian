@@ -198,6 +198,8 @@ def predict(df: pd.DataFrame, idx: pd.DataFrame | None, horizon: int | str = 2,
     reliability = float(np.clip((auc - 0.5) / 0.08, 0, 1)) if not np.isnan(auc) else 0.0
     if len(yte) < 150:
         reliability *= 0.5
+    if acc <= base_te:  # must also beat "always guess the most common outcome"
+        reliability = min(reliability, 0.3)
 
     final = model().fit(X, y)
     cur = usable.iloc[[-1]]

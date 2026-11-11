@@ -1,11 +1,21 @@
 name: Deploy web app
 
+# Publishes two apps on GitHub Pages:
+#   /            -> the web/ app (unchanged)
+#   /market-compass/ -> Market Compass, rebuilt from LIVE market data on the schedule below
 on:
   push:
     branches: [main]
     paths:
       - "web/**"
+      - "market-compass/**"
       - ".github/workflows/pages.yml"
+  schedule:
+    # Times are UTC. IST = UTC + 5:30.
+    - cron: "*/15 3-10 * * 1-5"   # every 15 min, ~08:30-16:15 IST, Mon-Fri (market hours)
+    - cron: "0 2 * * 1-5"         # 07:30 IST pre-market
+    - cron: "45 13 * * 1-5"       # 19:15 IST, after NSE publishes FII/DII data
+    - cron: "30 4 * * 0,6"        # weekend refresh (global markets, calendar)
   workflow_dispatch:
 
 permissions:
@@ -15,19 +25,53 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: market-compass/requirements.txt
+
+      - name: Install Market Compass dependencies
+        run: pip install -r market-compass/requirements.txt
+
+      - name: Build Market Compass live data (real market data)
+        id: mc
+        continue-on-error: true
+        working-directory: market-compass
+        run: >
+          python -m compass.build_site ../_mc_data
+          --previous-track "${{ steps.pages.outputs.base_url }}/market-compass/track.json"
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site/market-compass
+          cp -r web/. _site/
+          cp -r market-compass/web/. _site/market-compass/
+          if [ -f _mc_data/data.json ]; then
+            cp _mc_data/data.json _mc_data/track.json _site/market-compass/
+          else
+            echo "::warning::Market Compass build failed; keeping the previously published data"
+            for f in data.json track.json; do
+              curl -fsSL "${{ steps.pages.outputs.base_url }}/market-compass/$f" -o "_site/market-compass/$f" || true
+            done
+          fi
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: web
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

@@ -23,8 +23,6 @@ HISTORY_CSV = Path(__file__).resolve().parent / "data" / "scorecard_history.csv"
 with st.sidebar:
     st.title("🧭 Market Compass")
     st.caption(f"Version {__version__} · Indian markets")
-    demo = st.toggle("Demo mode (fake data, no internet)", value=D.demo_mode(),
-                     help="Use random sample data to try the app offline. Turn OFF for real markets.")
     if st.button("🔄 Refresh all data"):
         st.cache_data.clear()
         st.rerun()
@@ -35,28 +33,26 @@ with st.sidebar:
     st.caption("⚠️ Educational tool, not investment advice. Probabilities are estimates from data; "
                "markets can and will do the unexpected. Always use a stop-loss and never risk "
                "money you cannot afford to lose.")
-if demo:
-    st.warning("DEMO MODE: all numbers below are FAKE sample data. Turn off Demo mode in the sidebar for live markets.")
 
 
 @st.cache_data(ttl=600, show_spinner=False)
-def cached_snapshot(demo: bool):
-    return D.macro_snapshot(demo=demo)
+def cached_snapshot():
+    return D.macro_snapshot()
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
-def cached_fii(demo: bool):
-    return D.fii_dii(demo=demo)
+def cached_fii():
+    return D.fii_dii()
 
 
 @st.cache_data(ttl=900, show_spinner=False)
-def cached_sectors(demo: bool):
-    return D.sector_performance(demo=demo)
+def cached_sectors():
+    return D.sector_performance()
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def cached_history(symbol: str, period: str, interval: str, demo: bool):
-    return D.history(symbol, period=period, interval=interval, demo=demo)
+def cached_history(symbol: str, period: str, interval: str):
+    return D.history(symbol, period=period, interval=interval)
 
 
 tab_compass, tab_stock, tab_money, tab_cal, tab_help = st.tabs(
@@ -65,8 +61,8 @@ tab_compass, tab_stock, tab_money, tab_cal, tab_help = st.tabs(
 # ================================================================== TAB 1: COMPASS
 with tab_compass:
     with st.spinner("Fetching world markets…"):
-        snap = cached_snapshot(demo)
-        fii = cached_fii(demo)
+        snap = cached_snapshot()
+        fii = cached_fii()
 
     st.subheader("World & India right now")
     keys = ["nifty", "banknifty", "vix", "usdinr", "dxy", "us10y", "brent", "gold", "sp500", "nikkei", "hangseng"]
@@ -161,8 +157,8 @@ with tab_stock:
         st.session_state["analyse"] = (symbol, horizon)
     if st.session_state.get("analyse") and st.session_state["analyse"][0] == symbol:
         with st.spinner(f"Downloading 2 years of hourly data for {symbol} and testing the model…"):
-            df = cached_history(symbol, "730d", "60m", demo)
-            idx = cached_history("^NSEI", "730d", "60m", demo) if symbol != "^NSEI" else None
+            df = cached_history(symbol, "730d", "60m")
+            idx = cached_history("^NSEI", "730d", "60m") if symbol != "^NSEI" else None
             pr = M.predict(df, idx, horizon, st.session_state.get("macro_pct", 0.0), apply_macro)
         if not pr.ok:
             st.error(pr.message)
@@ -232,7 +228,7 @@ with tab_stock:
 # ================================================================== TAB 3: SMART MONEY
 with tab_money:
     st.subheader("🐋 Follow the big fish")
-    fii = cached_fii(demo)
+    fii = cached_fii()
     c1, c2 = st.columns(2)
     if fii:
         c1.metric(f"FII / FPI net ({fii.get('date', '')})", f"₹{fii['FII']:,.0f} cr")
@@ -247,7 +243,7 @@ with tab_money:
                 "Strong DII buying cushions falls.")
 
     st.markdown("#### Sector strength (which way money is rotating)")
-    sec = cached_sectors(demo)
+    sec = cached_sectors()
     if sec.empty:
         st.caption("Sector data not available right now.")
     else:

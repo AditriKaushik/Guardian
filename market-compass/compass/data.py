@@ -1,12 +1,6 @@
-"""Data fetching: Yahoo Finance (prices) and NSE (FII/DII flows), with a demo mode.
-
-Set the environment variable COMPASS_DEMO=1 (or tick "Demo mode" in the app) to use
-synthetic data. Demo data is random and only for trying the app without internet.
-"""
+"""Live data fetching: Yahoo Finance (prices) and NSE (FII/DII flows). No demo or sample data."""
 from __future__ import annotations
 
-import hashlib
-import os
 from datetime import datetime
 
 import numpy as np
@@ -37,17 +31,9 @@ SECTOR_INDICES = {
 }
 
 
-def demo_mode() -> bool:
-    return os.environ.get("COMPASS_DEMO", "").strip() in {"1", "true", "yes"}
-
-
 # ---------------------------------------------------------------- price history
-def history(symbol: str, period: str = "6mo", interval: str = "1d", demo: bool | None = None) -> pd.DataFrame:
-    """OHLCV history with columns Open, High, Low, Close, Volume. Empty frame on failure."""
-    if demo is None:
-        demo = demo_mode()
-    if demo:
-        return synthetic_history(symbol, period, interval)
+def history(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
+    """Live OHLCV history from Yahoo Finance: Open, High, Low, Close, Volume. Empty frame on failure."""
     try:
         import yfinance as yf
 
@@ -65,55 +51,12 @@ def history(symbol: str, period: str = "6mo", interval: str = "1d", demo: bool |
     return df
 
 
-def _period_days(period: str) -> int:
-    n = int("".join(ch for ch in period if ch.isdigit()) or 1)
-    if period.endswith("mo"):
-        return n * 30
-    if period.endswith("y"):
-        return n * 365
-    return n
-
-
-def synthetic_history(symbol: str, period: str, interval: str) -> pd.DataFrame:
-    """Deterministic random-walk data shaped like NSE sessions (demo only)."""
-    seed = int(hashlib.md5(f"{symbol}{interval}".encode()).hexdigest()[:8], 16)
-    rng = np.random.default_rng(seed)
-    days = pd.bdate_range(end=pd.Timestamp.now(tz=IST).normalize(), periods=max(5, int(_period_days(period) * 5 / 7)))
-    base = {"INR=X": 88.0, "DX-Y.NYB": 100.0, "^TNX": 4.2, "BZ=F": 72.0, "^INDIAVIX": 13.5,
-            "^NSEI": 25500.0, "^NSEBANK": 57000.0, "^GSPC": 6500.0, "GC=F": 3900.0}.get(symbol, 1000 + seed % 2500)
-    if interval in ("1d", "1wk"):
-        idx = days + pd.Timedelta(hours=9, minutes=15)
-        vol = 0.011 if not symbol.startswith(("INR", "DX", "^TNX")) else 0.003
-    else:
-        stamps = []
-        for d in days:
-            for h, m in [(9, 15), (10, 15), (11, 15), (12, 15), (13, 15), (14, 15), (15, 15)]:
-                stamps.append(d + pd.Timedelta(hours=h, minutes=m))
-        idx = pd.DatetimeIndex(stamps)
-        vol = 0.0045
-    rets = rng.normal(0.0002, vol, len(idx))
-    # a little autocorrelation so the model has something faint to find
-    for i in range(1, len(rets)):
-        rets[i] += 0.08 * rets[i - 1]
-    close = base * np.exp(np.cumsum(rets))
-    openp = np.r_[close[0], close[:-1]] * (1 + rng.normal(0, vol / 4, len(idx)))
-    high = np.maximum(openp, close) * (1 + np.abs(rng.normal(0, vol / 2, len(idx))))
-    low = np.minimum(openp, close) * (1 - np.abs(rng.normal(0, vol / 2, len(idx))))
-    volume = rng.integers(200_000, 2_000_000, len(idx)).astype(float)
-    if symbol.startswith("^") or "=" in symbol:
-        volume[:] = 0.0
-    df = pd.DataFrame({"Open": openp, "High": high, "Low": low, "Close": close, "Volume": volume}, index=idx)
-    if idx.tz is None:
-        df.index = df.index.tz_localize(IST)
-    return df
-
-
 # ---------------------------------------------------------------- macro snapshot
-def macro_snapshot(demo: bool | None = None) -> dict:
+def macro_snapshot() -> dict:
     """For each macro instrument: last value, 1-day and 5-day change, plus moving averages for Nifty."""
     out = {}
     for key, (ticker, label) in MACRO_TICKERS.items():
-        df = history(ticker, period="1y" if key == "nifty" else "3mo", interval="1d", demo=demo)
+        df = history(ticker, period="1y" if key == "nifty" else "3mo", interval="1d")
         if df.empty or len(df) < 6:
             out[key] = {"label": label, "ticker": ticker, "ok": False}
             continue
@@ -135,10 +78,10 @@ def macro_snapshot(demo: bool | None = None) -> dict:
     return out
 
 
-def sector_performance(demo: bool | None = None) -> pd.DataFrame:
+def sector_performance() -> pd.DataFrame:
     rows = []
     for ticker, name in SECTOR_INDICES.items():
-        df = history(ticker, period="1mo", interval="1d", demo=demo)
+        df = history(ticker, period="1mo", interval="1d")
         if df.empty or len(df) < 6:
             continue
         c = df["Close"]
@@ -149,15 +92,11 @@ def sector_performance(demo: bool | None = None) -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------- NSE FII / DII
-def fii_dii(demo: bool | None = None) -> dict | None:
+def fii_dii() -> dict | None:
     """Latest FII and DII net cash-market flows in Rs crore, from NSE. None if unavailable.
 
     NSE often blocks requests from cloud servers or outside India; the app then asks for manual entry.
     """
-    if demo is None:
-        demo = demo_mode()
-    if demo:
-        return {"date": datetime.now().strftime("%d-%b-%Y"), "FII": -1234.5, "DII": 1890.2, "source": "demo"}
     try:
         import requests
 

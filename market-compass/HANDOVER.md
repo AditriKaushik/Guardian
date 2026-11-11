@@ -1,7 +1,20 @@
 # 🧭 Market Compass: Handover Guide
 
-Market Compass is a standalone web app for the Indian stock market. It runs without Claude, on
-your computer or online, and opens in any browser, phone included.
+## 🔗 Your link (works on any phone or computer, installable as an app)
+
+**https://aditrikaushik.github.io/Guardian/market-compass/**
+
+- **Android (Chrome):** open the link → tap **⬇ Install app** at the top, or menu ⋮ → **Install app**.
+- **iPhone (Safari):** open the link → Share → **Add to Home Screen**.
+- **Windows / Mac (Chrome or Edge):** open the link → click the install icon in the address bar.
+
+All data is **real and live** (Yahoo Finance prices, NSE FII/DII). There is no demo or sample
+data. A GitHub Actions job rebuilds the data automatically: every 15 minutes in market hours, at
+7:30 AM before the open, at 7:15 PM after NSE publishes FII/DII figures, and at weekends.
+Nothing needs to stay running on your computer, and you don't need Claude.
+
+The **🎯 Live track record** tab is the real-world test. Every prediction made in market hours is
+recorded and later checked against the actual price.
 
 It does four things:
 
@@ -53,7 +66,10 @@ unzip it, and open the `market-compass` folder.
 
 ---
 
-## 2. Run it on a computer (Windows)
+## 2. Optional: the full desktop version (any NSE stock on demand)
+
+The link above covers about 50 popular stocks plus Nifty and Bank Nifty. For **any** NSE symbol,
+run the desktop version on your computer:
 
 1. Install **Python 3.10 or newer** from <https://www.python.org/downloads/>.
    **Tick "Add Python to PATH"** on the first install screen.
@@ -166,12 +182,12 @@ Neutral · ≤ −0.13 Defensive · ≤ −0.40 Protect Capital. Change these nu
 | Problem | Fix |
 |---|---|
 | "Python is not installed" | Install from python.org and tick **Add Python to PATH**, then restart the PC. |
-| Everything shows "n/a" | No internet, or Yahoo is temporarily down. Press **Refresh all data** after a minute. Make sure **Demo mode** is OFF. |
+| Everything shows "n/a" | No internet, or Yahoo is temporarily down. Press **Refresh all data** after a minute. |
 | FII/DII "not available" | NSE blocked the request (common online or outside India). Use the NSE link and set the factor by hand. |
 | "Not enough hourly history" | Check the symbol spelling (e.g. `HDFCBANK`, not `HDFC BANK`). Very new listings don't have enough history. |
-| Numbers look odd or random | Check that **Demo mode** is OFF. Demo data is fake. |
+| The link shows old data | GitHub's scheduler can run 5–30 min late at busy times. Check "data updated … ago" at the top. |
 | Prices look a bit late | Free Yahoo data can be delayed up to ~15 minutes. Confirm the price in your broker app before trading. |
-| Want to check the code works | In the folder, run `python -m pytest tests -q`. It uses fake data and needs no internet. |
+| Want to check the code works | In the folder, run `python -m pytest tests -q`. Logic tests plus live tests against real market data. |
 
 ---
 
@@ -195,8 +211,11 @@ Neutral · ≤ −0.13 Defensive · ≤ −0.40 Protect Capital. Change these nu
 > Probability, Smart Money, Event Calendar, How to use).
 >
 > **Modules:**
-> - `compass/data.py`: data via yfinance (`history()`, `macro_snapshot()`, `sector_performance()`)
->   and NSE's `api/fiidiiTradeReact` (`fii_dii()`). Demo/synthetic data when `COMPASS_DEMO=1`.
+> - `compass/data.py`: live data via yfinance (`history()`, `macro_snapshot()`, `sector_performance()`)
+>   and NSE's `api/fiidiiTradeReact` (`fii_dii()`). No demo data.
+> - `compass/build_site.py`: builds `data.json` and `track.json` (the live forward-test record) for
+>   the installable web app in `web/`. Run by `.github/workflows/pages.yml` on a schedule and
+>   published at https://aditrikaushik.github.io/Guardian/market-compass/.
 > - `compass/scorecard.py`: 16 `Factor`s (8 auto-scored, 8 manual). Each scores −1/0/+1, `stance()`
 >   averages them, and `sector_tilts()` maps factors to sectors.
 > - `compass/stock_model.py`: hourly OHLCV, 15 no-look-ahead features (momentum, VWAP distance,
@@ -206,7 +225,7 @@ Neutral · ≤ −0.13 Defensive · ≤ −0.40 Protect Capital. Change these nu
 >   (AUC-based), with an optional ±3 pt macro blend.
 > - `compass/events.py`: recurring Indian and US data releases plus the user's `data/events.csv`.
 >
-> Tests: `python -m pytest tests -q` (synthetic data). Run locally with `streamlit run app.py`,
+> Tests: `python -m pytest tests -q` (logic tests + live tests on real data). Run locally with `streamlit run app.py`,
 > deployed on Streamlit Community Cloud with main file `market-compass/app.py`.
 >
 > Please keep the honesty rules: always show model trust and out-of-sample accuracy, and never
