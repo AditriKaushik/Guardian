@@ -104,6 +104,13 @@ themselves are close to real time (usually within a minute or two).
        high → buy Nifty at the close. Target +1%, stop −6%, 10 days.
      - **Real numbers:** chosen on 2008–16 data; 2017–26: 75 trades, **77.3% wins, +0.24%**.
      - **No index SELL rule passed:** all lost money on 2008–16 data.
+   - **⏱️ Intraday (MIS):** 1,584 intraday variants were tested: 800 BUY (opening-range
+     breakout, morning flush, gap-up, VWAP, relative strength) and 784 SELL (gap-down, gap-up
+     fade, opening-range breakdown, relative weakness, VWAP rejection, over-extension). They used
+     150 stocks and 2 years of hourly bars, at 0.06–0.10% costs. **None qualified**, so the app
+     gives no intraday calls and shows the evidence instead. The tab also lists the intraday rules:
+     shorting is allowed for any stock but must be squared off the same day, leverage is about 5×,
+     and auto square-off is around 3:15–3:20.
    - **Live record:** BUY and SELL picks are logged and checked against real prices separately.
    - **Timing:** the list is provisional while the market is open and final after 3:30 PM. The
      rule enters near the close (3:15–3:25 PM). On many days **no stock qualifies**; that is part
