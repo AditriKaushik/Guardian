@@ -45,6 +45,18 @@ themselves are close to real time (usually within a minute or two).
    - The result is a **stance for the day** (Aggressive Buy / Cautious Buy / Neutral / Defensive /
      Protect Capital) and the **sectors to favour or avoid**. Your choices and daily log are saved
      on your device.
+   - **🌍 Metals, energy & crypto** (also on the Compass tab):
+     - Live silver, copper, aluminium, WTI, natural gas, Bitcoin, Ethereum, US VIX and Nasdaq.
+     - **"How Nifty should open today"**: a forecast from the overnight S&P 500, the US dollar,
+       Bitcoin and Hang Seng's 7 AM open. It got the direction right on 72–75% of days in
+       2021–26 tests; the app shows the actual opening next to it.
+     - A **metal stocks tilt** from copper, aluminium and Hang Seng.
+     - A **cause → effect table** with ✅ / ⚠️ / ❌ verdicts from 10-year tests. Examples:
+       - Copper → metal stocks ✅ (small effect)
+       - Crude → ONGC ⚠️
+       - Gold → Titan ❌
+       - Natural gas → GAIL ❌
+       - Crypto: adds almost nothing beyond the US market
 2. **⭐ Daily picks:** stocks that pass **every** condition, with a **75%+ historical win rate**.
    Checks 150 stocks (Nifty 50 + Next 50 + Midcap 50) every refresh.
    - **Rule:** buy a strong stock (above its 200-day average, 50-day above 200-day) on a short dip
@@ -62,6 +74,11 @@ themselves are close to real time (usually within a minute or two).
      losses big (−6 to −8%). In 2018, 2019 and 2022 it won 75%+ of trades yet lost money overall,
      and in 2026 so far it is at 69%. The page shows all of this, plus a live record of every
      final pick.
+   - **Stress filters (added after testing):** a pick also needs Nifty lower than 5 trading days
+     ago, India VIX at or above 98% of its 20-day average, and the dip on normal volume (< 1.2× its
+     20-day average). On unseen 2021–26 data this raised the win rate from 79.7% to **83.8%** and
+     the average per trade from +0.22% to **+0.55%**, better in every year 2017–2026. Picks are
+     now rarer.
    - **Timing:** the list is provisional while the market is open and final after 3:30 PM. The
      rule enters near the close (3:15–3:25 PM). On many days **no stock qualifies**; that is part
      of the strategy.
@@ -157,6 +174,7 @@ market-compass/
 │   ├── scorecard.py          ← the 16 factors, scoring rules, stance, sector tilts
 │   ├── stock_model.py        ← the stock probability engine
 │   ├── events.py             ← recurring events + seasonal themes
+│   ├── crossasset.py         ← opening-gap forecast, metals tilt, tested cause → effect table
 │   ├── picks.py              ← Daily picks: rule, backtest, conditions, SEBI/NSE checks
 │   ├── universe.py           ← which stocks: all Nifty 50 + top performers (auto)
 │   └── stocks.py             ← stock list for the desktop version
@@ -299,3 +317,17 @@ sign in with GitHub and choose repo `AditriKaushik/Guardian`, branch `main`, mai
 >
 > **Please keep the honesty rules:** always show model trust, out-of-sample accuracy and the live
 > track record, and never promise returns.
+
+---
+
+## 9. What was tested (Nov 2026 studies) and what was adopted
+
+Four studies on 10 years of real data. Rules were chosen on data before Nov 2021 and judged only
+on Nov 2021–Nov 2026.
+
+| Study | Adopted | Rejected |
+|---|---|---|
+| Commodities → Indian stocks | Copper/aluminium → metal stocks (small intraday tilt) | Next-day or 5-day prediction from any commodity; gold → Titan; gas → GAIL/IGL; crude → OMCs/IndiGo |
+| Global, crypto, FX → Nifty | Opening-gap forecast (S&P 500, dollar, Hang Seng open, Bitcoin): 72–75% direction | Anything after the open (coin flip); crude, gold, USD/INR for Nifty |
+| Daily Picks filters | Nifty 5-day down + India VIX not falling + calm-dip volume: 83.8% win, +0.55%/trade | US VIX, DXY, USD/INR, crude, copper, BTC, S&P trend, breadth, sector trend, ATR caps |
+| Hourly model + global features | Nothing (no gain over chance) | 13 model/feature sets, including pooled and gradient-boosted |

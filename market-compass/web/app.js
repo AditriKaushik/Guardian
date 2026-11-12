@@ -297,6 +297,7 @@ function renderStocks() {
 
   el.innerHTML = `
     <h2>Odds a stock is higher in the next few hours</h2>
+    <div class="note warnbox"><b>Honest status:</b> next-few-hours direction is close to a coin flip. A Nov 2026 study tested 13 model and feature sets (overnight US markets, crypto, crude, metals, USD/INR, sector strength, breadth, pooled and boosted models) on 29 Nifty stocks. None beat chance on unseen data, and the live track record agrees. For decisions, use <b>⭐ Daily picks</b> (multi-day, tested) and the opening forecast on the Compass tab. Treat this page as context.</div>
     <div class="controls">
       <label>Stock<select id="symSel">${["Nifty 50", "Top performer", "Index"].map(g => {
         const ks = syms.filter(k => (S[k].group || "Nifty 50") === g).sort();
