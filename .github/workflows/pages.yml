@@ -79,7 +79,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
   keep-refreshing:
-    # Starts the next run after a pause: ~every 10 min in market hours, hourly otherwise, 3-hourly at weekends.
+    # Starts the next run after a pause: ~every 5 min in market hours, hourly otherwise, 3-hourly at weekends.
     needs: deploy
     if: always() && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -90,7 +90,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           hm=$(TZ=Asia/Kolkata date +%H%M); dow=$(TZ=Asia/Kolkata date +%u)
-          if (( dow <= 5 && 10#$hm >= 845 && 10#$hm <= 1545 )); then pause=420
+          if (( dow <= 5 && 10#$hm >= 845 && 10#$hm <= 1545 )); then pause=120
           elif (( dow <= 5 )); then pause=3000
           else pause=10800; fi
           newer() {  # number of newer runs of this workflow still queued or running

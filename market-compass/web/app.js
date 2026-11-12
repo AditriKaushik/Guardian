@@ -26,10 +26,16 @@ async function load() {
   }
   try { const r = await fetch("track.json?t=" + Date.now(), { cache: "no-store" }); TRACK = r.ok ? await r.json() : null; } catch { TRACK = null; }
   const age = Math.round((Date.now() - new Date(DATA.generated_at).getTime()) / 60000);
-  const stale = isMarketHoursNow() && age > 35;
+  const stale = isMarketHoursNow() && age > 15;
   $("#status").innerHTML = `${DATA.market_open ? "🟢" : "🔴"} ${esc(DATA.market_status)} · data updated ${age < 1 ? "just now" : age + " min ago"} (${esc(DATA.generated_at.slice(11, 16))} IST)` +
     (stale ? ` · <b style="color:#ffb4ab">⚠ refresh is running late, prices may be old</b>` : "");
   renderAll();
+}
+
+function timeOf(ts) {  // "2026-11-12 11:29" -> "11:29 IST" (adds the date if it isn't today)
+  if (!ts) return "n/a";
+  const d = String(ts).slice(0, 10), t = String(ts).slice(11, 16);
+  return (d === todayIST() ? "" : d.slice(8, 10) + "/" + d.slice(5, 7) + " ") + t + " IST";
 }
 
 function isMarketHoursNow() {
@@ -91,7 +97,8 @@ function renderCompass() {
     if (!r.ok) return `<div class="card tile"><div class="lbl">${esc(r.label)}</div><div class="val">n/a</div><div class="chg muted">no data</div></div>`;
     const sign = BAD_WHEN_UP.has(k) ? -1 : 1;
     return `<div class="card tile"><div class="lbl">${esc(r.label)}</div><div class="val">${fmt(r.last, k === "nifty" || k === "banknifty" ? 0 : 2)}</div>
-      <div class="chg"><span class="${cls(sign * r.chg1)}">${pct(r.chg1)} today</span> · <span class="${cls(sign * r.chg5)}">${pct(r.chg5)} 5d</span></div>
+      <div class="chg"><span class="${cls(sign * r.chg1)}">${pct(r.chg1)} today</span> · <span class="${cls(sign * r.chg5)}">${pct(r.chg5)} 5-day</span></div>
+      <div class="chg muted">price at ${esc(timeOf(r.asof))}</div>
       <div class="${cls(sign * r.chg5)}">${spark(r.spark)}</div></div>`;
   }).join("");
 
@@ -112,7 +119,8 @@ function renderCompass() {
 
   el.innerHTML = `
     <h2>World &amp; India right now</h2><div class="grid">${tiles}</div>
-    <p class="muted">Green/red show whether the move is good or bad for Indian stocks (a rising dollar, crude, yields or VIX is shown red).</p>
+    <p class="muted"><b>today</b> = change since the previous close · <b>5-day</b> = change over the last 5 trading days (आज का बदलाव · पिछले 5 दिन का बदलाव). Prices are refreshed about every 5 minutes in market hours; each tile shows the time of its latest price.
+    Green/red show whether the move is good or bad for Indian stocks (a rising dollar, crude, yields or VIX is shown red).</p>
     <div class="stance" style="background:${sn.color}"><div class="sm">Today's stance · score ${sn.total > 0 ? "+" : ""}${sn.total} of ±${sn.n}</div>
       <div class="big">${sn.name}</div><div>${esc(sn.action)}</div></div>
     <div class="grid2"><div class="card"><h3>Favoured sectors</h3><table>${tiltRows(tilts.filter(t => t[1].v > 0))}</table></div>
@@ -202,7 +210,7 @@ function renderStocks() {
       <label style="flex-direction:row;align-items:center;gap:6px"><input id="blend" type="checkbox" ${sel.blend ? "checked" : ""}> Blend in today's Compass stance (±3 pts max)</label>
     </div>
     <div class="stance" style="background:${a.color}">
-      <div class="sm">${esc(sel.sym)} · ₹${fmt(s.last)} (${s.day_chg == null ? "n/a" : pct(s.day_chg)} today) at ${esc(s.last_time)} IST · ${H[sel.h]}${s.group === "Top performer" ? " · ⭐ top performer: " + esc(s.why) : ""}</div>
+      <div class="sm">${esc(sel.sym)} · ₹${fmt(s.last)} (${s.day_chg == null ? "n/a" : pct(s.day_chg)} today) · price at ${esc(timeOf(s.quote_time || s.last_time))} · ${H[sel.h]}${s.group === "Top performer" ? " · ⭐ top performer: " + esc(s.why) : ""}</div>
       <div class="big">${(a.pu * 100).toFixed(0)}% chance UP · ${(100 - a.pu * 100).toFixed(0)}% DOWN</div><div>${esc(a.verdict)}</div></div>
     ${!p.fits_today ? `<div class="note warnbox">${DATA.market_open ? "Not enough trading time left today for this horizon." : "Market is closed: this reads the last candle."} The overnight / next-morning gap is NOT predicted.</div>` : ""}
     <div class="grid">
@@ -329,7 +337,7 @@ function renderGuide() {
     <li>For intraday moves, <b>52–58% accuracy is normal even for professionals</b>. Anyone promising 80% is mistaken or selling something.</li>
     <li>The <b>Live track record</b> tab is the real report card: predictions checked against what actually happened.</li>
     <li>Nobody can predict sudden shocks (a war announcement, a policy surprise). Stop-losses are your protection.</li></ul></div>
-  <div class="card" style="margin-top:10px"><h3>Data &amp; updates</h3><p>Prices: Yahoo Finance (hourly candles, ~2 years per stock). FII/DII: NSE. A GitHub Actions job rebuilds everything from real data about every 15 minutes in market hours, plus before the open and after NSE publishes FII data. Full handover guide:
+  <div class="card" style="margin-top:10px"><h3>Data &amp; updates</h3><p>Prices: Yahoo Finance (hourly candles, ~2 years per stock). FII/DII: NSE. A GitHub Actions job rebuilds everything from real data about every 5 minutes in market hours and hourly at other times (latest prices from 1-minute data). Full handover guide:
     <a href="https://github.com/AditriKaushik/Guardian/blob/main/market-compass/HANDOVER.md" target="_blank" rel="noopener">HANDOVER.md</a>.</p>
     <p class="muted">Educational tool, not investment advice. Version ${esc(DATA.version)}.</p></div>`;
 }
@@ -352,5 +360,5 @@ $("#installBtn").onclick = async () => { if (!deferred) return; deferred.prompt(
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
 load();
-setInterval(load, 5 * 60 * 1000);
+setInterval(load, 60 * 1000);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });

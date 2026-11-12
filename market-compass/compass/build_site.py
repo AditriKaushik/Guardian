@@ -49,6 +49,27 @@ def _history_retry(symbol, period, interval, tries=3):
     return df
 
 
+def live_quotes(yahoo_symbols: list[str]) -> dict:
+    """Latest 1-minute price and its time (IST) for each symbol, in one batch request. {} on failure."""
+    import yfinance as yf
+
+    out = {}
+    try:
+        px = yf.download(yahoo_symbols, period="5d", interval="1m", progress=False, threads=True,
+                         auto_adjust=False, group_by="column")["Close"]
+    except Exception:
+        return out
+    if isinstance(px, pd.Series):
+        px = px.to_frame(yahoo_symbols[0])
+    for col in px.columns:
+        c = px[col].dropna()
+        if len(c):
+            ts = c.index[-1]
+            ts = ts.tz_convert(D.IST) if ts.tzinfo else ts.tz_localize("UTC").tz_convert(D.IST)
+            out[str(col)] = (float(c.iloc[-1]), ts.strftime("%Y-%m-%d %H:%M"))
+    return out
+
+
 def _pred_dict(p: M.Prediction) -> dict:
     return {
         "p_up": _num(p.p_up), "p_raw": _num(p.p_model_raw), "base": _num(p.base_rate),
@@ -114,6 +135,15 @@ def build_stocks(universe: dict, now: datetime, is_open: bool) -> tuple[dict, di
             },
         }
         time.sleep(0.2)
+    quotes = live_quotes([v["yahoo"] for v in out.values()])
+    for sym, rec in out.items():
+        q = quotes.get(rec["yahoo"])
+        if q and q[1] >= rec["last_time"]:
+            rec["last"], rec["quote_time"] = _num(q[0], 2), q[1]
+            if rec["prev_close"]:
+                rec["day_chg"] = _num(q[0] / rec["prev_close"] - 1, 5)
+        else:
+            rec["quote_time"] = rec["last_time"]
     return out, frames, failed
 
 
@@ -211,6 +241,11 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
     macro = {k: {kk: (_num(vv, 4) if isinstance(vv, float) else vv) for kk, vv in v.items() if kk != "series"}
              | ({"spark": [_num(x, 4) for x in v["series"].tail(30)]} if v.get("ok") else {})
              for k, v in snap.items()}
+    mq = live_quotes([v["ticker"] for v in snap.values() if v.get("ok")])
+    for k, v in macro.items():
+        q = mq.get(v.get("ticker"))
+        if v.get("ok") and q:
+            v["asof"] = q[1]
     factors = []
     for f in S.FACTORS:
         a, reason = S.auto_score(f.key, snap, fii) if f.auto else (None, "")
