@@ -23,7 +23,8 @@ from . import data as D
 from . import events as E
 from . import scorecard as S
 from . import stock_model as M
-from .stocks import INDICES, STOCKS, to_yahoo
+from .stocks import to_yahoo
+from .universe import build_universe
 
 HORIZONS = [1, 2, 3, "close"]
 KEEP_DAYS = 20
@@ -67,11 +68,10 @@ def _bars_left_today(last_bar: pd.Timestamp, now: datetime, is_open: bool) -> in
     return int((close_bar - last_bar) / pd.Timedelta(hours=1))
 
 
-def build_stocks(now: datetime, is_open: bool) -> tuple[dict, dict, list]:
+def build_stocks(universe: dict, now: datetime, is_open: bool) -> tuple[dict, dict, list]:
     idx = _history_retry("^NSEI", "730d", "60m")
     out, frames, failed = {}, {}, []
-    universe = {**{k: v for k, v in STOCKS.items()}, **{s: n for s, n in INDICES.items()}}
-    for sym, sector in universe.items():
+    for sym, info in universe.items():
         ysym = to_yahoo(sym)
         df = _history_retry(ysym, "730d", "60m")
         if df.empty or len(df) < 300:
@@ -80,26 +80,32 @@ def build_stocks(now: datetime, is_open: bool) -> tuple[dict, dict, list]:
         frames[sym] = df
         last_bar = df.index[-1]
         left = _bars_left_today(last_bar, now, is_open)
-        preds = {}
+        preds, p2 = {}, None
         for h in HORIZONS:
             p = M.predict(df, None if ysym == "^NSEI" else idx, h)
             if not p.ok:
                 continue
+            if h == 2:
+                p2 = p
             d = _pred_dict(p)
             d["fits_today"] = (h == "close" and is_open) or (isinstance(h, int) and h <= left)
             preds[str(h)] = d
         if not preds:
             failed.append(sym)
             continue
-        any_p = M.predict(df, None if ysym == "^NSEI" else idx, 2)
+        p2 = p2 or M.predict(df, None if ysym == "^NSEI" else idx, 1)
+        earlier = df["Close"][df.index.date < last_bar.date()]
+        prev_close = float(earlier.iloc[-1]) if len(earlier) else None
+        last = float(df["Close"].iloc[-1])
         tail = df.tail(75)
         out[sym] = {
-            "name": INDICES.get(sym, sym), "sector": sector, "yahoo": ysym,
-            "last": _num(df["Close"].iloc[-1], 2), "last_time": str(last_bar)[:16],
-            "prev_close": _num(df["Close"][df.index.date < last_bar.date()].iloc[-1], 2)
-            if (df.index.date < last_bar.date()).any() else None,
-            "atr": _num(any_p.atr, 2),
-            "signals": [[t, s] for t, s in any_p.signals],
+            "name": info.get("name", sym), "sector": info.get("sector", ""), "group": info.get("group", ""),
+            "why": info.get("why", ""), "yahoo": ysym,
+            "last": _num(last, 2), "last_time": str(last_bar)[:16],
+            "prev_close": _num(prev_close, 2),
+            "day_chg": _num(last / prev_close - 1, 5) if prev_close else None,
+            "atr": _num(p2.atr, 2),
+            "signals": [[t, s] for t, s in p2.signals],
             "preds": preds,
             "candles": {
                 "t": [x.strftime("%d %b %H:%M") for x in tail.index],
@@ -107,7 +113,7 @@ def build_stocks(now: datetime, is_open: bool) -> tuple[dict, dict, list]:
                 "l": [_num(v, 2) for v in tail["Low"]], "c": [_num(v, 2) for v in tail["Close"]],
             },
         }
-        time.sleep(0.3)
+        time.sleep(0.2)
     return out, frames, failed
 
 
@@ -196,6 +202,11 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
     now = D.now_ist()
     is_open, status = D.market_status(now)
     snap = D.macro_snapshot()
+    if is_open:
+        nifty_now = D.history("^NSEI", "5d", "60m")
+        if nifty_now.empty or pd.Timestamp(now) - nifty_now.index[-1] > pd.Timedelta(minutes=80):
+            is_open, status = False, "Market closed today (NSE holiday or no trading data yet)."
+    uni = build_universe()
     fii = D.fii_dii()
     macro = {k: {kk: (_num(vv, 4) if isinstance(vv, float) else vv) for kk, vv in v.items() if kk != "series"}
              | ({"spark": [_num(x, 4) for x in v["series"].tail(30)]} if v.get("ok") else {})
@@ -206,7 +217,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         factors.append({"key": f.key, "name": f.name, "auto": f.auto, "good": f.good, "bad": f.bad,
                         "where": f.where, "sectors": f.sectors, "auto_score": a, "reason": reason})
     sectors = D.sector_performance()
-    stocks, frames, failed = build_stocks(now, is_open)
+    stocks, frames, failed = build_stocks(uni["stocks"], now, is_open)
     today = now.date()
     cal = E.upcoming(today, 90)
     cal["date"] = cal["date"].astype(str)
@@ -220,6 +231,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "macro": macro, "factors": factors, "fii": fii,
         "sectors": sectors.round(2).to_dict(orient="records") if not sectors.empty else [],
         "stocks": stocks, "failed": failed,
+        "universe": {k: v for k, v in uni.items() if k != "stocks"},
         "calendar": cal.to_dict(orient="records"), "seasonal": E.SEASONAL[today.month],
         "track_summary": track["totals"],
     }
@@ -238,7 +250,7 @@ def main(argv=None):
     n = len(p["stocks"])
     print(f"Built {n} stocks ({len(p['failed'])} failed: {p['failed']}) at {p['generated_at']}; "
           f"market open={p['market_open']}; live track: {p['track_summary'].get('all', {})}")
-    if n < 10:
+    if n < 40:
         print("Too few stocks built: data source problem", file=sys.stderr)
         sys.exit(1)
 

@@ -93,3 +93,9 @@ def test_track_record_resolves_against_prices():
     assert r["exit"] == round(float(df.loc[target, "Close"]), 2)
     assert r["up"] == int(df.loc[target, "Close"] > rec["price"])
     assert out["totals"]["all"]["n"] == 1
+
+
+def test_builtin_nifty50_fallback_has_50():
+    from compass.universe import NIFTY50_FALLBACK
+
+    assert len(NIFTY50_FALLBACK) == 50

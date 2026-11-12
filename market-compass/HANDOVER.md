@@ -14,18 +14,20 @@ It works on any phone, tablet or computer, and you can install it as an app:
 You don't need Claude, a computer that stays on, or any login. Everything runs on GitHub's free
 service.
 
-**All data is real and live:** Yahoo Finance for prices, NSE for FII/DII flows. There is no demo
-or sample data. GitHub Actions rebuilds the data automatically:
+**All data is real and live:** Yahoo Finance for prices, NSE for FII/DII flows and the official
+index lists. There is no demo or sample data. GitHub Actions rebuilds everything in a
+**self-refreshing loop**: each run starts the next one itself.
 
-| When (IST) | What updates |
+| When (IST) | How often |
 |---|---|
-| Every 15 min, ~8:30 AM–4:15 PM, Mon–Fri | Prices, stock probabilities, live track record |
-| 7:30 AM, Mon–Fri | Pre-market refresh (overnight US and Asia moves) |
-| 7:15 PM, Mon–Fri | The day's FII/DII figures from NSE |
-| Saturday and Sunday mornings | Global markets and calendar |
+| Mon–Fri, 8:45 AM–3:45 PM (market hours) | About every 10 minutes |
+| Mon–Fri, other times | About every hour (catches the evening FII/DII data and the pre-market moves) |
+| Saturday and Sunday | About every 3 hours |
 
-GitHub's scheduler sometimes runs 5–30 minutes late. The top of the app always shows
-"data updated … min ago".
+GitHub's own timer (cron) is unreliable, so it is only a backup that restarts the loop if it ever
+stops. The top of the app shows "data updated … min ago". During market hours it warns
+**⚠ refresh is running late** if the data is more than 35 minutes old. Yahoo's free prices
+themselves can lag the exchange by up to ~15 minutes.
 
 > ⚠️ Educational tool, not investment advice. No tool can guarantee profits. Always use a
 > stop-loss and never risk money you can't afford to lose.
@@ -43,7 +45,11 @@ GitHub's scheduler sometimes runs 5–30 minutes late. The top of the app always
    - The result is a **stance for the day** (Aggressive Buy / Cautious Buy / Neutral / Defensive /
      Protect Capital) and the **sectors to favour or avoid**. Your choices and daily log are saved
      on your device.
-2. **📈 Stocks:** about 50 popular NSE stocks plus Nifty and Bank Nifty. Pick a stock, a horizon
+2. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
+   refresh, so index changes appear automatically) plus **20 ⭐ top performers** picked fresh
+   from Nifty Next 50 and Nifty Midcap 50 by 3-month return (each must also be up over 1 month).
+   Nifty and Bank Nifty are included too. A **Today's movers** table shows the live top gainers
+   and losers. Pick a stock, a horizon
    (1, 2 or 3 hours, or till close) and your amount in ₹. You get:
    - the **% chance up or down**;
    - **model trust** (how much to believe that %) and its accuracy on unseen history;
@@ -129,7 +135,8 @@ market-compass/
 │   ├── scorecard.py          ← the 16 factors, scoring rules, stance, sector tilts
 │   ├── stock_model.py        ← the stock probability engine
 │   ├── events.py             ← recurring events + seasonal themes
-│   └── stocks.py             ← the stock list (add stocks here)
+│   ├── universe.py           ← which stocks: all Nifty 50 + top performers (auto)
+│   └── stocks.py             ← stock list for the desktop version
 ├── data/events.csv           ← shared events shown on everyone's calendar (edit on GitHub)
 ├── app.py                    ← optional desktop version (any NSE stock on demand)
 ├── Start Market Compass.bat  ← Windows launcher for the desktop version
@@ -151,16 +158,18 @@ Published files: `…/market-compass/data.json` (all live data) and `…/market-
 Open the file on github.com → click the ✏️ pencil → edit → **Commit changes** to `main`. The
 app republishes itself within a few minutes.
 
-- **Add a stock:** edit `market-compass/compass/stocks.py` and add a line such as
-  `"IRCTC": "Railways / PSU",`. Use the NSE symbol exactly as NSE writes it.
+- **Stock list:** updates itself (see `market-compass/compass/universe.py`). To change how many
+  top performers are added, edit `build_universe(n_top=20)`. If NSE's list ever can't be
+  downloaded, a built-in Nifty 50 list (`NIFTY50_FALLBACK`) is used; update it when NSE changes
+  the index (usually March and September).
 - **Add events everyone sees:** edit `market-compass/data/events.csv`. One line per event:
   `2026-12-05,RBI policy decision,India policy,High - banks,`
   Add RBI MPC dates (rbi.org.in), US Fed FOMC dates (federalreserve.gov) and results dates (NSE
   announcements). The starter rows marked "verify" should be checked against the official source.
   Events you add inside the app are saved on that device only.
 - **Change scoring thresholds:** `market-compass/compass/scorecard.py`.
-- **Change the refresh schedule:** the `cron` lines in `.github/workflows/pages.yml` (times are
-  UTC; IST = UTC + 5:30).
+- **Change the refresh speed:** the `pause=` values (in seconds) in the `keep-refreshing` job of
+  `.github/workflows/pages.yml`.
 - **Force a refresh now:** github.com → repo → **Actions** → **Deploy web app** → **Run workflow**.
 - **Nifty expiry day:** the calendar assumes **Tuesday** (NSE's expiry day at the time of
   writing). If NSE changes it, edit `recurring_events` in `compass/events.py`.
@@ -180,14 +189,14 @@ app republishes itself within a few minutes.
   The new link becomes `https://<new-owner>.github.io/<repo-name>/market-compass/`. Also update
   the HANDOVER link in `web/app.js`.
 
-- **Note:** GitHub pauses scheduled jobs in a repo with no activity for 60 days. If the "data
-  updated" time stops moving, open Actions and click **Enable workflow**, or make any small commit.
+- **If the refresh ever stops** (for example after a GitHub outage), go to github.com → Actions →
+  **Deploy web app** → **Run workflow**. One click restarts the loop.
 
 ---
 
 ## 6. Optional: desktop version (any NSE stock on demand)
 
-The link covers about 50 stocks. To analyse **any** NSE symbol live:
+The link covers Nifty 50 plus 20 top performers. To analyse **any** NSE symbol live:
 
 1. Download the repo: github.com → **Code → Download ZIP**, then unzip it.
 2. Install **Python 3.10+** from <https://www.python.org/downloads/>. Tick **"Add Python to PATH"**.
@@ -212,9 +221,9 @@ sign in with GitHub and choose repo `AditriKaushik/Guardian`, branch `main`, mai
 | Problem | Fix |
 |---|---|
 | "Could not load live data" | Check your internet and reopen. If it continues, check github.com → Actions for a failed **Deploy web app** run. |
-| "Data updated" is hours old in market hours | GitHub may be delayed, or scheduled jobs were paused (see section 5). Run the workflow by hand from Actions. |
+| "⚠ refresh is running late" | Open github.com → Actions → **Deploy web app** → **Run workflow**. This restarts the refresh loop. |
 | FII/DII missing | NSE sometimes blocks the request. Use the NSE link on the Smart money tab and set the FII factor by hand. |
-| A stock is missing | Add it to `compass/stocks.py` (section 4), or use the desktop version. |
+| A stock is missing | The web app covers Nifty 50 + 20 top performers. For any other NSE stock, use the desktop version (section 6). |
 | Install button not shown | Use the browser menu → **Install app** / **Add to Home Screen**. iPhone needs Safari. |
 | Prices look a bit late | Free Yahoo data can lag ~15 minutes. Confirm in your broker app before trading. |
 | Check the code works | In `market-compass/`, run `python -m pytest tests -q` (needs internet for the live tests). |
@@ -228,8 +237,9 @@ sign in with GitHub and choose repo `AditriKaushik/Guardian`, branch `main`, mai
 > installable PWA at https://aditrikaushik.github.io/Guardian/market-compass/.
 >
 > **How it works:**
-> - `.github/workflows/pages.yml` runs on a schedule (every 15 min in IST market hours, plus
->   pre-open, after NSE FII data, and weekends).
+> - `.github/workflows/pages.yml` keeps itself running: its `keep-refreshing` job sleeps, then
+>   dispatches the next run (~10 min in market hours, hourly off-hours, 3-hourly at weekends;
+>   older loops stop if a newer run exists). Cron entries are only a backup.
 > - It runs `python -m compass.build_site ../_mc_data --previous-track <live track.json URL>`,
 >   then publishes `web/` (the repo's other app) at `/` and `market-compass/web/` plus the built
 >   `data.json` and `track.json` at `/market-compass/`. If the build fails, the previous JSON is
@@ -247,7 +257,9 @@ sign in with GitHub and choose repo `AditriKaushik/Guardian`, branch `main`, mai
 >     all data.
 >   - P(up) is shrunk toward the base rate by a reliability score: AUC-based, and capped at 0.3
 >     unless test accuracy beats always-guess.
-> - `compass/build_site.py`: about 52 symbols × 4 horizons, plus the live forward-test log
+> - `compass/universe.py`: all Nifty 50 (NSE's official CSV, with a built-in fallback) + top 20
+>   by 3-month return from Nifty Next 50 / Midcap 50, plus the two indices.
+> - `compass/build_site.py`: about 72 symbols × 4 horizons, plus the live forward-test log
 >   (`update_track`). Predictions are logged once per stock/horizon/bar in market hours and
 >   resolved against the target bar's real close. Records are kept for 20 days.
 > - `web/app.js`: vanilla JS front end. User judgement scores, the daily log and personal events

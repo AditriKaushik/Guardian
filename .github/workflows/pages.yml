@@ -1,6 +1,8 @@
 name: Deploy web app
 
 # Publishes two apps on GitHub Pages:
+# Live refresh: each run starts the next one itself (job "keep-refreshing" below), because GitHub's
+# cron schedule is unreliable. The cron lines are only a backup to restart the loop if it ever stops.
 #   /            -> the web/ app (unchanged)
 #   /market-compass/ -> Market Compass, rebuilt from LIVE market data on the schedule below
 on:
@@ -22,15 +24,15 @@ permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  actions: write   # lets each run start the next one (self-refreshing loop below)
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    timeout-minutes: 30
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -75,3 +77,27 @@ jobs:
           path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  keep-refreshing:
+    # Starts the next run after a pause: ~every 10 min in market hours, hourly otherwise, 3-hourly at weekends.
+    needs: deploy
+    if: always() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 200
+    steps:
+      - name: Wait, then start the next refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          hm=$(TZ=Asia/Kolkata date +%H%M); dow=$(TZ=Asia/Kolkata date +%u)
+          if (( dow <= 5 && 10#$hm >= 845 && 10#$hm <= 1545 )); then pause=420
+          elif (( dow <= 5 )); then pause=3000
+          else pause=10800; fi
+          newer() {  # number of newer runs of this workflow still queued or running
+            gh run list -R "$GITHUB_REPOSITORY" --workflow pages.yml --limit 30 --json databaseId,status \
+              --jq "[.[] | select(.status != \"completed\" and .databaseId > $GITHUB_RUN_ID)] | length"
+          }
+          echo "IST $hm (day $dow): next refresh in $((pause/60)) min"
+          sleep $pause
+          if [ "$(newer)" -gt 0 ]; then echo "A newer run is already refreshing; this loop stops here."; exit 0; fi
+          gh workflow run pages.yml --ref main -R "$GITHUB_REPOSITORY"
