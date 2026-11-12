@@ -39,3 +39,13 @@ def test_real_stock_prediction():
     p = M.predict(df, idx, 2)
     assert p.ok and 0.05 <= p.p_up <= 0.95
     assert abs(p.last_price / float(df["Close"].iloc[-1]) - 1) < 1e-9
+
+
+def test_universe_has_full_nifty50_and_top_performers():
+    from compass.universe import build_universe
+
+    u = build_universe()
+    groups = [v["group"] for v in u["stocks"].values()]
+    assert groups.count("Nifty 50") == 50
+    assert groups.count("Top performer") >= 5
+    assert "^NSEI" in u["stocks"]

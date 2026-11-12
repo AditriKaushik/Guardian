@@ -1,5 +1,5 @@
-// Market Compass service worker: app shell works offline; live data is always fetched fresh first.
-const CACHE = "market-compass-v1";
+// Market Compass service worker: network first for everything (live data), cached copy only when offline.
+const CACHE = "market-compass-v2";
 const SHELL = ["./", "index.html", "app.js", "style.css", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener("activate", e => {
@@ -9,14 +9,10 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;
-  const live = url.pathname.endsWith(".json");
-  if (live) {  // network first, cached copy only if offline
-    e.respondWith(fetch(e.request).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put(url.pathname, cp)); return r; })
-      .catch(() => caches.match(url.pathname)));
-  } else {     // shell: cache first, refresh in background
-    e.respondWith(caches.match(e.request).then(hit => {
-      const net = fetch(e.request).then(r => { const cp = r.clone(); caches.open(CACHE).then(c => c.put(e.request, cp)); return r; }).catch(() => hit);
-      return hit || net;
-    }));
-  }
+  // Always try the network first so prices and app updates show immediately; use the cache only when offline.
+  const key = url.pathname.endsWith(".json") ? url.pathname : e.request;
+  e.respondWith(fetch(e.request).then(r => {
+    if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(key, cp)); }
+    return r;
+  }).catch(() => caches.match(key)));
 });

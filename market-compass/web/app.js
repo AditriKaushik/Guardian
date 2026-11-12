@@ -26,8 +26,15 @@ async function load() {
   }
   try { const r = await fetch("track.json?t=" + Date.now(), { cache: "no-store" }); TRACK = r.ok ? await r.json() : null; } catch { TRACK = null; }
   const age = Math.round((Date.now() - new Date(DATA.generated_at).getTime()) / 60000);
-  $("#status").innerHTML = `${DATA.market_open ? "🟢" : "🔴"} ${esc(DATA.market_status)} · data updated ${age < 1 ? "just now" : age + " min ago"} (${esc(DATA.generated_at.slice(11, 16))} IST)`;
+  const stale = isMarketHoursNow() && age > 35;
+  $("#status").innerHTML = `${DATA.market_open ? "🟢" : "🔴"} ${esc(DATA.market_status)} · data updated ${age < 1 ? "just now" : age + " min ago"} (${esc(DATA.generated_at.slice(11, 16))} IST)` +
+    (stale ? ` · <b style="color:#ffb4ab">⚠ refresh is running late, prices may be old</b>` : "");
   renderAll();
+}
+
+function isMarketHoursNow() {
+  const t = new Date(Date.now() + 5.5 * 3600e3), d = t.getUTCDay(), m = t.getUTCHours() * 60 + t.getUTCMinutes();
+  return d >= 1 && d <= 5 && m >= 9 * 60 + 15 && m <= 15 * 60 + 30;
 }
 
 function renderAll() { renderCompass(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
@@ -185,13 +192,17 @@ function renderStocks() {
   el.innerHTML = `
     <h2>Odds a stock is higher in the next few hours</h2>
     <div class="controls">
-      <label>Stock<select id="symSel">${syms.map(k => `<option value="${esc(k)}" ${k === sel.sym ? "selected" : ""}>${esc(k)} · ${esc(S[k].sector)}</option>`).join("")}</select></label>
+      <label>Stock<select id="symSel">${["Nifty 50", "Top performer", "Index"].map(g => {
+        const ks = syms.filter(k => (S[k].group || "Nifty 50") === g).sort();
+        return ks.length ? `<optgroup label="${g === "Top performer" ? "Top performers (Next 50 / Midcap)" : g === "Index" ? "Indices" : "Nifty 50 (all " + ks.length + ")"}">${ks.map(k =>
+          `<option value="${esc(k)}" ${k === sel.sym ? "selected" : ""}>${esc(S[k].name !== k ? S[k].name : k)} · ${S[k].day_chg == null ? "" : pct(S[k].day_chg)} · ${esc(S[k].sector)}</option>`).join("")}</optgroup>` : "";
+      }).join("")}</select></label>
       <label>Horizon<select id="hSel">${Object.entries(H).map(([k, v]) => `<option value="${k}" ${k === sel.h ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       <label>Amount (₹)<input id="amt" type="number" min="100" step="500" value="${sel.amt}" style="width:120px"></label>
       <label style="flex-direction:row;align-items:center;gap:6px"><input id="blend" type="checkbox" ${sel.blend ? "checked" : ""}> Blend in today's Compass stance (±3 pts max)</label>
     </div>
     <div class="stance" style="background:${a.color}">
-      <div class="sm">${esc(sel.sym)} · last ₹${fmt(s.last)} at ${esc(s.last_time)} IST · ${H[sel.h]}</div>
+      <div class="sm">${esc(sel.sym)} · ₹${fmt(s.last)} (${s.day_chg == null ? "n/a" : pct(s.day_chg)} today) at ${esc(s.last_time)} IST · ${H[sel.h]}${s.group === "Top performer" ? " · ⭐ top performer: " + esc(s.why) : ""}</div>
       <div class="big">${(a.pu * 100).toFixed(0)}% chance UP · ${(100 - a.pu * 100).toFixed(0)}% DOWN</div><div>${esc(a.verdict)}</div></div>
     ${!p.fits_today ? `<div class="note warnbox">${DATA.market_open ? "Not enough trading time left today for this horizon." : "Market is closed: this reads the last candle."} The overnight / next-morning gap is NOT predicted.</div>` : ""}
     <div class="grid">
@@ -216,11 +227,17 @@ function renderStocks() {
         <h3>Biggest drivers of the number</h3><ul class="list">${p.drivers.map(([n, v]) => `<li>${v > 0 ? "⬆️" : "⬇️"} ${esc(n)} (${v > 0 ? "+" : ""}${v})</li>`).join("")}</ul></div>
     </div>
     <div class="card" style="margin-top:10px"><h3>Last ~10 trading days, hourly, with Bollinger Bands</h3>${stockChart(s.candles)}</div>
+    <h2>Today's movers (live)</h2>
+    <div class="grid2">${[["Top gainers", 1], ["Top losers", -1]].map(([t, dir]) => {
+      const list = syms.filter(k => S[k].group !== "Index" && S[k].day_chg != null).sort((a, b) => dir * (S[b].day_chg - S[a].day_chg)).slice(0, 8);
+      return `<div class="card tablewrap"><h3>${t}</h3><table>${list.map(k => `<tr class="clickrow" data-sym="${esc(k)}"><td><b>${esc(k)}</b> <span class="muted">${S[k].group === "Top performer" ? "⭐ " : ""}${esc(S[k].sector)}</span></td><td class="num">₹${fmt(S[k].last)}</td><td class="num ${cls(S[k].day_chg)}">${pct(S[k].day_chg)}</td></tr>`).join("")}</table></div>`;
+    }).join("")}</div>
+    <p class="muted">Coverage: all ${DATA.universe ? DATA.universe.n_nifty : ""} Nifty 50 stocks (${DATA.universe ? esc(DATA.universe.nifty_source) : ""}) + ${DATA.universe ? DATA.universe.n_top : ""} ⭐ top performers picked fresh from Nifty Next 50 &amp; Midcap 50 by 3-month return.</p>
     <h2>Stocks where the model has proven some skill (${H[sel.h]})</h2>
     <p class="muted">Only stocks whose model beat chance on unseen history are listed, ranked by chance of going up. Tap a row to open it. Most stocks will not qualify on most days, and that is the honest result.</p>
     <div class="card tablewrap"><table><tr><th>Stock</th><th class="num">Chance up</th><th class="num">Trust</th><th class="num">Edge vs guess</th></tr>${ranked.map(rankRow).join("") || `<tr><td colspan=4 class="muted">No stock qualifies for this horizon right now.</td></tr>`}</table></div>
     <p class="muted">Model details: trained on ~${p.n_train.toLocaleString()} hourly samples, tested on ${p.n_test.toLocaleString()} unseen ones · AUC ${p.auc} (0.5 = coin flip) · raw model output ${(p.p_raw * 100).toFixed(1)}%.
-    Want a stock that isn't listed? Add it to <code>market-compass/compass/stocks.py</code> on GitHub; it appears after the next refresh.</p>`;
+    The list updates itself: Nifty 50 from NSE's official list, top performers re-ranked on every refresh.</p>`;
   const save = () => store.set("mc_stock", sel);
   $("#symSel").onchange = e => { sel.sym = e.target.value; save(); renderStocks(); };
   $("#hSel").onchange = e => { sel.h = e.target.value; save(); renderStocks(); };
