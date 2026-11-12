@@ -252,6 +252,25 @@ function renderHistory() {
 }
 
 
+
+function intradaySection(P) {
+  const X = P.intraday;
+  if (!X) return "";
+  const tbl = (rows) => `<table><tr><th>Setup</th><th>Design period: win / avg</th><th>Test period: win / avg</th></tr>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("")}</table>`;
+  return `<h2>⏱️ Intraday (same-day, MIS): BUY &amp; SELL</h2>
+    <div class="note warnbox"><b>No intraday BUY or SELL setup passed the 75%+ test, so the app gives no intraday calls.</b> ${X.buy.variants + X.sell.variants} intraday variants were tested on 150 stocks (${esc(X.period)}; cost ${esc(X.cost)}).
+      The only intraday "75%+" results came from a tiny target with a wide stop (e.g. +0.5% / −3%). Those win often but still <b>lose money</b> after costs. The few variants that crossed 75% in the test period had lost money in the design period, which is what chance would produce.<br>
+      <b>हिंदी:</b> इंट्राडे (उसी दिन ख़रीद-बिक्री) में ख़रीद या बिक्री, किसी का भी 75%+ जीत वाला भरोसेमंद नियम नहीं मिला, इसलिए ऐप इंट्राडे सुझाव नहीं देता। छोटे टारगेट और बड़े स्टॉप से जीत ज़्यादा दिखती है, पर ख़र्च के बाद नुकसान होता है।</div>
+    <div class="grid2"><div class="card tablewrap"><h3>Intraday BUY: ${X.buy.variants} variants, ${X.buy.qualified} qualified</h3>${tbl(X.buy.rows)}</div>
+      <div class="card tablewrap"><h3>Intraday SELL: ${X.sell.variants} variants, ${X.sell.qualified} qualified</h3>${tbl(X.sell.rows)}</div></div>
+    <div class="card" style="margin-top:10px"><h3>If you still trade intraday: the rules</h3><ul class="list">
+      <li><b>Intraday short selling</b> is allowed in the cash market for <b>any</b> stock (not only F&amp;O), but it must be squared off the same day. Brokers auto square-off around 3:15–3:20 PM. A short that can't be covered goes to the exchange auction, which can cost up to 20% above the close.</li>
+      <li><b>Leverage</b>: SEBI's peak-margin rules cap intraday leverage at about 5× (20% margin). Leverage multiplies losses as much as gains.</li>
+      <li><b>Costs</b>: roughly 0.06% per round trip, plus slippage. In tests, these stocks on average drifted slightly <b>down</b> from open to close after costs, so blind intraday buying starts at a disadvantage.</li>
+      <li>The <b>multi-day</b> SELL rule above does <b>not</b> work as a same-day trade: covered at the close, it lost money in the design period.</li>
+      <li>Use ⭐ BUY picks (multi-day, delivery), the 🔴 SELL rule (multi-day, F&amp;O) and the 📈 Nifty signal. Those are the tested ones.</li></ul></div>`;
+}
+
 function indexSection(P) {
   const I = P.index;
   if (!I || I.error) return "";
@@ -338,6 +357,7 @@ function renderPicks() {
     ${P.blocked.length ? `<h3>Signal, but blocked by a condition</h3><div class="card tablewrap"><table><tr><th>Stock</th><th>Industry</th><th>Blocked by</th></tr>${P.blocked.map(b => `<tr><td><b>${esc(b.sym)}</b></td><td class="muted">${esc(b.industry)}</td><td>${b.blocked_by.map(esc).join("; ")}</td></tr>`).join("")}</table></div>` : ""}
     ${indexSection(P)}
     ${sellSection(P, cap)}
+    ${intradaySection(P)}
     <h2>How honest is "75%+"? The real numbers (BUY rule)</h2>
     <div class="grid">
       <div class="card tile"><div class="lbl">Win rate, last 5 years</div><div class="val">${pc(S.recent5y.win)}</div><div class="chg muted">${S.recent5y.n.toLocaleString()} real trades, after costs</div></div>

@@ -45,6 +45,28 @@ MAX_SELL, MAX_SELL_PER_INDUSTRY = 3, 1
 # India VIX closes above its prior 20-day high -> buy Nifty at the close; +1% target, -6% stop, 10 days.
 # Test 2017..2026: 75 trades, 77.3% wins, +0.24% avg. No index SELL rule qualified.
 IX_TARGET, IX_STOP, IX_DAYS, IX_COST = 0.01, 0.06, 10, 0.0005
+
+# Intraday (MIS, squared off the same day) study, Nov 2026: 150 stocks, ~2 years of hourly bars
+# (design 2023-11..2025-09, test 2025-09..2026-11), 0.06% round-trip cost (0.10% robustness).
+# No BUY or SELL setup qualified, so the app issues no intraday calls; the page shows this evidence.
+INTRADAY_STUDY = {
+    "period": "Nov 2023 – Nov 2026 (hourly bars), design ≈ first 60%, test = last 40%",
+    "cost": "0.06% round trip (STT 0.025% on sell, exchange, stamp duty, brokerage, GST); 0.10% also tested",
+    "buy": {"variants": 800, "qualified": 0, "rows": [
+        ["Opening-range breakout", "50.4% / +0.05%", "46.8% / −0.04%"],
+        ["Morning flush reversal in strong stocks", "39.7% / −0.12%", "48.7% / +0.12%"],
+        ["Gap-up continuation", "51.6% / +0.08%", "56.8% / +0.15% (only 57% wins)"],
+        ["VWAP mean reversion", "45.1% / −0.17%", "48.3% / −0.16%"],
+        ["Relative strength vs Nifty", "50.9% / −0.04%", "45.0% / −0.21%"],
+        ["Blind buy at 10:15, +0.5% / −3%", "64–65% / −0.08 to −0.10%", "high win rate, still a loss"]]},
+    "sell": {"variants": 784, "qualified": 0, "rows": [
+        ["Gap-down continuation (intraday)", "54.0% / +0.03%", "50.0% / +0.17% (16 trades)"],
+        ["Gap-up fade", "51.8% / 0.00%", "47.3% / −0.22%"],
+        ["Opening-range breakdown", "58.2% / 0.00%", "54.6% / −0.06%"],
+        ["Relative weakness vs Nifty", "70.1% / +0.02%", "63.4% / −0.02%"],
+        ["VWAP rejection", "45.2% / −0.03%", "42.9% / −0.07%"],
+        ["Over-extension fade", "51.7% / −0.02%", "40.0% / −0.21%"]]},
+}
 MAX_PICKS, MAX_PER_INDUSTRY = 5, 2
 DEFENSIVE = ("FMCG", "Fast Moving Consumer Goods", "Healthcare", "Information Technology", "Pharma")
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
@@ -492,7 +514,7 @@ def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, i
 
     last_bar = max((f.index[-1] for f in frames.values()), default=today)
     payload = {
-        "sell": sell, "index": index_sig,
+        "sell": sell, "index": index_sig, "intraday": INTRADAY_STUDY,
         "rule": {"target": TARGET, "stop": STOP, "max_days": MAX_DAYS, "cost": COST, "min_win": MIN_WIN,
                  "max_picks": max_picks, "max_per_industry": MAX_PER_INDUSTRY},
         "stats": stats, "market": market, "market_ok": market_ok,
