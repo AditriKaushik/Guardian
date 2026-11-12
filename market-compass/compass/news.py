@@ -64,16 +64,20 @@ TOPICS = {
     "sebi": ("SEBI / regulation", r"\bsebi\b|regulator|f&o rule|derivatives rule|margin rule|ban on", 0, {}),
     "monsoon": ("Monsoon / weather", r"monsoon|rainfall|\bimd\b|drought|flood|heatwave|cyclone", 0, {"FMCG": +1, "Tractors / Rural": +1, "Fertilisers": +1}),
     "crypto": ("Crypto", r"bitcoin|crypto|ethereum|\bbtc\b", 0, {}),
-    "tech_ai": ("Tech / AI / IT services", r"\bai\b|artificial intelligence|nvidia|chip|semiconductor|it services|h-1b|outsourcing", 0, {"IT": +1}),
+    "tech_ai": ("Tech / AI / IT services", r"\bai\b|artificial intelligence|nvidia|\bchips?\b|semiconductor|it services|h-1b|outsourcing", 0, {"IT": +1}),
 }
 
 # Context-dependent phrases first (they override the generic word lists)
 PHRASES = [
-    (r"rate cut|cuts rates|cut rates|eases policy|dovish", +1), (r"rate hike|raises rates|hikes rates|hawkish|tightening", -1),
+    (r"rate cut|cuts rates|cut rates|eases policy|dovish", +1),
+    (r"rate hike|rate rises|raises rates|hikes rates|hawkish|tightening|bigger and faster", -1),
+    (r"(end|ends|ending|halt|halts) (the )?(\w+ )?(war|conflict|fighting)|peace (plan|deal|talks|efforts)", +1),
     (r"(crude|oil|brent)( oil)?( prices?)? (fall|falls|fell|drop|drops|slump|slumps|slide|slides|eases|declines|plunge|plunges|tumbles?)", +1),
     (r"(crude|oil|brent)( oil)?( prices?)? (rise|rises|rose|jump|jumps|surge|surges|spike|spikes|soar|soars|climb|climbs)", -1),
     (r"rupee (gains|rises|strengthens|recovers|firms)", +1), (r"rupee (falls|slumps|weakens|hits record low|record low|slides)", -1),
-    (r"inflation (cools|eases|slows|falls)", +1), (r"inflation (rises|jumps|accelerates|hits|surges)", -1),
+    (r"inflation (cools|eases|slows|falls)", +1),
+    (r"inflation (rises|jumps|accelerates|hits|surges|crosses|breaches|above|exceeds|spikes)|(crosses|breaches) rbi", -1),
+    (r"(food|onion|vegetable|tomato|fuel|petrol|diesel) prices? (jump|jumps|surge|surges|soar|soars|rise|rises|spike)", -1),
     (r"ceasefire|truce|peace deal|peace talks|de-escalat", +1), (r"escalat|airstrike|missile|invasion|declares war|attack", -1),
     (r"tariff (cut|relief|pause|exemption)|trade deal", +1), (r"(new|higher|hikes?|imposes?) tariffs?|trade war", -1),
     (r"fii (buy|inflow)|foreign investors (buy|pour)|inflows", +1), (r"fii (sell|outflow)|foreign investors (sell|pull)|outflows", -1),

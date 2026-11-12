@@ -138,6 +138,11 @@ def test_news_headline_tone_and_topics():
         "Missile attack escalates conflict": (-1, "war"),
         "Ceasefire agreed, markets cheer": (1, "war"),
         "US imposes new tariffs on Indian goods": (-1, "trade"),
+        # real headlines from 12 Nov 2026 that were scored wrongly at first
+        "India's retail inflation crosses RBI's 6% limit as onion prices jump 116%": (-1, "inflation"),
+        "Fed Forced to Confront Case for Bigger and Faster Rate Rises": (-1, "fed"),
+        "G7 backs Quad efforts to end Sudan war": (1, "war"),
+        "No rate cut from RBI, banks slide": (-1, "rbi"),
     }
     for title, (tone, topic) in cases.items():
         t, topics = N.score_headline(title)
