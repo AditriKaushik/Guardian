@@ -126,3 +126,28 @@ def test_pick_signal_needs_uptrend_and_dip():
     assert not P.signal_frame(up)["sig"].iloc[-1]            # steady rise, no dip
     dip = pd.concat([up, pd.Series([190.0, 180.0, 172.0])], ignore_index=True)
     assert P.signal_frame(dip)["sig"].iloc[-1]               # sharp dip in an uptrend
+
+
+def test_news_headline_tone_and_topics():
+    from compass import news as N
+
+    cases = {
+        "Crude oil prices jump after OPEC cuts output": (-1, "crude"),
+        "Oil falls 3% on demand worries": (1, "crude"),
+        "RBI signals rate cut ahead": (1, "rbi"),
+        "Missile attack escalates conflict": (-1, "war"),
+        "Ceasefire agreed, markets cheer": (1, "war"),
+        "US imposes new tariffs on Indian goods": (-1, "trade"),
+    }
+    for title, (tone, topic) in cases.items():
+        t, topics = N.score_headline(title)
+        assert t == tone and topic in topics, title
+
+
+def test_last_close_time_skips_weekend():
+    from compass import news as N
+
+    mon_morning = pd.Timestamp("2026-11-16 08:00", tz="Asia/Kolkata")
+    assert N.last_close_time(mon_morning) == pd.Timestamp("2026-11-13 15:30", tz="Asia/Kolkata")
+    wed_evening = pd.Timestamp("2026-11-11 18:00", tz="Asia/Kolkata")
+    assert N.last_close_time(wed_evening) == pd.Timestamp("2026-11-11 15:30", tz="Asia/Kolkata")

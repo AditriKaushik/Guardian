@@ -1,0 +1,29 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Market Compass Android app: a thin, framework-only WebView shell around the live web app
+// (https://aditrikaushik.github.io/Guardian/market-compass/), so prices and picks are always current.
+android {
+    namespace 'org.marketcompass.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'org.marketcompass.app'
+        minSdk 24
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

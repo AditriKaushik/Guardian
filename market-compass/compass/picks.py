@@ -186,7 +186,8 @@ def load_frames(symbols: list[str]) -> dict:
     return frames
 
 
-def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, is_open: bool) -> tuple[dict, dict]:
+def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, is_open: bool,
+                news_flags: dict | None = None) -> tuple[dict, dict]:
     """Returns (picks payload for data.json, frames used) using only real data."""
     uni = {}
     for name, grp in (("ind_nifty50list", "Nifty 50"), ("ind_niftynext50list", "Nifty Next 50"),
@@ -274,6 +275,10 @@ def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, i
              f"{df['Volume'].iloc[-1] / df['Volume'].rolling(20).mean().shift(1).iloc[-1]:.2f}× average"),
             ("No circuit-type move today (within ±8%)", abs(day_chg) <= 0.08, f"{day_chg:+.1%} today"),
             ("No corporate-action price gap (above 20%) in the last 20 days", not jump, "gap found" if jump else "clear"),
+            ("No negative company news since the last close (headlines + NSE filings)",
+             None if news_flags is None else not (news_flags.get(sym) or {}).get("negative", False),
+             "; ".join(x["title"][:90] for x in (news_flags or {}).get(sym, {}).get("items", [])[:2]) or
+             ("none found" if news_flags is not None else "news not checked")),
             ("Sector allowed by today's macro stance", stance_name != "DEFENSIVE" or any(d in ind for d in DEFENSIVE),
              ind),
         ]
