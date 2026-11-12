@@ -84,6 +84,27 @@ themselves are close to real time (usually within a minute or two).
      20-day average). On unseen 2021–26 data this raised the win rate from 79.7% to **83.8%** and
      the average per trade from +0.22% to **+0.55%**, better in every year 2017–2026. Picks are
      now rarer.
+   - **🔴 SELL picks (experimental, F&O only):**
+     - **Rule:** "gap-down continuation". The stock opens 4%+ below yesterday's close, on 2×+ its
+       50-day volume, and closes in the bottom 25% of the day's range. Short at the close via
+       stock futures. Cover at −1.5% (profit), +8% stop, or after 15 days.
+     - **Real numbers:** 2021–26, 86 trades: **83.7% wins, +0.61% per trade** after 0.15% costs.
+       It is rare (about 17 a year) and not statistically proven (t ≈ 1.4).
+     - **What was rejected:** 675 short setups were tested. The plain mirror of the BUY rule won
+       73% but lost money, because a short's losses (−7% to −14% on gap-ups) dwarf its +2% wins.
+     - **SELL checks:** the stock is in NSE F&O (NSE's lot-size list, 218 stocks), not in the
+       F&O ban, not under ASM/GSM, liquid, and not a corporate-action gap. Max 3 a day, one per
+       industry.
+     - **Each SELL card shows:** lot size, contract value, ~20% margin, and profit/loss per lot.
+     - **Warnings:** English and Hindi warnings appear on every card: unlimited loss risk, and
+       91%+ of individual F&O traders lose money (SEBI FY25). For non-F&O users, SELL means
+       "consider exiting if you hold it".
+   - **📈 Nifty index signal:**
+     - **Rule:** Nifty is above its 200-day average and India VIX closes above its prior 20-day
+       high → buy Nifty at the close. Target +1%, stop −6%, 10 days.
+     - **Real numbers:** chosen on 2008–16 data; 2017–26: 75 trades, **77.3% wins, +0.24%**.
+     - **No index SELL rule passed:** all lost money on 2008–16 data.
+   - **Live record:** BUY and SELL picks are logged and checked against real prices separately.
    - **Timing:** the list is provisional while the market is open and final after 3:30 PM. The
      rule enters near the close (3:15–3:25 PM). On many days **no stock qualifies**; that is part
      of the strategy.
@@ -221,7 +242,8 @@ market-compass/
 │   ├── history.py            ← History lab: similar past days, event history, VIX range
 │   ├── news.py               ← overnight news: feeds, topics, tone, sectors, NSE filings, live check
 │   ├── crossasset.py         ← opening-gap forecast, metals tilt, tested cause → effect table
-│   ├── picks.py              ← Daily picks: rule, backtest, conditions, SEBI/NSE checks
+│   ├── picks.py              ← Daily picks: BUY rule, SELL rule, Nifty index rule, backtests, checks
+│   ├── fo.py                 ← NSE F&O lot sizes + F&O ban list (for SELL suggestions)
 │   ├── universe.py           ← which stocks: all Nifty 50 + top performers (auto)
 │   └── stocks.py             ← stock list for the desktop version
 ├── data/events.csv           ← shared events shown on everyone's calendar (edit on GitHub)

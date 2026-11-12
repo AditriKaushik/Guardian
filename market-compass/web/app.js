@@ -251,6 +251,49 @@ function renderHistory() {
     <div class="note">What the evidence supports so far: <b>India VIX above 25 (panic)</b> was followed by a higher Nifty 20 days later 82% / 75% of the time (normal 56% / 63%). <b>Crude oil crashing 20%+ in a month</b> (2008, 2014–15, 2020) was followed by a weaker Nifty: only 20% / 33% up after 20 days. ⭐ Daily picks now allow trades in high-VIX panics, because its own tests showed those dips bounced best (93% wins with India VIX above 20).</div>`;
 }
 
+
+function indexSection(P) {
+  const I = P.index;
+  if (!I || I.error) return "";
+  const st = I.stats && I.stats.all ? I.stats.all : null;
+  return `<h2>📈 Nifty index signal</h2>
+    <div class="card"><div class="factor head"><span class="name">Nifty 50: ${I.signal ? '<span class="pill" style="background:#1a7f37;color:#fff">BUY signal today</span>' : '<span class="pill">no signal today</span>'}</span>
+      <span class="muted">Nifty ${fmt(I.price, 1)} · India VIX ${I.vix} vs prior 20-day high ${I.vix_20d_high} · ${I.above_200dma ? "above" : "below"} 200-day average</span></div>
+      <p><b>Rule:</b> when Nifty is above its 200-day average and India VIX closes above its previous 20-day high (a fear spike in an uptrend), buy Nifty at the close (index futures, or a Nifty ETF/fund for small amounts). Sell at <b>+1%</b>, stop <b>−6%</b>, or after <b>10 days</b>.${I.signal ? ` Today: target ${fmt(I.target, 1)}, stop ${fmt(I.stop, 1)}.` : ""}</p>
+      <p class="muted">Tested: chosen on 2008–2016 data, then ${I.study.oos_n} trades in ${I.study.period} won <b>${(I.study.oos_win * 100).toFixed(1)}%</b>, average +${(I.study.oos_avg * 100).toFixed(2)}% per trade.${st ? ` On the last 10 years recomputed live: ${st.n} trades, ${(st.win * 100).toFixed(0)}% wins, ${(st.avg * 100).toFixed(2)}% avg.` : ""} Wins are small (+1%) and a loss is about −2.5% on average. <b>No index SELL rule passed</b>: all short rules on Nifty and Bank Nifty lost money on 2008–2016 data.</p></div>`;
+}
+
+function sellSection(P, cap) {
+  const S = P.sell;
+  if (!S) return "";
+  const ok = v => v === true ? "✅" : v === false ? "❌" : "⚪";
+  const pc = x => x == null ? "n/a" : (x * 100).toFixed(1) + "%";
+  const st = S.stats || {}, r5 = st.recent5y || {}, r12 = st.last12m || {};
+  const card = p => `<div class="card" style="border-left:4px solid #cf222e"><div class="factor head"><span class="name" style="font-size:18px">🔴 SELL ${esc(p.sym)}</span><span class="pill">${esc(p.group)} · ${esc(p.industry)}</span></div>
+      <div class="grid" style="margin-top:8px">
+        <div class="tile"><div class="lbl">Price now</div><div class="val">₹${fmt(p.price)}</div><div class="chg ${cls(p.day_chg)}">${pct(p.day_chg)} today</div></div>
+        <div class="tile"><div class="lbl">Win chance (rule, last 5 yrs)</div><div class="val">${pc(p.p_rule)}</div><div class="chg muted">experimental rule</div></div>
+        <div class="tile"><div class="lbl">Cover target (−${(S.rule.target * 100).toFixed(1)}%)</div><div class="val pos">₹${fmt(p.target)}</div></div>
+        <div class="tile"><div class="lbl">Stop-loss (+${(S.rule.stop * 100).toFixed(0)}%)</div><div class="val neg">₹${fmt(p.stop)}</div><div class="chg muted">exit anyway by ${esc(p.exit_by)}</div></div>
+      </div>
+      <p><b>Why:</b> ${p.why.map(esc).join("; ")}.</p>
+      <p>${p.lot ? `<b>F&amp;O:</b> 1 lot = ${p.lot} shares ≈ ₹${fmt(p.contract_value, 0)} exposure; margin roughly ₹${fmt(p.margin_est, 0)} (~20%). If target: +₹${fmt(p.lot * (p.price - p.target), 0)} per lot; if stop: −₹${fmt(p.lot * (p.stop - p.price), 0)} per lot (more on a gap up).${p.contract_value > cap ? ` <span class="neg">One lot is larger than your capital of ₹${fmt(cap, 0)}.</span>` : ""}` : "Not in F&amp;O: you cannot short it overnight. If you hold it, consider exiting."}</p>
+      <details><summary>All ${p.checks.length} SELL checks</summary><ul class="list">${p.checks.map(c => `<li>${ok(c.ok)} ${esc(c.name)}: <span class="muted">${esc(c.detail)}</span></li>`).join("")}</ul></details></div>`;
+  return `<h2>🔴 SELL picks today (${S.picks.length}) <span class="pill" style="background:#9a6700;color:#fff">experimental</span></h2>
+    <div class="note warnbox"><b>SELL = bearish model signal.</b> If you hold this stock, consider reducing or exiting. Short selling overnight is only possible via F&amp;O (stock futures), carries <b>unlimited loss risk</b> (a stock can gap up through any stop), and over 91% of individual F&amp;O traders lost money (SEBI FY25 study). Educational only, not investment advice.<br>
+      <b>हिंदी:</b> SELL का मतलब: अगर यह शेयर आपके पास है तो बेचने/घटाने पर विचार करें। F&amp;O में शॉर्ट सेलिंग में असीमित नुकसान का जोखिम है। SEBI के अनुसार 91% से ज़्यादा व्यक्तिगत F&amp;O ट्रेडर नुकसान में रहे। यह केवल शैक्षिक जानकारी है, निवेश सलाह नहीं।</div>
+    <div class="grid2"><div class="card"><h3>SELL conditions today</h3><ul class="list">${S.market.map(m => `<li>${ok(m.ok)} ${esc(m.name)}<br><span class="muted">${esc(m.detail)}</span></li>`).join("")}</ul></div>
+      <div class="card"><h3>The SELL rule (gap-down continuation)</h3><ul class="list">
+        <li><b>Short</b> a stock that opened <b>${(S.rule.gap * -100).toFixed(0)}%+ below</b> yesterday's close on <b>${S.rule.vol}×+</b> its 50-day volume and closed in the <b>bottom ${(S.rule.close_pos * 100).toFixed(0)}%</b> of the day's range (heavy selling into the close, often after bad results or news).</li>
+        <li><b>Cover</b> at −${(S.rule.target * 100).toFixed(1)}% (profit), +${(S.rule.stop * 100).toFixed(0)}% stop-loss, or after ${S.rule.max_days} trading days. F&amp;O stocks only (${S.fo_count} today), not in F&amp;O ban, not under ASM/GSM. Max ${S.rule.max_picks} a day, one per industry.</li></ul></div></div>
+    ${S.picks.length ? S.picks.map(card).join("") : `<div class="card"><p><b>No stock qualifies for SELL today.</b> The pattern is rare: about 17 times a year across 150 stocks.</p></div>`}
+    ${S.blocked.length ? `<h3>SELL signal, but blocked</h3><div class="card tablewrap"><table><tr><th>Stock</th><th>Gap</th><th>Blocked by</th></tr>${S.blocked.map(b => `<tr><td><b>${esc(b.sym)}</b></td><td class="neg">${pct(b.gap, 1)}</td><td>${b.blocked_by.map(esc).join("; ")}</td></tr>`).join("")}</table></div>` : ""}
+    <div class="card tablewrap" style="margin-top:10px"><h3>SELL rule: real numbers (after 0.15% costs)</h3>
+      <table><tr><th></th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg per trade</th><th class="num">Avg win / avg loss</th></tr>
+      ${[["Last 5 years", r5], ["Last 12 months", r12]].map(([n, x]) => `<tr><td>${n}</td><td class="num">${x.n ?? 0}</td><td class="num">${pc(x.win)}</td><td class="num ${cls(x.avg)}">${x.avg == null ? "n/a" : (x.avg * 100).toFixed(2) + "%"}</td><td class="num">${x.avg_win == null ? "" : "+" + (x.avg_win * 100).toFixed(1) + "% / " + (x.avg_loss * 100).toFixed(1) + "%"}</td></tr>`).join("")}</table>
+      <p class="muted">Why "experimental": 675 short setups were tested on 10 years of data. Only this one kept 75%+ wins with a positive average on 2021–2026 data. It trades rarely, and the result is not statistically proven (t ≈ 1.4). The plain mirror of the BUY rule (shorting rallies in weak stocks) won 73% of the time but <b>lost money</b> (−0.38% per trade), because short losses (−7% to −14% on gaps) are much bigger than the +2% wins.</p></div>`;
+}
+
 /* ---------------------------------------------------------------- daily picks */
 function renderPicks() {
   const el = $("#picks"), P = DATA.daily_picks;
@@ -278,7 +321,7 @@ function renderPicks() {
   };
   const yrs = S.years.map(y => `<tr><td>${y.year}</td><td class="num">${y.n}</td><td class="num ${y.win >= R.min_win ? "pos" : "neg"}">${pc(y.win)}</td><td class="num ${cls(y.avg)}">${y.avg == null ? "" : (y.avg >= 0 ? "+" : "") + (y.avg * 100).toFixed(2) + "%"}</td></tr>`).join("");
   const T = P.track || {};
-  el.innerHTML = `<h2>⭐ Daily picks: stocks that pass every condition</h2>
+  el.innerHTML = `<h2>⭐ Daily picks: BUY &amp; SELL suggestions that pass every condition</h2>
     <div class="note">${P.provisional ? "🟡 <b>Provisional</b> (market open): the list can change until 3:30 PM. Final picks are fixed after the close. The rule enters near the close (3:15–3:25 PM)." : "🟢 <b>Final for " + esc(P.as_of) + "</b>: based on the closing price."}
       Checked ${P.universe_n} stocks (Nifty 50 + Next 50 + Midcap 50) against 13 conditions (including overnight company news) and SEBI/NSE rules.</div>
     <div class="grid2">
@@ -289,11 +332,13 @@ function renderPicks() {
         <li><b>Sell</b> at +${(R.target * 100).toFixed(0)}% target, or −${(R.stop * 100).toFixed(0)}% stop-loss, or after ${R.max_days} trading days.</li>
         <li>Delivery (CNC) only, no leverage, no F&amp;O. Max ${R.max_picks} picks a day, max ${R.max_per_industry} per industry. Risk 1% of capital per trade.</li></ul></div>
     </div>
-    <h2>Today's picks (${P.picks.length})</h2>
+    <h2>🟢 BUY picks today (${P.picks.length})</h2>
     ${P.picks.length ? P.picks.map(pickCard).join("") : `<div class="card"><p><b>No stock qualifies today.</b> ${P.market_ok ? "No strong stock is in a qualifying dip right now (common when the market is rising steadily). In the last 12 months, signals appeared on about 3 of every 10 trading days." : "A market-level condition above is not met, so the rule stays out today."} Doing nothing is part of the strategy.</p></div>`}
     <div class="card" style="margin-top:12px"><label class="muted">Your capital for position sizing (₹) <input id="pickCap" type="number" min="1000" step="1000" value="${cap}" style="width:140px"></label></div>
     ${P.blocked.length ? `<h3>Signal, but blocked by a condition</h3><div class="card tablewrap"><table><tr><th>Stock</th><th>Industry</th><th>Blocked by</th></tr>${P.blocked.map(b => `<tr><td><b>${esc(b.sym)}</b></td><td class="muted">${esc(b.industry)}</td><td>${b.blocked_by.map(esc).join("; ")}</td></tr>`).join("")}</table></div>` : ""}
-    <h2>How honest is "75%+"? The real numbers</h2>
+    ${indexSection(P)}
+    ${sellSection(P, cap)}
+    <h2>How honest is "75%+"? The real numbers (BUY rule)</h2>
     <div class="grid">
       <div class="card tile"><div class="lbl">Win rate, last 5 years</div><div class="val">${pc(S.recent5y.win)}</div><div class="chg muted">${S.recent5y.n.toLocaleString()} real trades, after costs</div></div>
       <div class="card tile"><div class="lbl">Win rate, last 12 months</div><div class="val ${S.last12m.win >= R.min_win ? "" : "neg"}">${pc(S.last12m.win)}</div><div class="chg muted">${S.last12m.n} trades</div></div>
@@ -306,7 +351,7 @@ function renderPicks() {
     <div class="note warnbox">The rule wins often, but only small amounts: <b>+2% wins, −8% losses</b>. In some years it won 75%+ of trades and still lost money overall. Never skip the stop-loss, and never put all your money in one pick. These numbers are recomputed from real prices on every refresh.</div>
     <div class="card tablewrap"><h3>Year by year (after costs)</h3><table><tr><th>Year</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg per trade</th></tr>${yrs}</table></div>
     <h3>🎯 Live record of these picks</h3>
-    <div class="card"><p>${T.n ? `${T.wins} of ${T.n} closed picks won (${(T.wins / T.n * 100).toFixed(0)}%), average ${(T.avg * 100).toFixed(2)}% per pick after costs.` : "No closed picks yet. Final picks are logged after each close and checked against real prices until target, stop or 15 days."}</p></div>
+    <div class="card"><p>${(P.track_sell || {}).n ? `<b>SELL:</b> ${P.track_sell.wins} of ${P.track_sell.n} closed SELL picks won (${(P.track_sell.wins / P.track_sell.n * 100).toFixed(0)}%), average ${(P.track_sell.avg * 100).toFixed(2)}% after costs. ` : ""}<b>BUY:</b> ${T.n ? `${T.wins} of ${T.n} closed picks won (${(T.wins / T.n * 100).toFixed(0)}%), average ${(T.avg * 100).toFixed(2)}% per pick after costs.` : "No closed picks yet. Final picks are logged after each close and checked against real prices until target, stop or 15 days."}</p></div>
     <h2>Rules, regulations &amp; law (India)</h2>
     <div class="card"><ul class="list">
       <li><b>Not investment advice.</b> Under the SEBI (Research Analysts) Regulations, 2014, personalised stock recommendations for a fee need SEBI registration. This tool is an educational screen of public data. Check that any adviser is SEBI-registered on sebi.gov.in.</li>

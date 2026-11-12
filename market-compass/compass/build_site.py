@@ -291,6 +291,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
                                              None if "error" in news else news.get("stocks", {}))
         track = PK.update_pick_track(track, picks, daily_frames, now, is_open)
         picks["track"] = track.get("picks", {}).get("summary", {})
+        picks["track_sell"] = track.get("picks", {}).get("summary_sell", {})
     except Exception as exc:  # never let the picks page break the rest of the app
         picks = {"error": f"Daily picks unavailable this refresh: {exc}"}
 
