@@ -347,9 +347,12 @@ sign in with GitHub and choose repo `AditriKaushik/Guardian`, branch `main`, mai
 >     unless test accuracy beats always-guess.
 > - `compass/picks.py`: Daily picks. 150 stocks × 10y daily data; rule = uptrend + (close < lower BB or RSI2 < 5)
 >   with Nifty > 200DMA; exit +2% / −8% / 15 days; 0.25% costs. Stats recomputed every build.
->   Gates: VIX ≤ 25, auto-stance, rule's 5y win ≥ 75%, NSE event calendar (21 days), F&O ban CSV, NSE ASM/GSM
+>   Gates: India VIX ≤ 40 crash guard, Nifty 5-day down, India VIX ≥ 0.98×SMA20, dip volume < 1.2×, auto-stance, rule's 5y win ≥ 75%, NSE event calendar (21 days), F&O ban CSV, NSE ASM/GSM
 >   APIs, liquidity, ±8% move, corporate-action gaps, max 5 picks / 2 per industry. Final picks are logged
 >   after the close and resolved in track.json → picks.
+> - `compass/history.py`: History lab. Daily state since 2008 → 10 nearest past days (z-scored with history to date,
+>   de-clustered), walk-forward scorecard, 18 event studies split 2008–16 / 2016–now, India VIX 20-day range.
+> - `compass/news.py`: overnight headlines (RSS) + NSE filings → topics, tone, sectors; negative company news blocks picks.
 > - `compass/universe.py`: all Nifty 50 (NSE's official CSV, with a built-in fallback) + top 20
 >   by 3-month return from Nifty Next 50 / Midcap 50, plus the two indices.
 > - `compass/build_site.py`: about 72 symbols × 4 horizons, plus the live forward-test log
