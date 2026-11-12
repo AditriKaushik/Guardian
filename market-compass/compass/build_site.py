@@ -25,6 +25,7 @@ from . import scorecard as S
 from . import stock_model as M
 from .stocks import to_yahoo
 from .universe import build_universe
+from . import picks as PK
 
 HORIZONS = [1, 2, 3, "close"]
 KEEP_DAYS = 20
@@ -149,7 +150,7 @@ def build_stocks(universe: dict, now: datetime, is_open: bool) -> tuple[dict, di
 
 # ------------------------------------------------------------------ live track record
 def load_previous_track(src: str | None) -> dict:
-    empty = {"open": [], "resolved": [], "totals": {}}
+    empty = {"open": [], "resolved": [], "totals": {}, "picks": {"open": [], "resolved": []}}
     if not src:
         return empty
     try:
@@ -259,6 +260,14 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
 
     track = update_track(load_previous_track(previous_track), stocks, frames, now, is_open)
 
+    auto = [f["auto_score"] for f in factors if f["auto"] and f["auto_score"] is not None]
+    try:
+        picks, daily_frames = PK.build_picks(snap, sum(auto) / len(auto) if auto else 0.0, fii, now, is_open)
+        track = PK.update_pick_track(track, picks, daily_frames, now, is_open)
+        picks["track"] = track.get("picks", {}).get("summary", {})
+    except Exception as exc:  # never let the picks page break the rest of the app
+        picks = {"error": f"Daily picks unavailable this refresh: {exc}"}
+
     payload = {
         "version": __version__,
         "generated_at": now.isoformat(timespec="minutes"),
@@ -269,6 +278,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "universe": {k: v for k, v in uni.items() if k != "stocks"},
         "calendar": cal.to_dict(orient="records"), "seasonal": E.SEASONAL[today.month],
         "track_summary": track["totals"],
+        "daily_picks": picks,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "data.json").write_text(json.dumps(payload, separators=(",", ":")))

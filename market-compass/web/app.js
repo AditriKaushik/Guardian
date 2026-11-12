@@ -43,7 +43,7 @@ function isMarketHoursNow() {
   return d >= 1 && d <= 5 && m >= 9 * 60 + 15 && m <= 15 * 60 + 30;
 }
 
-function renderAll() { renderCompass(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
+function renderAll() { renderCompass(); renderPicks(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
 
 /* ---------------------------------------------------------------- compass */
 const MACRO_ORDER = ["nifty", "banknifty", "vix", "usdinr", "dxy", "us10y", "brent", "gold", "sp500", "nikkei", "hangseng"];
@@ -149,6 +149,72 @@ function renderLog() {
   const log = store.get("mc_log", []).slice(-10).reverse();
   $("#logTable").innerHTML = log.length ? `<table><tr><th>Date</th><th>Stance</th><th>Score</th><th class="num">Nifty</th><th>Note</th></tr>${log.map(r => `<tr><td>${esc(r.date)} ${esc(r.time)}</td><td>${esc(r.stance)}</td><td>${esc(r.score)}</td><td class="num">${fmt(r.nifty, 0)}</td><td>${esc(r.note)}</td></tr>`).join("")}</table>`
     : `<p class="muted">No saved days yet. Saving daily lets you check later whether your stance calls were right.</p>`;
+}
+
+
+/* ---------------------------------------------------------------- daily picks */
+function renderPicks() {
+  const el = $("#picks"), P = DATA.daily_picks;
+  if (!P || P.error) { el.innerHTML = `<h2>Daily picks</h2><div class="note warnbox">${esc(P ? P.error : "Not available yet: appears after the next refresh.")}</div>`; return; }
+  const R = P.rule, S = P.stats, cap = store.get("mc_pick_cap", 100000);
+  const ok = v => v === true ? "✅" : v === false ? "❌" : "⚪";
+  const pc = x => x == null ? "n/a" : (x * 100).toFixed(1) + "%";
+  const size = p => {  // risk 1% of capital per trade, max 20% of capital in one stock
+    const risk = cap * 0.01, perShare = p.price - p.stop;
+    const q = Math.max(0, Math.min(Math.floor(risk / perShare), Math.floor(cap * 0.20 / p.price)));
+    return { q, amt: q * p.price, maxLoss: q * perShare, gain: q * (p.target - p.price) };
+  };
+  const pickCard = p => {
+    const z = size(p);
+    return `<div class="card"><div class="factor head"><span class="name" style="font-size:18px">${esc(p.sym)}</span><span class="pill">${esc(p.group)} · ${esc(p.industry)}</span></div>
+      <div class="grid" style="margin-top:8px">
+        <div class="tile"><div class="lbl">Price now</div><div class="val">₹${fmt(p.price)}</div><div class="chg ${cls(p.day_chg)}">${pct(p.day_chg)} today</div></div>
+        <div class="tile"><div class="lbl">Win chance (rule, last 5 yrs)</div><div class="val pos">${pc(p.p_rule)}</div><div class="chg muted">this stock: ${p.stock_hist.wins}/${p.stock_hist.n} past trades won</div></div>
+        <div class="tile"><div class="lbl">Target (+${(R.target * 100).toFixed(0)}%)</div><div class="val pos">₹${fmt(p.target)}</div></div>
+        <div class="tile"><div class="lbl">Stop-loss (−${(R.stop * 100).toFixed(0)}%)</div><div class="val neg">₹${fmt(p.stop)}</div><div class="chg muted">exit anyway by ${esc(p.exit_by)}</div></div>
+      </div>
+      <p><b>Why:</b> ${p.why.map(esc).join("; ")}. Strong uptrend (above 200-day average) with a short dip.</p>
+      <p><b>For ₹${fmt(cap, 0)}:</b> buy <b>${z.q}</b> shares ≈ ₹${fmt(z.amt, 0)} (risking 1% of capital) → if target: +₹${fmt(z.gain, 0)}, if stop: −₹${fmt(z.maxLoss, 0)} (before charges).</p>
+      <details><summary>All ${p.checks.length} stock checks ✅</summary><ul class="list">${p.checks.map(c => `<li>${ok(c.ok)} ${esc(c.name)}: <span class="muted">${esc(c.detail)}</span></li>`).join("")}</ul></details></div>`;
+  };
+  const yrs = S.years.map(y => `<tr><td>${y.year}</td><td class="num">${y.n}</td><td class="num ${y.win >= R.min_win ? "pos" : "neg"}">${pc(y.win)}</td><td class="num ${cls(y.avg)}">${y.avg == null ? "" : (y.avg >= 0 ? "+" : "") + (y.avg * 100).toFixed(2) + "%"}</td></tr>`).join("");
+  const T = P.track || {};
+  el.innerHTML = `<h2>⭐ Daily picks: stocks that pass every condition</h2>
+    <div class="note">${P.provisional ? "🟡 <b>Provisional</b> (market open): the list can change until 3:30 PM. Final picks are fixed after the close. The rule enters near the close (3:15–3:25 PM)." : "🟢 <b>Final for " + esc(P.as_of) + "</b>: based on the closing price."}
+      Checked ${P.universe_n} stocks (Nifty 50 + Next 50 + Midcap 50) against 9 conditions and SEBI/NSE rules.</div>
+    <div class="grid2">
+      <div class="card"><h3>Market conditions today</h3><ul class="list">${P.market.map(m => `<li>${ok(m.ok)} ${esc(m.name)}<br><span class="muted">${esc(m.detail)}${m.soft ? " (caution only)" : ""}</span></li>`).join("")}</ul></div>
+      <div class="card"><h3>The rule (tested on real data)</h3><ul class="list">
+        <li><b>Buy</b> a strong stock (above its 200-day average, 50-day above 200-day) on a short dip: below its lower Bollinger Band or RSI(2) under 5. Only while Nifty is above its 200-day average.</li>
+        <li><b>Sell</b> at +${(R.target * 100).toFixed(0)}% target, or −${(R.stop * 100).toFixed(0)}% stop-loss, or after ${R.max_days} trading days.</li>
+        <li>Delivery (CNC) only, no leverage, no F&amp;O. Max ${R.max_picks} picks a day, max ${R.max_per_industry} per industry. Risk 1% of capital per trade.</li></ul></div>
+    </div>
+    <h2>Today's picks (${P.picks.length})</h2>
+    ${P.picks.length ? P.picks.map(pickCard).join("") : `<div class="card"><p><b>No stock qualifies today.</b> ${P.market_ok ? "No strong stock is in a qualifying dip right now (common when the market is rising steadily). In the last 12 months, signals appeared on about 3 of every 10 trading days." : "A market-level condition above is not met, so the rule stays out today."} Doing nothing is part of the strategy.</p></div>`}
+    <div class="card" style="margin-top:12px"><label class="muted">Your capital for position sizing (₹) <input id="pickCap" type="number" min="1000" step="1000" value="${cap}" style="width:140px"></label></div>
+    ${P.blocked.length ? `<h3>Signal, but blocked by a condition</h3><div class="card tablewrap"><table><tr><th>Stock</th><th>Industry</th><th>Blocked by</th></tr>${P.blocked.map(b => `<tr><td><b>${esc(b.sym)}</b></td><td class="muted">${esc(b.industry)}</td><td>${b.blocked_by.map(esc).join("; ")}</td></tr>`).join("")}</table></div>` : ""}
+    <h2>How honest is "75%+"? The real numbers</h2>
+    <div class="grid">
+      <div class="card tile"><div class="lbl">Win rate, last 5 years</div><div class="val">${pc(S.recent5y.win)}</div><div class="chg muted">${S.recent5y.n.toLocaleString()} real trades, after costs</div></div>
+      <div class="card tile"><div class="lbl">Win rate, last 12 months</div><div class="val ${S.last12m.win >= R.min_win ? "" : "neg"}">${pc(S.last12m.win)}</div><div class="chg muted">${S.last12m.n} trades</div></div>
+      <div class="card tile"><div class="lbl">Average win / average loss</div><div class="val"><span class="pos">+${(S.recent5y.avg_win * 100).toFixed(1)}%</span> / <span class="neg">${(S.recent5y.avg_loss * 100).toFixed(1)}%</span></div><div class="chg muted">one loss ≈ ${Math.round(-S.recent5y.avg_loss / S.recent5y.avg_win)} wins</div></div>
+      <div class="card tile"><div class="lbl">Average per trade (5 yrs)</div><div class="val ${cls(S.recent5y.avg)}">${(S.recent5y.avg >= 0 ? "+" : "") + (S.recent5y.avg * 100).toFixed(2)}%</div><div class="chg muted">last 12 months: ${(S.last12m.avg * 100).toFixed(2)}%</div></div>
+    </div>
+    <div class="note warnbox">The rule wins often, but only small amounts: <b>+2% wins, −8% losses</b>. In some years it won 75%+ of trades and still lost money overall. Never skip the stop-loss, and never put all your money in one pick. These numbers are recomputed from real prices on every refresh.</div>
+    <div class="card tablewrap"><h3>Year by year (after costs)</h3><table><tr><th>Year</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg per trade</th></tr>${yrs}</table></div>
+    <h3>🎯 Live record of these picks</h3>
+    <div class="card"><p>${T.n ? `${T.wins} of ${T.n} closed picks won (${(T.wins / T.n * 100).toFixed(0)}%), average ${(T.avg * 100).toFixed(2)}% per pick after costs.` : "No closed picks yet. Final picks are logged after each close and checked against real prices until target, stop or 15 days."}</p></div>
+    <h2>Rules, regulations &amp; law (India)</h2>
+    <div class="card"><ul class="list">
+      <li><b>Not investment advice.</b> Under the SEBI (Research Analysts) Regulations, 2014, personalised stock recommendations for a fee need SEBI registration. This tool is an educational screen of public data. Check that any adviser is SEBI-registered on sebi.gov.in.</li>
+      <li><b>Surveillance (checked automatically):</b> stocks under NSE/SEBI ASM or GSM surveillance are excluded (today: ${P.regulatory_counts.asm} ASM, ${P.regulatory_counts.gsm} GSM). Stocks in the F&amp;O ban list are excluded (today: ${P.regulatory_counts.fo_ban.map(esc).join(", ") || "none"}).</li>
+      <li><b>Results / board meetings</b> within 3 weeks are excluded (NSE event calendar: ${P.regulatory_counts.events} upcoming).</li>
+      <li><b>Settlement:</b> T+1. Shares bought today reach your demat account the next trading day. Sell only after delivery (or the trade becomes BTST with its own risks).</li>
+      <li><b>Costs:</b> delivery STT 0.1% on both buy and sell, plus brokerage, exchange fees, SEBI fee, GST and stamp duty (0.015% on buy). The tests deduct 0.25% per round trip.</li>
+      <li><b>Tax:</b> listed shares held under 12 months give short-term capital gains (taxed at 20% after the July 2024 Budget). Losses can be set off. Keep your contract notes. Rates change, so check the current Budget.</li>
+      <li><b>Avoid</b> tips on WhatsApp/Telegram, "guaranteed return" schemes and pump-and-dump stocks. SEBI warns against unregistered "finfluencers". Report fraud on SEBI SCORES.</li>
+    </ul></div>`;
+  $("#pickCap").onchange = e => { store.set("mc_pick_cap", Math.max(1000, Number(e.target.value) || 100000)); renderPicks(); };
 }
 
 /* ---------------------------------------------------------------- stocks */
