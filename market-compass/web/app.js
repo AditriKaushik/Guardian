@@ -121,6 +121,7 @@ function renderCompass() {
     <h2>World &amp; India right now</h2><div class="grid">${tiles}</div>
     <p class="muted"><b>today</b> = change since the previous close · <b>5-day</b> = change over the last 5 trading days (आज का बदलाव · पिछले 5 दिन का बदलाव). Prices are refreshed about every 5 minutes in market hours; each tile shows the time of its latest price.
     Green/red show whether the move is good or bad for Indian stocks (a rising dollar, crude, yields or VIX is shown red).</p>
+    ${globalPanel()}
     <div class="stance" style="background:${sn.color}"><div class="sm">Today's stance · score ${sn.total > 0 ? "+" : ""}${sn.total} of ±${sn.n}</div>
       <div class="big">${sn.name}</div><div>${esc(sn.action)}</div></div>
     <div class="grid2"><div class="card"><h3>Favoured sectors</h3><table>${tiltRows(tilts.filter(t => t[1].v > 0))}</table></div>
@@ -152,6 +153,33 @@ function renderLog() {
 }
 
 
+
+const GLOBAL_TILES = ["silver", "copper", "aluminium", "wti", "natgas", "btc", "eth", "usvix", "nasdaq"];
+function globalPanel() {
+  const G = DATA.global, m = DATA.macro;
+  if (!G || G.error) return G && G.error ? `<div class="note warnbox">${esc(G.error)}</div>` : "";
+  const tiles = GLOBAL_TILES.map(k => { const r = m[k]; if (!r || !r.ok) return "";
+    return `<div class="card tile"><div class="lbl">${esc(r.label)}</div><div class="val">${fmt(r.last, r.last > 1000 ? 0 : 2)}</div>
+      <div class="chg"><span class="${cls(r.chg1)}">${pct(r.chg1)} today</span> · <span class="${cls(r.chg5)}">${pct(r.chg5)} 5-day</span></div><div class="chg muted">price at ${esc(timeOf(r.asof))}</div></div>`; }).join("");
+  const g = G.gap_forecast, mt = G.metals;
+  const badge = v => v.startsWith("USE") ? `<span class="pill" style="background:#1a7f37;color:#fff">✅ ${esc(v)}</span>` : v === "WEAK" ? `<span class="pill" style="background:#9a6700;color:#fff">⚠️ weak</span>` : `<span class="pill" style="background:#cf222e;color:#fff">❌ no link</span>`;
+  const rows = G.effects.map(e => `<tr><td><b>${esc(e.driver)}</b>${e.chg1 == null ? "" : ` <span class="${cls(e.chg1)}">${pct(e.chg1)}</span>`}</td><td>${esc(e.effect)}<div class="muted">${esc(e.note)}</div></td><td>${badge(e.verdict)}</td></tr>`).join("");
+  return `<h2>🌍 Metals, energy &amp; crypto</h2><div class="grid">${tiles}</div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="card"><h3>🔮 How Nifty should open today</h3>
+        <div class="val ${cls(g.pred)}" style="font-size:26px;font-weight:800">${pct(g.pred)}</div>
+        <p class="muted">From overnight S&amp;P 500 (${pct(g.parts.spx)}), US dollar (${pct(g.parts.dxy)}), Bitcoin (${pct(g.parts.btc)})${g.hsi_included ? ` and Hang Seng's open (${pct(g.parts.hsi_gap)})` : " (Hang Seng's open is added after 7 AM IST)"}.</p>
+        ${g.actual != null ? `<p><b>Actual opening today: <span class="${cls(g.actual)}">${pct(g.actual)}</span></b> ${Math.sign(g.actual) === Math.sign(g.pred) ? "✅ direction matched" : "❌ direction missed"}</p>` : ""}
+        <p class="muted">${esc(g.accuracy_note)}</p></div>
+      <div class="card"><h3>⛏️ Metal stocks tilt today: ${mt.tilt === "positive" ? '<span class="pos">positive</span>' : mt.tilt === "negative" ? '<span class="neg">negative</span>' : "neutral"}</h3>
+        <p>Overnight copper ${mt.copper_z == null ? "n/a" : (mt.copper_z >= 0 ? "+" : "") + mt.copper_z.toFixed(1) + "σ"}, aluminium ${mt.aluminium_z == null ? "n/a" : (mt.aluminium_z >= 0 ? "+" : "") + mt.aluminium_z.toFixed(1) + "σ"}${mt.hsi_gap == null ? "" : ", Hang Seng open " + pct(mt.hsi_gap)}.</p>
+        <p class="muted">${esc(mt.note)} Applies to Hindalco, NALCO, Vedanta, Tata Steel, JSW Steel, Nifty Metal.</p></div>
+    </div>
+    <div class="card tablewrap" style="margin-top:10px"><h3>Cause → effect, tested on 10 years of real data</h3>
+      <p class="muted">Each link was checked on 2021–2026 data that was not used to find it. ✅ = held up, ⚠️ = small or unstable, ❌ = no reliable link (shown so you don't rely on it).</p>
+      <table><tr><th>Driver (today)</th><th>Effect on Indian stocks</th><th>Verdict</th></tr>${rows}</table></div>`;
+}
+
 /* ---------------------------------------------------------------- daily picks */
 function renderPicks() {
   const el = $("#picks"), P = DATA.daily_picks;
@@ -181,11 +209,12 @@ function renderPicks() {
   const T = P.track || {};
   el.innerHTML = `<h2>⭐ Daily picks: stocks that pass every condition</h2>
     <div class="note">${P.provisional ? "🟡 <b>Provisional</b> (market open): the list can change until 3:30 PM. Final picks are fixed after the close. The rule enters near the close (3:15–3:25 PM)." : "🟢 <b>Final for " + esc(P.as_of) + "</b>: based on the closing price."}
-      Checked ${P.universe_n} stocks (Nifty 50 + Next 50 + Midcap 50) against 9 conditions and SEBI/NSE rules.</div>
+      Checked ${P.universe_n} stocks (Nifty 50 + Next 50 + Midcap 50) against 12 conditions and SEBI/NSE rules.</div>
     <div class="grid2">
       <div class="card"><h3>Market conditions today</h3><ul class="list">${P.market.map(m => `<li>${ok(m.ok)} ${esc(m.name)}<br><span class="muted">${esc(m.detail)}${m.soft ? " (caution only)" : ""}</span></li>`).join("")}</ul></div>
       <div class="card"><h3>The rule (tested on real data)</h3><ul class="list">
         <li><b>Buy</b> a strong stock (above its 200-day average, 50-day above 200-day) on a short dip: below its lower Bollinger Band or RSI(2) under 5. Only while Nifty is above its 200-day average.</li>
+        <li><b>Only when the market is under mild stress</b>: Nifty lower than 5 days ago and India VIX not falling. The stock's dip must come on normal volume (no heavy news-driven selling). <span class="muted">Added after testing: win rate on unseen 2021–26 data rose from ${S.baseline ? pc(S.baseline.recent5y.win) : "79.7%"} to ${pc(S.recent5y.win)}.</span></li>
         <li><b>Sell</b> at +${(R.target * 100).toFixed(0)}% target, or −${(R.stop * 100).toFixed(0)}% stop-loss, or after ${R.max_days} trading days.</li>
         <li>Delivery (CNC) only, no leverage, no F&amp;O. Max ${R.max_picks} picks a day, max ${R.max_per_industry} per industry. Risk 1% of capital per trade.</li></ul></div>
     </div>
@@ -200,6 +229,9 @@ function renderPicks() {
       <div class="card tile"><div class="lbl">Average win / average loss</div><div class="val"><span class="pos">+${(S.recent5y.avg_win * 100).toFixed(1)}%</span> / <span class="neg">${(S.recent5y.avg_loss * 100).toFixed(1)}%</span></div><div class="chg muted">one loss ≈ ${Math.round(-S.recent5y.avg_loss / S.recent5y.avg_win)} wins</div></div>
       <div class="card tile"><div class="lbl">Average per trade (5 yrs)</div><div class="val ${cls(S.recent5y.avg)}">${(S.recent5y.avg >= 0 ? "+" : "") + (S.recent5y.avg * 100).toFixed(2)}%</div><div class="chg muted">last 12 months: ${(S.last12m.avg * 100).toFixed(2)}%</div></div>
     </div>
+    ${S.baseline ? `<div class="card tablewrap"><h3>Effect of the stress filters (same data)</h3><table><tr><th></th><th class="num">Trades (5 yrs)</th><th class="num">Win rate (5 yrs)</th><th class="num">Avg/trade (5 yrs)</th><th class="num">Win rate (12 m)</th><th class="num">Avg/trade (12 m)</th></tr>
+      ${[["Without filters", S.baseline], ["With filters (used now)", S]].map(([n, x]) => `<tr><td>${n}</td><td class="num">${x.recent5y.n.toLocaleString()}</td><td class="num">${pc(x.recent5y.win)}</td><td class="num ${cls(x.recent5y.avg)}">${(x.recent5y.avg * 100).toFixed(2)}%</td><td class="num">${pc(x.last12m.win)}</td><td class="num ${cls(x.last12m.avg)}">${(x.last12m.avg * 100).toFixed(2)}%</td></tr>`).join("")}</table>
+      <p class="muted">The filters halve the number of trades. Picks appear less often, but each one has historically been better.</p></div>` : ""}
     <div class="note warnbox">The rule wins often, but only small amounts: <b>+2% wins, −8% losses</b>. In some years it won 75%+ of trades and still lost money overall. Never skip the stop-loss, and never put all your money in one pick. These numbers are recomputed from real prices on every refresh.</div>
     <div class="card tablewrap"><h3>Year by year (after costs)</h3><table><tr><th>Year</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg per trade</th></tr>${yrs}</table></div>
     <h3>🎯 Live record of these picks</h3>
@@ -265,6 +297,7 @@ function renderStocks() {
 
   el.innerHTML = `
     <h2>Odds a stock is higher in the next few hours</h2>
+    <div class="note warnbox"><b>Honest status:</b> next-few-hours direction is close to a coin flip. A Nov 2026 study tested 13 model and feature sets (overnight US markets, crypto, crude, metals, USD/INR, sector strength, breadth, pooled and boosted models) on 29 Nifty stocks. None beat chance on unseen data, and the live track record agrees. For decisions, use <b>⭐ Daily picks</b> (multi-day, tested) and the opening forecast on the Compass tab. Treat this page as context.</div>
     <div class="controls">
       <label>Stock<select id="symSel">${["Nifty 50", "Top performer", "Index"].map(g => {
         const ks = syms.filter(k => (S[k].group || "Nifty 50") === g).sort();
