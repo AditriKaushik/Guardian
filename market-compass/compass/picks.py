@@ -32,6 +32,19 @@ MIN_WIN = 0.75
 # Stress filters (v2, added Nov 2026 after an out-of-sample study: win 79.7% -> 83.8%, avg +0.22% -> +0.55%
 # per trade on 2021-11..2026-11 data that was not used to choose them; better in every year 2017-2026).
 IVIX_REL, NIFTY_5D_MAX, VOL_MAX = -0.02, 0.0, 1.2
+
+# SELL (short) rule, EXPERIMENTAL (Nov 2026 study of 675 short variants; only this one held out of sample):
+# gap-down continuation. Stock opens 4%+ below yesterday's close on 2x+ its 50-day volume and closes in the bottom
+# quarter of the day's range. Short at the close via stock futures; cover at -1.5% (target), +8% (stop; a gap up
+# through it fills at the open) or after 15 trading days. 0.15% round-trip cost.
+# Test 2021-11..2026-11: 86 trades, 83.7% wins, +0.61% avg (t=1.4, not statistically proven).
+S_TARGET, S_STOP, S_MAX_DAYS, S_COST = 0.015, 0.08, 15, 0.0015
+S_GAP, S_VOL, S_CLOSEPOS = -0.04, 2.0, 0.25
+MAX_SELL, MAX_SELL_PER_INDUSTRY = 3, 1
+# Nifty index BUY rule (study of 360 index variants; chosen on pre-2017 data): Nifty above its 200-day average and
+# India VIX closes above its prior 20-day high -> buy Nifty at the close; +1% target, -6% stop, 10 days.
+# Test 2017..2026: 75 trades, 77.3% wins, +0.24% avg. No index SELL rule qualified.
+IX_TARGET, IX_STOP, IX_DAYS, IX_COST = 0.01, 0.06, 10, 0.0005
 MAX_PICKS, MAX_PER_INDUSTRY = 5, 2
 DEFENSIVE = ("FMCG", "Fast Moving Consumer Goods", "Healthcare", "Information Technology", "Pharma")
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
@@ -128,6 +141,98 @@ def stress_masks(frames: dict, nifty: pd.Series, ivix: pd.Series) -> tuple[pd.Se
     return regime, vol
 
 
+def short_signal(df: pd.DataFrame) -> pd.Series:
+    avgv = df["Volume"].rolling(50).mean().shift(1)
+    rng = (df["High"] - df["Low"]).replace(0, np.nan)
+    gap = df["Open"] / df["Close"].shift() - 1
+    return ((gap <= S_GAP) & (df["Volume"] > S_VOL * avgv) & ((df["Close"] - df["Low"]) / rng <= S_CLOSEPOS)).fillna(False)
+
+
+def simulate_short(o, h, l, c, i, target=S_TARGET, stop=S_STOP, max_days=S_MAX_DAYS, cost=S_COST):
+    """Short entered at close i. Returns (net return or None if still open, exit index, how)."""
+    e = c[i]
+    tgt, stp = e * (1 - target), e * (1 + stop)
+    for j in range(i + 1, min(i + 1 + max_days, len(c))):
+        if o[j] >= stp:
+            return 1 - o[j] / e - cost, j, "stop (gap)"
+        if o[j] <= tgt:
+            return 1 - o[j] / e - cost, j, "target (gap)"
+        if h[j] >= stp:
+            return -stop - cost, j, "stop"
+        if l[j] <= tgt:
+            return target - cost, j, "target"
+    if i + max_days < len(c):
+        j = i + max_days
+        return 1 - c[j] / e - cost, j, "time exit"
+    return None, len(c) - 1, "open"
+
+
+def backtest_short(frames: dict) -> pd.DataFrame:
+    rows = []
+    for sym, df in frames.items():
+        c = df["Close"]
+        if len(c) < 300:
+            continue
+        sig = short_signal(df).to_numpy()
+        jump = ((df["Open"] / c.shift() - 1).abs() > 0.20).to_numpy()
+        o, h, l, cc = (df[k].to_numpy() for k in ("Open", "High", "Low", "Close"))
+        i = 60
+        while i < len(cc) - 1:
+            if not sig[i] or jump[i]:
+                i += 1
+                continue
+            r, j, how = simulate_short(o, h, l, cc, i)
+            if r is None:
+                break
+            if not jump[i + 1: j + 1].any():
+                rows.append((sym, c.index[i], r, j - i, how))
+            i = j + 1
+    return pd.DataFrame(rows, columns=["sym", "date", "ret", "days", "how"])
+
+
+def index_rule(nifty: pd.DataFrame, ivix: pd.Series, today: pd.Timestamp) -> dict:
+    """Nifty VIX-spike BUY rule: today's signal plus its own backtest on the available history."""
+    c = nifty["Close"]
+    v = ivix.reindex(c.index).ffill(limit=3)
+    sma = c.rolling(200).mean()
+    vh = v.shift(1).rolling(20).max()
+    sig = ((c > sma) & (v > vh)).fillna(False).to_numpy()
+    o, h, l, cc = (nifty[k].to_numpy() for k in ("Open", "High", "Low", "Close"))
+    rows, i = [], 200
+    while i < len(cc) - 1:
+        if not sig[i]:
+            i += 1
+            continue
+        e = cc[i]
+        tgt, stp, out = e * (1 + IX_TARGET), e * (1 - IX_STOP), None
+        for j in range(i + 1, min(i + 1 + IX_DAYS, len(cc))):
+            if o[j] <= stp:
+                out = (o[j] / e - 1, j)
+            elif o[j] >= tgt:
+                out = (o[j] / e - 1, j)
+            elif l[j] <= stp:
+                out = (-IX_STOP, j)
+            elif h[j] >= tgt:
+                out = (IX_TARGET, j)
+            elif j == i + IX_DAYS:
+                out = (cc[j] / e - 1, j)
+            if out:
+                break
+        if out is None:
+            break
+        rows.append((c.index[i], out[0] - IX_COST))
+        i = out[1] + 1
+    tr = pd.DataFrame(rows, columns=["date", "ret"])
+    last = float(c.iloc[-1])
+    active = bool(sig[-1]) and c.index[-1] >= today - pd.Timedelta(days=5)
+    st = rule_stats(tr, today) if len(tr) else {}
+    return {"signal": "BUY" if active else None, "price": round(last, 1), "target": round(last * (1 + IX_TARGET), 1),
+            "stop": round(last * (1 - IX_STOP), 1), "days": IX_DAYS,
+            "vix": round(float(v.iloc[-1]), 2), "vix_20d_high": round(float(vh.iloc[-1]), 2),
+            "above_200dma": bool(c.iloc[-1] > sma.iloc[-1]), "stats": st,
+            "study": {"oos_n": 75, "oos_win": 0.773, "oos_avg": 0.0024, "period": "2017–2026"}}
+
+
 def backtest(frames: dict, nifty_up: pd.Series, regime: pd.Series | None = None, vol: dict | None = None) -> pd.DataFrame:
     rows = []
     for sym, df in frames.items():
@@ -196,8 +301,9 @@ def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, i
         for s, ind in fetch_index_list(name).items():
             uni.setdefault(s, {"industry": ind or "Other", "group": grp})
     frames = load_frames(sorted(uni))
-    nif = D.history("^NSEI", "10y", "1d")["Close"]
-    nif.index = pd.to_datetime(nif.index).tz_localize(None).normalize()
+    nif_df = D.history("^NSEI", "10y", "1d")
+    nif_df.index = pd.to_datetime(nif_df.index).tz_localize(None).normalize()
+    nif = nif_df["Close"]
     nifty_up = nif > nif.rolling(200).mean()
     today = pd.Timestamp(now.date())
     iv = D.history("^INDIAVIX", "10y", "1d")["Close"]
@@ -313,8 +419,80 @@ def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, i
         per_ind[r["industry"]] = per_ind.get(r["industry"], 0) + 1
         picks.append(r)
 
+    # ---------------- SELL (short) suggestions, experimental, F&O stocks only
+    from . import fo
+    lots = fo.fo_lot_sizes()
+    str_ = backtest_short(frames)
+    s_stats = rule_stats(str_, today) if len(str_) else {"recent5y": {"n": 0, "win": None, "avg": None}}
+    s_ok = bool(s_stats["recent5y"]["win"] and s_stats["recent5y"]["win"] >= MIN_WIN and (s_stats["recent5y"]["avg"] or 0) > 0)
+    sell_market = [
+        {"name": f"SELL rule still works: last-5-year win rate at or above {MIN_WIN:.0%} and average above 0",
+         "ok": s_ok, "detail": f"{(s_stats['recent5y']['win'] or 0):.1%} wins, {(s_stats['recent5y']['avg'] or 0)*100:+.2f}% avg over {s_stats['recent5y']['n']} real trades"},
+        {"name": "Crash guard: India VIX at or below 40", "ok": vix is not None and vix <= 40,
+         "detail": f"India VIX {vix:.1f}" if vix is not None else "VIX not available"},
+    ]
+    sell_cands, sell_blocked = [], []
+    for sym, df in frames.items():
+        if len(df) < 60 or df.index[-1] < today - pd.Timedelta(days=5):
+            continue
+        if not bool(short_signal(df).iloc[-1]):
+            continue
+        last = float(df["Close"].iloc[-1])
+        gap = float(df["Open"].iloc[-1] / df["Close"].iloc[-2] - 1)
+        volx = float(df["Volume"].iloc[-1] / df["Volume"].rolling(50).mean().shift(1).iloc[-1])
+        rngd = float(df["High"].iloc[-1] - df["Low"].iloc[-1]) or 1e-9
+        pos = float((last - df["Low"].iloc[-1]) / rngd)
+        tv20 = float((df["Close"] * df["Volume"]).tail(20).mean() / 1e7)
+        info = uni.get(sym, {})
+        lot = lots.get(sym)
+        checks = [
+            ("In NSE F&O (only F&O stocks can be shorted overnight)", lot is not None,
+             f"lot size {lot}" if lot else "not in F&O: cannot short overnight; if you hold it, consider exiting"),
+            ("Not in NSE F&O ban list (no fresh positions allowed in ban)",
+             None if not reg["checked"].get("fo_ban") else sym not in reg["fo_ban"], "in ban" if sym in reg["fo_ban"] else "clear"),
+            ("Not under ASM/GSM surveillance", None if not reg["checked"].get("asm") else (sym not in reg["asm"] and sym not in reg["gsm"]),
+             reg["asm"].get(sym) or reg["gsm"].get(sym) or "clear"),
+            ("Liquid: average daily traded value at or above Rs 20 crore", tv20 >= 20, f"Rs {tv20:,.0f} cr/day"),
+            ("Not a corporate-action gap (above 20%)", abs(gap) <= 0.20, f"gap {gap:+.1%}"),
+        ]
+        fails = [n for n, ok, _ in checks if ok is False]
+        rec = {"sym": sym, "side": "SELL", "industry": info.get("industry", "Other"), "group": info.get("group", ""),
+               "price": round(last, 2), "gap": round(gap, 4), "vol_x": round(volx, 1), "close_pos": round(pos, 2),
+               "day_chg": round(float(last / df["Close"].iloc[-2] - 1), 5),
+               "target": round(last * (1 - S_TARGET), 2), "stop": round(last * (1 + S_STOP), 2),
+               "exit_by": (today + pd.tseries.offsets.BDay(S_MAX_DAYS)).date().isoformat(),
+               "lot": lot, "contract_value": round(lot * last) if lot else None,
+               "margin_est": round(lot * last * 0.20) if lot else None,
+               "p_rule": round(s_stats["recent5y"]["win"] or 0, 4),
+               "why": [f"opened {gap:+.1%} below yesterday's close", f"volume {volx:.1f}× its 50-day average",
+                       f"closed in the bottom {pos:.0%} of the day's range"],
+               "checks": [{"name": n, "ok": ok, "detail": d} for n, ok, d in checks]}
+        if fails or not all(m["ok"] for m in sell_market):
+            rec["blocked_by"] = fails or ["SELL rule conditions not met"]
+            sell_blocked.append(rec)
+        else:
+            sell_cands.append(rec)
+    sell_cands.sort(key=lambda r: (r["gap"], -r["vol_x"]))
+    sell_picks, per_ind_s = [], {}
+    for r in sell_cands:
+        if len(sell_picks) >= MAX_SELL or per_ind_s.get(r["industry"], 0) >= MAX_SELL_PER_INDUSTRY:
+            r["blocked_by"] = ["daily SELL limit or one-per-industry limit reached (diversification)"]
+            sell_blocked.append(r)
+            continue
+        per_ind_s[r["industry"]] = per_ind_s.get(r["industry"], 0) + 1
+        sell_picks.append(r)
+    sell = {"rule": {"target": S_TARGET, "stop": S_STOP, "max_days": S_MAX_DAYS, "cost": S_COST, "gap": S_GAP,
+                     "vol": S_VOL, "close_pos": S_CLOSEPOS, "max_picks": MAX_SELL},
+            "stats": s_stats, "market": sell_market, "picks": sell_picks, "blocked": sell_blocked[:15],
+            "fo_count": len(lots)}
+    try:
+        index_sig = index_rule(nif_df, iv, today)
+    except Exception as exc:
+        index_sig = {"error": str(exc)}
+
     last_bar = max((f.index[-1] for f in frames.values()), default=today)
     payload = {
+        "sell": sell, "index": index_sig,
         "rule": {"target": TARGET, "stop": STOP, "max_days": MAX_DAYS, "cost": COST, "min_win": MIN_WIN,
                  "max_picks": max_picks, "max_per_industry": MAX_PER_INDUSTRY},
         "stats": stats, "market": market, "market_ok": market_ok,
@@ -341,6 +519,20 @@ def update_pick_track(track: dict, payload: dict, frames: dict, now: datetime, i
         entry_day = pd.Timestamp(rec["date"])
         after = df[df.index > entry_day]
         e, done = rec["entry"], None
+        if rec.get("side") == "SELL":
+            if len(after):
+                o_, h_, l_, c_ = (np.r_[e, after[k].to_numpy()] for k in ("Open", "High", "Low", "Close"))
+                r_, j_, how_ = simulate_short(o_, h_, l_, c_, 0)
+                if r_ is not None:
+                    done = (r_, after.index[j_ - 1], how_)
+            if done and not (is_open and pd.Timestamp(done[1]).date() == now.date()):
+                rec.update({"ret": round(done[0], 5), "exit_date": str(pd.Timestamp(done[1]).date()), "how": done[2]})
+                pt["resolved"].append(rec)
+            else:
+                if len(after):
+                    rec["last"] = round(float(after.Close.iloc[-1]), 2)
+                still.append(rec)
+            continue
         for k, (d, row) in enumerate(after.iterrows(), start=1):
             if row.Open <= rec["stop"]:
                 done = (row.Open / e - 1 - COST, d, "stop (gap)")
@@ -368,11 +560,15 @@ def update_pick_track(track: dict, payload: dict, frames: dict, now: datetime, i
     today = now.date().isoformat()
     if not is_open and after_close and payload.get("as_of") == today:
         have = {(r["sym"], r["date"]) for r in pt["open"] + pt["resolved"]}
-        for p in payload["picks"]:
+        for p in payload["picks"] + payload.get("sell", {}).get("picks", []):
             if (p["sym"], today) not in have:
-                pt["open"].append({"sym": p["sym"], "date": today, "entry": p["price"], "target": p["target"],
-                                   "stop": p["stop"], "p": p["p_rule"]})
+                pt["open"].append({"sym": p["sym"], "side": p.get("side", "BUY"), "date": today, "entry": p["price"],
+                                   "target": p["target"], "stop": p["stop"], "p": p["p_rule"]})
     res = pt["resolved"]
-    pt["summary"] = {"n": len(res), "wins": sum(1 for r in res if r["ret"] > 0),
-                     "avg": round(sum(r["ret"] for r in res) / len(res), 5) if res else None}
+
+    def summ(rows):
+        return {"n": len(rows), "wins": sum(1 for r in rows if r["ret"] > 0),
+                "avg": round(sum(r["ret"] for r in rows) / len(rows), 5) if rows else None}
+    pt["summary"] = summ([r for r in res if r.get("side", "BUY") == "BUY"])
+    pt["summary_sell"] = summ([r for r in res if r.get("side") == "SELL"])
     return track

@@ -172,3 +172,37 @@ def test_history_features_and_analogs_have_no_lookahead():
     picked, _ = Hh._nearest(F, t, 20, 10)
     assert (picked <= t - 20).all()                     # every analog's 20-day outcome is already known
     assert len(set(picked)) == len(picked)
+
+
+def test_short_rule_exits_and_signal():
+    from compass import picks as P
+
+    e = 100.0
+    # target (price falls 1.5%) on day 2
+    r, j, how = P.simulate_short(np.array([e, 99.5, 99.0]), np.array([e, 100.5, 99.2]), np.array([e, 99.0, 98.0]), np.array([e, 99.4, 98.6]), 0)
+    assert how == "target" and j == 2 and abs(r - (P.S_TARGET - P.S_COST)) < 1e-9
+    # gap UP through the stop fills at the open (worse than -8%)
+    r, j, how = P.simulate_short(np.array([e, 110.0]), np.array([e, 111.0]), np.array([e, 109.0]), np.array([e, 110.0]), 0)
+    assert how == "stop (gap)" and abs(r - (1 - 110 / 100 - P.S_COST)) < 1e-9
+    # signal: 5% gap down on 3x volume closing near the low
+    n = 80
+    df = pd.DataFrame({"Open": np.full(n, 100.0), "High": np.full(n, 101.0), "Low": np.full(n, 99.0),
+                       "Close": np.full(n, 100.0), "Volume": np.full(n, 1000.0)})
+    df.loc[n - 1] = [95.0, 95.5, 92.0, 92.3, 3000.0]
+    assert P.short_signal(df).iloc[-1] and not P.short_signal(df).iloc[-2]
+
+
+def test_sell_pick_track_resolves_short():
+    from compass import picks as P
+
+    idx = pd.bdate_range("2026-11-02", periods=6)
+    df = pd.DataFrame({"Open": [100, 99.5, 99, 98, 97, 97], "High": [101, 100, 99.5, 98.5, 97.5, 97.5],
+                       "Low": [99, 99, 98.2, 97.5, 96.5, 96.5], "Close": [100, 99.4, 98.6, 98, 97, 97],
+                       "Volume": [1] * 6}, index=idx, dtype=float)
+    track = {"picks": {"open": [{"sym": "X", "side": "SELL", "date": "2026-11-02", "entry": 100.0,
+                                 "target": 98.5, "stop": 108.0, "p": 0.8}], "resolved": []}}
+    out = P.update_pick_track(track, {"picks": [], "as_of": "2026-11-09"}, {"X": df},
+                              pd.Timestamp("2026-11-10 18:00", tz="Asia/Kolkata").to_pydatetime(), False)
+    res = out["picks"]["resolved"]
+    assert len(res) == 1 and res[0]["how"] == "target" and res[0]["ret"] > 0
+    assert out["picks"]["summary_sell"]["wins"] == 1
