@@ -21,6 +21,17 @@ MACRO_TICKERS = {
     "nikkei": ("^N225", "Nikkei (Japan)"),
     "hangseng": ("^HSI", "Hang Seng (HK)"),
     "gold": ("GC=F", "Gold ($)"),
+    # Commodities, metals, energy, crypto and US risk gauges (cause -> effect panel)
+    "silver": ("SI=F", "Silver ($)"),
+    "copper": ("HG=F", "Copper ($/lb)"),
+    "aluminium": ("ALI=F", "Aluminium ($/t)"),
+    "zinc": ("ZNC=F", "Zinc ($/t)"),
+    "wti": ("CL=F", "WTI crude ($)"),
+    "natgas": ("NG=F", "Natural gas ($)"),
+    "btc": ("BTC-USD", "Bitcoin ($)"),
+    "eth": ("ETH-USD", "Ethereum ($)"),
+    "usvix": ("^VIX", "US VIX (fear)"),
+    "nasdaq": ("^IXIC", "Nasdaq (US tech)"),
 }
 
 SECTOR_INDICES = {
