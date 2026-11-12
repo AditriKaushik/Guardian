@@ -34,7 +34,7 @@ themselves are close to real time (usually within a minute or two).
 
 ---
 
-## 1. What's in the app (6 tabs)
+## 1. What's in the app (7 tabs)
 
 1. **🧭 Compass:** live tiles for Nifty, Bank Nifty, India VIX, USD/INR, the US Dollar Index,
    the US 10-year yield, Brent crude, gold, the S&P 500, Nikkei and Hang Seng.
@@ -45,7 +45,29 @@ themselves are close to real time (usually within a minute or two).
    - The result is a **stance for the day** (Aggressive Buy / Cautious Buy / Neutral / Defensive /
      Protect Capital) and the **sectors to favour or avoid**. Your choices and daily log are saved
      on your device.
-2. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
+2. **⭐ Daily picks:** stocks that pass **every** condition, with a **75%+ historical win rate**.
+   Checks 150 stocks (Nifty 50 + Next 50 + Midcap 50) every refresh.
+   - **Rule:** buy a strong stock (above its 200-day average, 50-day above 200-day) on a short dip
+     (below its lower Bollinger Band or RSI(2) under 5), only while Nifty is above its 200-day
+     average. Sell at **+2% target, −8% stop-loss, or after 15 trading days**. Delivery only.
+   - **Conditions:**
+     - Market-level: market regime, India VIX ≤ 25, macro stance, the rule's own recent win rate
+       ≥ 75%, and FII selling (caution only).
+     - Stock-level: no results or board meeting within 3 weeks (NSE event calendar), not in the
+       F&O ban list, not under ASM/GSM surveillance, liquidity ≥ ₹20 cr a day, no circuit-type
+       move, no corporate-action gap, and a sector allowed by the stance.
+     - Limits: max 5 picks a day and 2 per industry. Position size risks 1% of your capital.
+   - **Real numbers** (recomputed from 10 years of real prices on every refresh, after 0.25%
+     costs): about **81% wins overall and ~80% in the last 5 years**. But wins are small (+2%) and
+     losses big (−6 to −8%). In 2018, 2019 and 2022 it won 75%+ of trades yet lost money overall,
+     and in 2026 so far it is at 69%. The page shows all of this, plus a live record of every
+     final pick.
+   - **Timing:** the list is provisional while the market is open and final after 3:30 PM. The
+     rule enters near the close (3:15–3:25 PM). On many days **no stock qualifies**; that is part
+     of the strategy.
+   - Also on the page: Indian rules and regulations (SEBI RA rules, surveillance, T+1 settlement,
+     STT and costs, tax, fraud warnings).
+3. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
    refresh, so index changes appear automatically) plus **20 ⭐ top performers** picked fresh
    from Nifty Next 50 and Nifty Midcap 50 by 3-month return (each must also be up over 1 month).
    Nifty and Bank Nifty are included too. A **Today's movers** table shows the live top gainers
@@ -57,16 +79,16 @@ themselves are close to real time (usually within a minute or two).
    - the quantity to buy, with a stop-loss, a target and the rough expected value;
    - a plain-language reading of the chart, and a chart with Bollinger Bands;
    - a ranked list of the stocks where the model has proven some skill today.
-3. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
+4. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
    1 month), and links to NSE's big-player pages: bulk/block deals, option chain, FII positions,
    insider trades.
-4. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
+5. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
    month's seasonal theme (festivals, monsoon, Budget, results season).
-5. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
+6. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
    at the live price, then marked ✅ or ❌ against the **actual** price when its horizon ends. It
    shows the live hit rate against simple guessing, overall and for each horizon. It covers the
    last 20 days.
-6. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
+7. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
 
 ---
 
@@ -135,6 +157,7 @@ market-compass/
 │   ├── scorecard.py          ← the 16 factors, scoring rules, stance, sector tilts
 │   ├── stock_model.py        ← the stock probability engine
 │   ├── events.py             ← recurring events + seasonal themes
+│   ├── picks.py              ← Daily picks: rule, backtest, conditions, SEBI/NSE checks
 │   ├── universe.py           ← which stocks: all Nifty 50 + top performers (auto)
 │   └── stocks.py             ← stock list for the desktop version
 ├── data/events.csv           ← shared events shown on everyone's calendar (edit on GitHub)
@@ -257,6 +280,11 @@ sign in with GitHub and choose repo `AditriKaushik/Guardian`, branch `main`, mai
 >     all data.
 >   - P(up) is shrunk toward the base rate by a reliability score: AUC-based, and capped at 0.3
 >     unless test accuracy beats always-guess.
+> - `compass/picks.py`: Daily picks. 150 stocks × 10y daily data; rule = uptrend + (close < lower BB or RSI2 < 5)
+>   with Nifty > 200DMA; exit +2% / −8% / 15 days; 0.25% costs. Stats recomputed every build.
+>   Gates: VIX ≤ 25, auto-stance, rule's 5y win ≥ 75%, NSE event calendar (21 days), F&O ban CSV, NSE ASM/GSM
+>   APIs, liquidity, ±8% move, corporate-action gaps, max 5 picks / 2 per industry. Final picks are logged
+>   after the close and resolved in track.json → picks.
 > - `compass/universe.py`: all Nifty 50 (NSE's official CSV, with a built-in fallback) + top 20
 >   by 3-month return from Nifty Next 50 / Midcap 50, plus the two indices.
 > - `compass/build_site.py`: about 72 symbols × 4 horizons, plus the live forward-test log

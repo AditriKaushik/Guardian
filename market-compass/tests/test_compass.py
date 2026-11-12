@@ -99,3 +99,30 @@ def test_builtin_nifty50_fallback_has_50():
     from compass.universe import NIFTY50_FALLBACK
 
     assert len(NIFTY50_FALLBACK) == 50
+
+
+def test_pick_rule_exits():
+    from compass import picks as P
+
+    e = 100.0
+    # target hit on day 2
+    o, h, l, c = [e, 100, 101], [e, 101, 102.5], [e, 99, 100], [e, 100.5, 102]
+    r, j, how = P.simulate(np.array(o), np.array(h), np.array(l), np.array(c), 0)
+    assert how == "target" and abs(r - (P.TARGET - P.COST)) < 1e-9 and j == 2
+    # gap below stop -> filled at the open, worse than -8%
+    r, j, how = P.simulate(np.array([e, 85.0]), np.array([e, 86.0]), np.array([e, 84.0]), np.array([e, 85.0]), 0)
+    assert how == "stop (gap)" and abs(r - (85 / 100 - 1 - P.COST)) < 1e-9
+    # neither hit within MAX_DAYS -> time exit at close
+    n = P.MAX_DAYS + 2
+    flat = np.full(n, 100.0)
+    r, j, how = P.simulate(flat, flat + 0.5, flat - 0.5, flat, 0)
+    assert how == "time exit" and j == P.MAX_DAYS
+
+
+def test_pick_signal_needs_uptrend_and_dip():
+    from compass import picks as P
+
+    up = pd.Series(np.linspace(100, 200, 300))
+    assert not P.signal_frame(up)["sig"].iloc[-1]            # steady rise, no dip
+    dip = pd.concat([up, pd.Series([190.0, 180.0, 172.0])], ignore_index=True)
+    assert P.signal_frame(dip)["sig"].iloc[-1]               # sharp dip in an uptrend
