@@ -11,7 +11,8 @@ THE RULE (tested on 10 years of real daily data for Nifty 50 + Next 50 + Midcap 
 Small target + wide stop = high win rate but one loss wipes out ~4 wins, so the
 statistics (recomputed on every build from real data) are shown with the picks.
 
-CONDITIONS (every one must pass): market regime, India VIX, macro stance, no results/board meeting
+CONDITIONS (every one must pass): market regime, India VIX crash guard (<= 40; the old <= 25 gate was
+dropped in Nov 2026: picks taken with India VIX above 20 historically won 93% vs 85% below it), macro stance, no results/board meeting
 within 21 days (NSE event calendar), not in the F&O ban list, not under ASM/GSM surveillance, liquidity,
 no circuit-type move or corporate-action gap, and the rule's recent 5-year win rate must be >= 75%.
 """
@@ -219,7 +220,7 @@ def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, i
     market = [
         {"name": "Market regime: Nifty above its 200-day average", "ok": regime_ok,
          "detail": f"Nifty {nif.iloc[-1]:,.0f} vs 200-day avg {nif.rolling(200).mean().iloc[-1]:,.0f}"},
-        {"name": "Fear index: India VIX at or below 25", "ok": vix is not None and vix <= 25,
+        {"name": "Crash guard: India VIX at or below 40", "ok": vix is not None and vix <= 40,
          "detail": f"India VIX {vix:.1f}" if vix is not None else "VIX not available"},
         {"name": "Macro stance (auto factors) is not PROTECT CAPITAL", "ok": stance_name != "PROTECT CAPITAL",
          "detail": f"auto stance: {stance_name}" + (" (only defensive sectors allowed)" if stance_name == "DEFENSIVE" else "")},

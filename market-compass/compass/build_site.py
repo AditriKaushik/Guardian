@@ -28,6 +28,7 @@ from .universe import build_universe
 from . import picks as PK
 from . import crossasset as XA
 from . import news as NW
+from . import history as HL
 from .universe import NAMES, fetch_index_list
 
 HORIZONS = [1, 2, 3, "close"]
@@ -279,6 +280,11 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
     except Exception as exc:
         news = {"error": f"News unavailable this refresh: {exc}"}
 
+    try:
+        hist_lab = HL.build(now)
+    except Exception as exc:
+        hist_lab = {"error": f"History lab unavailable this refresh: {exc}"}
+
     auto = [f["auto_score"] for f in factors if f["auto"] and f["auto_score"] is not None]
     try:
         picks, daily_frames = PK.build_picks(snap, sum(auto) / len(auto) if auto else 0.0, fii, now, is_open,
@@ -301,6 +307,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "daily_picks": picks,
         "global": global_view,
         "news": news,
+        "history": hist_lab,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "data.json").write_text(json.dumps(payload, separators=(",", ":")))

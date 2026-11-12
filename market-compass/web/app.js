@@ -43,7 +43,7 @@ function isMarketHoursNow() {
   return d >= 1 && d <= 5 && m >= 9 * 60 + 15 && m <= 15 * 60 + 30;
 }
 
-function renderAll() { renderCompass(); renderPicks(); renderNews(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
+function renderAll() { renderCompass(); renderPicks(); renderNews(); renderHistory(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
 
 /* ---------------------------------------------------------------- compass */
 const MACRO_ORDER = ["nifty", "banknifty", "vix", "usdinr", "dxy", "us10y", "brent", "gold", "sp500", "nikkei", "hangseng"];
@@ -209,6 +209,46 @@ function renderNews() {
     <h3>All latest headlines</h3>
     <div class="card"><ul class="list">${(N.latest || []).map(h => `<li>${tone(h.tone)} <a href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.title)}</a> <span class="muted">${esc(h.source)} · ${timeShort(h.time)}${h.topics.length ? " · " + h.topics.join(", ") : ""}</span></li>`).join("") || "<li class='muted'>None this refresh.</li>"}</ul>
       <p class="muted">Sources: Google News, Economic Times, Moneycontrol, Livemint, BBC, CNBC, NSE announcements (${feedsOk}/${(N.feeds || []).length} feeds answered on this refresh). Tone is a simple finance-phrase reading of each headline (e.g. "crude jumps" = bad for India, "rate cut" = good), so it can be wrong. Open the story before acting.</p></div>`;
+}
+
+
+/* ---------------------------------------------------------------- history lab */
+function renderHistory() {
+  const el = $("#history"), H = DATA.history;
+  if (!H || H.error) { el.innerHTML = `<h2>📜 History lab</h2><div class="note warnbox">${esc(H ? H.error : "Not available yet.")}</div>`; return; }
+  const D = H.descr, show = (k, v) => v == null ? "n/a" : D[k].kind === "pct" ? pct(v, 1) : D[k].kind === "logpct" ? pct(Math.exp(v) - 1, 0) : fmt(v, 2);
+  const keys = ["n_dd", "n_r20", "ivix", "inr_r20", "gold_r20", "brent_r20", "dxy_r20", "us10y", "curve", "spx_r20", "usvix"];
+  const out = v => v == null ? `<span class="muted">not yet</span>` : `<span class="${cls(v)}">${pct(v, 1)}</span>`;
+  const S = H.analog_summary, T = H.analog_test, R = H.risk;
+  const sumRow = h => { const x = S[h]; return `<tr><td>${h} trading days</td><td class="num">${(x.up * 100).toFixed(0)}% <span class="muted">(normal ${(x.base_up * 100).toFixed(0)}%)</span></td><td class="num ${cls(x.median)}">${pct(x.median, 1)} <span class="muted">(normal ${pct(x.base_median, 1)})</span></td><td class="num">${pct(x.p10, 1)} … ${pct(x.p90, 1)}</td></tr>`; };
+  const verdictPill = v => v.startsWith("consistently better") ? `<span class="pill" style="background:#1a7f37;color:#fff">✅ ${esc(v)}</span>` : v.startsWith("consistently worse") ? `<span class="pill" style="background:#cf222e;color:#fff">⚠️ ${esc(v)}</span>` : `<span class="pill">${esc(v)}</span>`;
+  const evStat = (st, part) => st[part].n ? `${st[part].n} cases: up ${(st[part].up * 100).toFixed(0)}%, median ${pct(st[part].median, 1)}` : "no cases";
+  const evRow = e => `<details class="card" style="margin-top:8px" ${e.active ? "open" : ""}><summary><b>${e.active ? "🔔 ACTIVE NOW · " : ""}${esc(e.name)}</b> <span class="muted">(${e.n_episodes} times since 2008)</span> ${verdictPill(e.stats["20"].verdict)}</summary>
+      <table><tr><th>After</th><th>2008–2016</th><th>2016–now</th><th>Verdict</th></tr>${["20", "60"].map(h => `<tr><td>${h} days</td><td>${evStat(e.stats[h], "old")} <span class="muted">(normal ${(e.stats[h].base_old * 100).toFixed(0)}%)</span></td><td>${evStat(e.stats[h], "new")} <span class="muted">(normal ${(e.stats[h].base_new * 100).toFixed(0)}%)</span></td><td>${esc(e.stats[h].verdict)}</td></tr>`).join("")}</table>
+      <p class="muted">Latest episodes (Nifty after 20 / 60 days): ${e.episodes.slice().reverse().map(x => `${esc(x.date)}: ${out(x.after20)} / ${out(x.after60)}`).join(" · ") || "none"}</p></details>`;
+  const active = H.events.filter(e => e.active), rest = H.events.filter(e => !e.active);
+  el.innerHTML = `<h2>📜 History lab: when the world looked like today, what happened next?</h2>
+    <div class="note">Compares today with every trading day since ${esc(H.first_date)}. It uses the Nifty trend and fall from its high, India VIX, rupee, gold, crude, copper, dollar index, US interest rates and yield curve, S&amp;P 500 and US VIX. A US close is used only from the next Indian day.</div>
+    <h3>Today's situation (${esc(H.as_of)})</h3>
+    <div class="card tablewrap"><table><tr>${keys.map(k => `<th>${esc(D[k].label)}</th>`).join("")}</tr><tr>${keys.map(k => `<td class="num">${show(k, H.today_state[k])}</td>`).join("")}</tr></table></div>
+    <h3>🔁 The 10 most similar past days, and what Nifty did next</h3>
+    <div class="card tablewrap"><table><tr><th>Date</th><th class="num">Similarity</th>${keys.slice(0, 6).map(k => `<th class="num">${esc(D[k].label)}</th>`).join("")}<th class="num">+5 days</th><th class="num">+20 days</th><th class="num">+60 days</th></tr>
+      ${H.analogs.map(a => `<tr><td><b>${esc(a.date)}</b></td><td class="num">${(a.similarity * 100).toFixed(0)}%</td>${keys.slice(0, 6).map(k => `<td class="num">${show(k, a.state[k])}</td>`).join("")}<td class="num">${out(a.after["5"])}</td><td class="num">${out(a.after["20"])}</td><td class="num">${out(a.after["60"])}</td></tr>`).join("")}</table></div>
+    <div class="card tablewrap" style="margin-top:10px"><h3>What the 25 closest past situations did next</h3>
+      <table><tr><th>Horizon</th><th class="num">Nifty was higher</th><th class="num">Median move</th><th class="num">Range (10th…90th %)</th></tr>${["5", "20", "60"].map(sumRow).join("")}</table></div>
+    <div class="note warnbox"><b>Honest scorecard:</b> this "similar days" forecast was tested on every week since 2013, using only the history available on each date.
+      It called the 20-day direction right <b>${(T["20"].hit * 100).toFixed(0)}%</b> of the time, while simply assuming "Nifty goes up" was right <b>${(T["20"].hit_always_up * 100).toFixed(0)}%</b>. For 60 days: ${(T["60"].hit * 100).toFixed(0)}% vs ${(T["60"].hit_always_up * 100).toFixed(0)}%.
+      History rhymes, but similar-looking days did <b>not</b> predict better than the market's normal upward drift. Treat this as context.</div>
+    <h3>📏 Expected Nifty range for the next 20 trading days (from India VIX)</h3>
+    <div class="grid"><div class="card tile"><div class="lbl">Likely range (about 2 in 3 chance)</div><div class="val">${fmt(R.lo, 0)} – ${fmt(R.hi, 0)}</div><div class="chg muted">±${pct(R.sigma20, 1).replace("+", "")} from ${fmt(H.nifty, 0)}</div></div>
+      <div class="card tile"><div class="lbl">Wide range (about 19 in 20)</div><div class="val">${fmt(R.lo2, 0)} – ${fmt(R.hi2, 0)}</div><div class="chg muted">India VIX ${R.ivix}</div></div>
+      <div class="card tile"><div class="lbl">How often it held</div><div class="val">${(R.hit_1sigma * 100).toFixed(0)}%</div><div class="chg muted">of ${R.n.toLocaleString()} past days stayed inside the likely range</div></div></div>
+    <p class="muted">In tests India VIX predicted the next month's volatility better than similar-day matching (correlation 0.59 vs 0.44). Size your positions from this range: the wider it is, the smaller the position.</p>
+    <h2>⚡ Cause → effect event history</h2>
+    <p class="muted">Each event lists every past episode since 2008 and what Nifty did next, split into 2008–2016 and 2016–now. "Consistently better/worse" means both periods differed from normal by 8+ points and each had at least 5 cases. Few events pass that bar, so most are context only.</p>
+    ${active.length ? `<h3>🔔 Active in the last 20 trading days</h3>${active.map(evRow).join("")}` : `<p>No tracked event is active right now.</p>`}
+    <h3>All tracked events</h3>${rest.map(evRow).join("")}
+    <div class="note">What the evidence supports so far: <b>India VIX above 25 (panic)</b> was followed by a higher Nifty 20 days later 82% / 75% of the time (normal 56% / 63%). <b>Crude oil crashing 20%+ in a month</b> (2008, 2014–15, 2020) was followed by a weaker Nifty: only 20% / 33% up after 20 days. ⭐ Daily picks now allow trades in high-VIX panics, because its own tests showed those dips bounced best (93% wins with India VIX above 20).</div>`;
 }
 
 /* ---------------------------------------------------------------- daily picks */

@@ -39,7 +39,7 @@ themselves are close to real time (usually within a minute or two).
 
 ---
 
-## 1. What's in the app (8 tabs)
+## 1. What's in the app (9 tabs)
 
 1. **🧭 Compass:** live tiles for Nifty, Bank Nifty, India VIX, USD/INR, the US Dollar Index,
    the US 10-year yield, Brent crude, gold, the S&P 500, Nikkei and Hang Seng.
@@ -68,7 +68,7 @@ themselves are close to real time (usually within a minute or two).
      (below its lower Bollinger Band or RSI(2) under 5), only while Nifty is above its 200-day
      average. Sell at **+2% target, −8% stop-loss, or after 15 trading days**. Delivery only.
    - **Conditions:**
-     - Market-level: market regime, India VIX ≤ 25, macro stance, the rule's own recent win rate
+     - Market-level: market regime, India VIX ≤ 40 (crash guard), macro stance, the rule's own recent win rate
        ≥ 75%, and FII selling (caution only).
      - Stock-level: no results or board meeting within 3 weeks (NSE event calendar), not in the
        F&O ban list, not under ASM/GSM surveillance, liquidity ≥ ₹20 cr a day, no circuit-type
@@ -108,7 +108,27 @@ themselves are close to real time (usually within a minute or two).
    - **Honest note:** research and our own tests agree that overnight news is mostly priced in at
      the open. So the app saves each morning's mood and compares it with Nifty's real opening and
      day move. The 🎯 live check shows the hit rate once 5 days are logged.
-4. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
+4. **📜 History lab:** "when the world looked like today, what happened next?"
+   - **Today's state:** Nifty trend and fall from its high, India VIX, rupee, gold, crude,
+     copper, dollar index, US 10-year and 3-month rates and the yield curve, S&P 500 and US VIX.
+     It is compared with every trading day since 2008.
+   - **The 10 most similar past days**, with what Nifty did 5, 20 and 60 days later, plus a
+     summary of the 25 closest.
+   - **Honest scorecard (recomputed every refresh):** in weekly tests since 2013 this
+     "similar days" forecast was right on the 20-day direction 56% of the time vs 62% for
+     simply assuming "Nifty goes up". It is shown as context, not as a forecast.
+   - **Expected 20-day Nifty range from India VIX:** this predicted volatility best in tests.
+     The actual move stayed inside the likely range 74% of the time.
+   - **Cause → effect event history** for 18 events (rupee crash, crude spike or crash, VIX
+     panic, gold surge, yield jumps, curve inversion, S&P crash, copper moves…). Each shows
+     every episode since 2008 and the outcome in 2008–16 vs 2016–now. 🔔 marks events active in
+     the last 20 days. Only two passed the consistency bar:
+     - **India VIX above 25 →** Nifty higher 20 days later 82% / 75% of the time.
+     - **Crude down 20%+ in a month →** weaker Nifty.
+   - **Change it caused:** ⭐ Daily picks dropped the old "India VIX ≤ 25" gate, which had never
+     been tested; it is now a crash guard at 40. Picks taken with India VIX above 20 won 93%
+     vs 85% below it.
+5. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
    refresh, so index changes appear automatically) plus **20 ⭐ top performers** picked fresh
    from Nifty Next 50 and Nifty Midcap 50 by 3-month return (each must also be up over 1 month).
    Nifty and Bank Nifty are included too. A **Today's movers** table shows the live top gainers
@@ -120,16 +140,16 @@ themselves are close to real time (usually within a minute or two).
    - the quantity to buy, with a stop-loss, a target and the rough expected value;
    - a plain-language reading of the chart, and a chart with Bollinger Bands;
    - a ranked list of the stocks where the model has proven some skill today.
-5. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
+6. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
    1 month), and links to NSE's big-player pages: bulk/block deals, option chain, FII positions,
    insider trades.
-6. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
+7. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
    month's seasonal theme (festivals, monsoon, Budget, results season).
-7. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
+8. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
    at the live price, then marked ✅ or ❌ against the **actual** price when its horizon ends. It
    shows the live hit rate against simple guessing, overall and for each horizon. It covers the
    last 20 days.
-8. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
+9. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
 
 ---
 
@@ -198,6 +218,7 @@ market-compass/
 │   ├── scorecard.py          ← the 16 factors, scoring rules, stance, sector tilts
 │   ├── stock_model.py        ← the stock probability engine
 │   ├── events.py             ← recurring events + seasonal themes
+│   ├── history.py            ← History lab: similar past days, event history, VIX range
 │   ├── news.py               ← overnight news: feeds, topics, tone, sectors, NSE filings, live check
 │   ├── crossasset.py         ← opening-gap forecast, metals tilt, tested cause → effect table
 │   ├── picks.py              ← Daily picks: rule, backtest, conditions, SEBI/NSE checks

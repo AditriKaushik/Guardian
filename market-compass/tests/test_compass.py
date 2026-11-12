@@ -156,3 +156,19 @@ def test_last_close_time_skips_weekend():
     assert N.last_close_time(mon_morning) == pd.Timestamp("2026-11-13 15:30", tz="Asia/Kolkata")
     wed_evening = pd.Timestamp("2026-11-11 18:00", tz="Asia/Kolkata")
     assert N.last_close_time(wed_evening) == pd.Timestamp("2026-11-11 15:30", tz="Asia/Kolkata")
+
+
+def test_history_features_and_analogs_have_no_lookahead():
+    from compass import history as Hh
+
+    idx = pd.bdate_range("2010-01-01", periods=1500)
+    rng = np.random.default_rng(1)
+    raw = {k: pd.Series(100 * np.exp(np.cumsum(rng.normal(0, 0.01, len(idx)))), index=idx) for k in Hh.TICKERS}
+    raw["ivix"] = pd.Series(15 + rng.normal(0, 1, len(idx)).cumsum() * 0.05, index=idx).abs() + 10
+    F, N = Hh.features(raw)
+    # a US series moved on day D must only show up from the next Indian day
+    assert F.index.equals(F.index.sort_values())
+    t = len(F) - 1
+    picked, _ = Hh._nearest(F, t, 20, 10)
+    assert (picked <= t - 20).all()                     # every analog's 20-day outcome is already known
+    assert len(set(picked)) == len(picked)
