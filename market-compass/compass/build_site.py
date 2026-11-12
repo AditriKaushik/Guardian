@@ -26,6 +26,7 @@ from . import stock_model as M
 from .stocks import to_yahoo
 from .universe import build_universe
 from . import picks as PK
+from . import crossasset as XA
 
 HORIZONS = [1, 2, 3, "close"]
 KEEP_DAYS = 20
@@ -260,6 +261,11 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
 
     track = update_track(load_previous_track(previous_track), stocks, frames, now, is_open)
 
+    try:
+        global_view = XA.build(now, snap)
+    except Exception as exc:
+        global_view = {"error": f"Global view unavailable this refresh: {exc}"}
+
     auto = [f["auto_score"] for f in factors if f["auto"] and f["auto_score"] is not None]
     try:
         picks, daily_frames = PK.build_picks(snap, sum(auto) / len(auto) if auto else 0.0, fii, now, is_open)
@@ -279,6 +285,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "calendar": cal.to_dict(orient="records"), "seasonal": E.SEASONAL[today.month],
         "track_summary": track["totals"],
         "daily_picks": picks,
+        "global": global_view,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "data.json").write_text(json.dumps(payload, separators=(",", ":")))

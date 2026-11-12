@@ -25,7 +25,6 @@ MACRO_TICKERS = {
     "silver": ("SI=F", "Silver ($)"),
     "copper": ("HG=F", "Copper ($/lb)"),
     "aluminium": ("ALI=F", "Aluminium ($/t)"),
-    "zinc": ("ZNC=F", "Zinc ($/t)"),
     "wti": ("CL=F", "WTI crude ($)"),
     "natgas": ("NG=F", "Natural gas ($)"),
     "btc": ("BTC-USD", "Bitcoin ($)"),
