@@ -27,6 +27,8 @@ from .stocks import to_yahoo
 from .universe import build_universe
 from . import picks as PK
 from . import crossasset as XA
+from . import news as NW
+from .universe import NAMES, fetch_index_list
 
 HORIZONS = [1, 2, 3, "close"]
 KEEP_DAYS = 20
@@ -266,9 +268,21 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
     except Exception as exc:
         global_view = {"error": f"Global view unavailable this refresh: {exc}"}
 
+    try:
+        news_uni = {}
+        for lst in ("ind_nifty50list", "ind_niftynext50list", "ind_niftymidcap50list"):
+            for sym, ind in fetch_index_list(lst).items():
+                news_uni[sym] = {"name": NAMES.get(sym, sym), "industry": ind}
+        news = NW.build(now, news_uni)
+        track = NW.update_news_log(track, news, D.history("^NSEI", "3mo", "1d"), now)
+        news["live_check"] = track.get("news_summary", {})
+    except Exception as exc:
+        news = {"error": f"News unavailable this refresh: {exc}"}
+
     auto = [f["auto_score"] for f in factors if f["auto"] and f["auto_score"] is not None]
     try:
-        picks, daily_frames = PK.build_picks(snap, sum(auto) / len(auto) if auto else 0.0, fii, now, is_open)
+        picks, daily_frames = PK.build_picks(snap, sum(auto) / len(auto) if auto else 0.0, fii, now, is_open,
+                                             None if "error" in news else news.get("stocks", {}))
         track = PK.update_pick_track(track, picks, daily_frames, now, is_open)
         picks["track"] = track.get("picks", {}).get("summary", {})
     except Exception as exc:  # never let the picks page break the rest of the app
@@ -286,6 +300,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "track_summary": track["totals"],
         "daily_picks": picks,
         "global": global_view,
+        "news": news,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "data.json").write_text(json.dumps(payload, separators=(",", ":")))

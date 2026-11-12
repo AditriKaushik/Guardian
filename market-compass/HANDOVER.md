@@ -8,6 +8,11 @@ It works on any phone, tablet or computer, and you can install it as an app:
 
 - **Android (Chrome):** open the link → tap **⬇ Install app** at the top, or menu ⋮ → **Install app**.
 - **iPhone / iPad (Safari):** open the link → Share button → **Add to Home Screen**.
+- **📱 Android app (APK):** download
+  **https://github.com/AditriKaushik/Guardian/releases/download/market-compass-apk/MarketCompass.apk**
+  on the phone, open the file, and allow "Install unknown apps" for your browser when Android asks.
+  The app shows the live site, so its data is always current. News and NSE links open in your browser.
+  GitHub rebuilds the APK automatically whenever `market-compass/android/` changes.
 - **Windows / Mac (Chrome or Edge):** open the link → click the install icon in the address bar,
   or menu → **Install Market Compass**.
 
@@ -34,7 +39,7 @@ themselves are close to real time (usually within a minute or two).
 
 ---
 
-## 1. What's in the app (7 tabs)
+## 1. What's in the app (8 tabs)
 
 1. **🧭 Compass:** live tiles for Nifty, Bank Nifty, India VIX, USD/INR, the US Dollar Index,
    the US 10-year yield, Brent crude, gold, the S&P 500, Nikkei and Hang Seng.
@@ -84,7 +89,26 @@ themselves are close to real time (usually within a minute or two).
      of the strategy.
    - Also on the page: Indian rules and regulations (SEBI RA rules, surveillance, T+1 settlement,
      STT and costs, tax, fraud warnings).
-3. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
+3. **📰 Overnight news:** everything published between the last NSE close (3:30 PM) and now.
+   - **Sources:** Google News searches (India markets, world economy, oil and commodities,
+     geopolitics, RBI), Economic Times, Moneycontrol, Livemint, BBC, CNBC, and NSE corporate
+     announcements for the 150 stocks.
+   - **Analysis:**
+     - Each headline gets topics (war, Fed, RBI, crude/OPEC, tariffs, China, inflation, rupee,
+       FII, metals, gold, results, Budget, elections, SEBI, monsoon, crypto, tech/AI).
+     - Each headline gets a tone for Indian stocks from finance phrases, e.g. "crude jumps" = bad,
+       "rate cut" = good, "ceasefire" = good.
+     - Each topic lists the sectors it helps (▲) or hurts (▼). The page also gives an overnight
+       mood.
+   - **Company news:**
+     - Negative company items block that stock from ⭐ Daily picks. Examples: auditor resignation,
+       default, rating downgrade, pledge invoked, raid or investigation, FDA warning letter,
+       plant shutdown, CFO/CEO resignation.
+     - Routine paperwork is filtered out.
+   - **Honest note:** research and our own tests agree that overnight news is mostly priced in at
+     the open. So the app saves each morning's mood and compares it with Nifty's real opening and
+     day move. The 🎯 live check shows the hit rate once 5 days are logged.
+4. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
    refresh, so index changes appear automatically) plus **20 ⭐ top performers** picked fresh
    from Nifty Next 50 and Nifty Midcap 50 by 3-month return (each must also be up over 1 month).
    Nifty and Bank Nifty are included too. A **Today's movers** table shows the live top gainers
@@ -96,16 +120,16 @@ themselves are close to real time (usually within a minute or two).
    - the quantity to buy, with a stop-loss, a target and the rough expected value;
    - a plain-language reading of the chart, and a chart with Bollinger Bands;
    - a ranked list of the stocks where the model has proven some skill today.
-4. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
+5. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
    1 month), and links to NSE's big-player pages: bulk/block deals, option chain, FII positions,
    insider trades.
-5. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
+6. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
    month's seasonal theme (festivals, monsoon, Budget, results season).
-6. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
+7. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
    at the live price, then marked ✅ or ❌ against the **actual** price when its horizon ends. It
    shows the live hit rate against simple guessing, overall and for each horizon. It covers the
    last 20 days.
-7. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
+8. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
 
 ---
 
@@ -174,11 +198,13 @@ market-compass/
 │   ├── scorecard.py          ← the 16 factors, scoring rules, stance, sector tilts
 │   ├── stock_model.py        ← the stock probability engine
 │   ├── events.py             ← recurring events + seasonal themes
+│   ├── news.py               ← overnight news: feeds, topics, tone, sectors, NSE filings, live check
 │   ├── crossasset.py         ← opening-gap forecast, metals tilt, tested cause → effect table
 │   ├── picks.py              ← Daily picks: rule, backtest, conditions, SEBI/NSE checks
 │   ├── universe.py           ← which stocks: all Nifty 50 + top performers (auto)
 │   └── stocks.py             ← stock list for the desktop version
 ├── data/events.csv           ← shared events shown on everyone's calendar (edit on GitHub)
+├── android/                  ← Android app (WebView shell) → built by .github/workflows/market-compass-apk.yml
 ├── app.py                    ← optional desktop version (any NSE stock on demand)
 ├── Start Market Compass.bat  ← Windows launcher for the desktop version
 ├── start.sh                  ← Mac/Linux launcher for the desktop version
@@ -331,3 +357,12 @@ on Nov 2021–Nov 2026.
 | Global, crypto, FX → Nifty | Opening-gap forecast (S&P 500, dollar, Hang Seng open, Bitcoin): 72–75% direction | Anything after the open (coin flip); crude, gold, USD/INR for Nifty |
 | Daily Picks filters | Nifty 5-day down + India VIX not falling + calm-dip volume: 83.8% win, +0.55%/trade | US VIX, DXY, USD/INR, crude, copper, BTC, S&P trend, breadth, sector trend, ATR caps |
 | Hourly model + global features | Nothing (no gain over chance) | 13 model/feature sets, including pooled and gradient-boosted |
+
+### Overnight news study (Nov 2026, research summary)
+- **Supported by evidence:** macro and world news is absorbed at the open. Company-specific
+  negative news, especially in mid-caps, can drift for days. Examples: auditor resignation,
+  default, downgrade, pledge, FDA warning.
+- **Not supported:** headline sentiment predicting Nifty after 9:15, Budget-day direction, or big
+  lasting moves from India–Pakistan tensions, which historically moved the market about 1–2%.
+- **What the app does with this:** it uses company news to block risky picks, and it tracks the
+  morning mood against the real open, so its value is measured, not assumed.

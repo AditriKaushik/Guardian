@@ -42,6 +42,9 @@ NIFTY50_FALLBACK = {
 }
 
 
+NAMES: dict[str, str] = {}   # symbol -> company name, filled by fetch_index_list
+
+
 def fetch_index_list(name: str) -> dict[str, str]:
     """{symbol: industry} for an NSE index list such as 'ind_nifty50list'. Empty dict on failure."""
     import requests
@@ -54,6 +57,9 @@ def fetch_index_list(name: str) -> dict[str, str]:
                 continue
             rows = list(csv.DictReader(io.StringIO(r.text)))
             out = {row["Symbol"].strip(): (row.get("Industry") or "").strip() for row in rows if row.get("Symbol")}
+            for row in rows:
+                if row.get("Symbol"):
+                    NAMES[row["Symbol"].strip()] = (row.get("Company Name") or "").strip()
             if len(out) >= 40:
                 return out
         except Exception:

@@ -43,7 +43,7 @@ function isMarketHoursNow() {
   return d >= 1 && d <= 5 && m >= 9 * 60 + 15 && m <= 15 * 60 + 30;
 }
 
-function renderAll() { renderCompass(); renderPicks(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
+function renderAll() { renderCompass(); renderPicks(); renderNews(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
 
 /* ---------------------------------------------------------------- compass */
 const MACRO_ORDER = ["nifty", "banknifty", "vix", "usdinr", "dxy", "us10y", "brent", "gold", "sp500", "nikkei", "hangseng"];
@@ -180,6 +180,37 @@ function globalPanel() {
       <table><tr><th>Driver (today)</th><th>Effect on Indian stocks</th><th>Verdict</th></tr>${rows}</table></div>`;
 }
 
+
+/* ---------------------------------------------------------------- overnight news */
+function renderNews() {
+  const el = $("#news"), N = DATA.news;
+  if (!N || N.error) { el.innerHTML = `<h2>📰 Overnight news</h2><div class="note warnbox">${esc(N ? N.error : "Not available yet.")}</div>`; return; }
+  const tone = t => t > 0 ? "🟢" : t < 0 ? "🔴" : "⚪";
+  const timeShort = t => esc(String(t).slice(5, 16).replace("T", " "));
+  const moodColor = N.mood === "positive" ? "#1a7f37" : N.mood === "negative" ? "#cf222e" : "#9a6700";
+  const topicCard = t => `<div class="card"><div class="factor head"><span class="name">${esc(t.label)}</span>
+      <span class="pill" style="background:${t.direction === "positive" ? "#1a7f37" : t.direction === "negative" ? "#cf222e" : "#9a6700"};color:#fff">${t.direction} · ${t.n} stories</span></div>
+      ${t.sectors.filter(x => x.effect).length ? `<p class="muted">Sectors: ${t.sectors.filter(x => x.effect).map(x => `<span class="${x.effect > 0 ? "pos" : "neg"}">${esc(x.sector)} ${x.effect > 0 ? "▲" : "▼"}</span>`).join(", ")}</p>` : ""}
+      <ul class="list">${t.headlines.map(h => `<li>${tone(h.tone)} <a href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.title)}</a> <span class="muted">${esc(h.source)} · ${timeShort(h.time)}</span></li>`).join("")}</ul></div>`;
+  const stocks = Object.entries(N.stocks || {}).sort((a, b) => a[1].tone - b[1].tone).slice(0, 30);
+  const lc = N.live_check || {};
+  const feedsOk = (N.feeds || []).filter(f => f.ok).length;
+  el.innerHTML = `<h2>📰 What happened since the last close</h2>
+    <div class="stance" style="background:${moodColor}"><div class="sm">News from ${esc(N.since)} to ${esc(N.until)} IST · ${N.n_headlines} headlines · ${N.n_filings} NSE filings (Nifty 50 / Next 50 / Midcap 50)</div>
+      <div class="big">Overnight mood: ${N.mood.toUpperCase()}</div><div>Net tone ${N.score > 0 ? "+" : ""}${N.score} (−1 = all bad, +1 = all good for Indian stocks)</div></div>
+    <div class="note warnbox"><b>How to use it:</b> research and our own tests agree that overnight news is mostly priced in at the 9:15 AM open, so use it to understand the opening gap (see 🔮 on the Compass tab), not to chase the open.
+      The useful part is <b>company-specific news and filings</b>: a negative item (auditor resignation, default, downgrade, pledge, raid, FDA warning…) automatically blocks that stock from ⭐ Daily picks.</div>
+    <div class="card"><h3>🎯 Live check: does the morning news mood call the day?</h3>
+      <p>${lc.days >= 5 ? `Over ${lc.days} days, a positive or negative pre-open mood matched the direction of Nifty's <b>opening gap ${(lc.gap_hit * 100).toFixed(0)}%</b> of the time, and the <b>rest of the day ${(lc.day_hit * 100).toFixed(0)}%</b> (50% = coin flip).` : `Collecting data: ${lc.days || 0} of 5 days logged. The pre-open mood is saved every morning and compared with Nifty's real opening and close.`}</p></div>
+    <h2>Topics moving markets</h2>
+    ${(N.topics || []).length ? `<div class="grid2">${N.topics.map(topicCard).join("")}</div>` : `<div class="card"><p class="muted">No market headlines collected this refresh (${feedsOk} of ${(N.feeds || []).length} news feeds answered).</p></div>`}
+    <h2>Stocks in the news (headlines + NSE filings)</h2>
+    <div class="card tablewrap"><table><tr><th>Stock</th><th>Tone</th><th>Latest items</th></tr>${stocks.map(([s, v]) => `<tr><td><b>${esc(s)}</b>${v.negative ? ' <span class="pill" style="background:#cf222e;color:#fff">blocks picks</span>' : ""}</td><td>${tone(v.tone)}</td><td>${v.items.slice(0, 3).map(x => `<div>${tone(x.tone)} <a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title.slice(0, 140))}</a> <span class="muted">${timeShort(x.time)}</span></div>`).join("")}</td></tr>`).join("") || `<tr><td colspan=3 class="muted">No company news since the last close.</td></tr>`}</table></div>
+    <h3>All latest headlines</h3>
+    <div class="card"><ul class="list">${(N.latest || []).map(h => `<li>${tone(h.tone)} <a href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.title)}</a> <span class="muted">${esc(h.source)} · ${timeShort(h.time)}${h.topics.length ? " · " + h.topics.join(", ") : ""}</span></li>`).join("") || "<li class='muted'>None this refresh.</li>"}</ul>
+      <p class="muted">Sources: Google News, Economic Times, Moneycontrol, Livemint, BBC, CNBC, NSE announcements (${feedsOk}/${(N.feeds || []).length} feeds answered on this refresh). Tone is a simple finance-phrase reading of each headline (e.g. "crude jumps" = bad for India, "rate cut" = good), so it can be wrong. Open the story before acting.</p></div>`;
+}
+
 /* ---------------------------------------------------------------- daily picks */
 function renderPicks() {
   const el = $("#picks"), P = DATA.daily_picks;
@@ -209,7 +240,7 @@ function renderPicks() {
   const T = P.track || {};
   el.innerHTML = `<h2>⭐ Daily picks: stocks that pass every condition</h2>
     <div class="note">${P.provisional ? "🟡 <b>Provisional</b> (market open): the list can change until 3:30 PM. Final picks are fixed after the close. The rule enters near the close (3:15–3:25 PM)." : "🟢 <b>Final for " + esc(P.as_of) + "</b>: based on the closing price."}
-      Checked ${P.universe_n} stocks (Nifty 50 + Next 50 + Midcap 50) against 12 conditions and SEBI/NSE rules.</div>
+      Checked ${P.universe_n} stocks (Nifty 50 + Next 50 + Midcap 50) against 13 conditions (including overnight company news) and SEBI/NSE rules.</div>
     <div class="grid2">
       <div class="card"><h3>Market conditions today</h3><ul class="list">${P.market.map(m => `<li>${ok(m.ok)} ${esc(m.name)}<br><span class="muted">${esc(m.detail)}${m.soft ? " (caution only)" : ""}</span></li>`).join("")}</ul></div>
       <div class="card"><h3>The rule (tested on real data)</h3><ul class="list">
