@@ -20,14 +20,14 @@ index lists. There is no demo or sample data. GitHub Actions rebuilds everything
 
 | When (IST) | How often |
 |---|---|
-| Mon–Fri, 8:45 AM–3:45 PM (market hours) | About every 10 minutes |
+| Mon–Fri, 8:45 AM–3:45 PM (market hours) | About every 5 minutes (each price shows its exact time, e.g. "price at 11:30 IST") |
 | Mon–Fri, other times | About every hour (catches the evening FII/DII data and the pre-market moves) |
 | Saturday and Sunday | About every 3 hours |
 
 GitHub's own timer (cron) is unreliable, so it is only a backup that restarts the loop if it ever
 stops. The top of the app shows "data updated … min ago". During market hours it warns
-**⚠ refresh is running late** if the data is more than 35 minutes old. Yahoo's free prices
-themselves can lag the exchange by up to ~15 minutes.
+**⚠ refresh is running late** if the data is more than 15 minutes old. An open app checks for new data every minute. Yahoo's free prices
+themselves are close to real time (usually within a minute or two).
 
 > ⚠️ Educational tool, not investment advice. No tool can guarantee profits. Always use a
 > stop-loss and never risk money you can't afford to lose.
@@ -238,7 +238,7 @@ sign in with GitHub and choose repo `AditriKaushik/Guardian`, branch `main`, mai
 >
 > **How it works:**
 > - `.github/workflows/pages.yml` keeps itself running: its `keep-refreshing` job sleeps, then
->   dispatches the next run (~10 min in market hours, hourly off-hours, 3-hourly at weekends;
+>   dispatches the next run (~5 min in market hours, hourly off-hours, 3-hourly at weekends;
 >   older loops stop if a newer run exists). Cron entries are only a backup.
 > - It runs `python -m compass.build_site ../_mc_data --previous-track <live track.json URL>`,
 >   then publishes `web/` (the repo's other app) at `/` and `market-compass/web/` plus the built
