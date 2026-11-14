@@ -266,6 +266,9 @@ function summaryPanel(P) {
   if (ok(buyP)) (P.picks || []).forEach(p => buys.push({ name: p.sym, what: `${esc(p.industry)} · ₹${fmt(p.price)} → target ₹${fmt(p.target)}, stop ₹${fmt(p.stop)}`, p: buyP, kind: "Stock, delivery, multi-day" }));
   if (I.signal === "BUY" && ok(ixP)) buys.push({ name: "NIFTY 50", what: `${fmt(I.price, 1)} → target ${fmt(I.target, 1)}, stop ${fmt(I.stop, 1)}`, p: ixP, kind: "Index, up to 10 days" });
   if (ok(sellP) && S.ok) (S.picks || []).forEach(p => sells.push({ name: p.sym, what: `${esc(p.industry)} · ₹${fmt(p.price)} → cover ₹${fmt(p.target)}, stop ₹${fmt(p.stop)}${p.lot ? ` · lot ${p.lot}` : ""}`, p: sellP, kind: "Stock futures (F&amp;O), multi-day" }));
+  const L = DATA.intraday_lab || {};
+  (L.live || []).forEach(v => { const st = (L.setups || []).find(x => x.key === v.setup);
+    if (st && st.status === "PROMOTED" && ok(st.live_win) && v.result == null) (v.side === "BUY" ? buys : sells).push({ name: v.sym, what: `₹${fmt(v.entry)} → target ₹${fmt(v.target)}, stop ₹${fmt(v.stop)} · ${esc(st.name)}`, p: st.live_win, kind: "INTRADAY (square off by 3:15 PM), live-tested" }); });
   const dirColor = D.name === "UP" ? "#1a7f37" : D.name === "DOWN" ? "#cf222e" : "#9a6700";
   const dirIcon = D.name === "UP" ? "⬆️" : D.name === "DOWN" ? "⬇️" : "↔️";
   const list = (arr, side) => arr.length ? `<table>${arr.map(x => `<tr><td><b>${side === "BUY" ? "🟢 BUY" : "🔴 SELL"} ${esc(x.name)}</b><div class="muted">${x.what}</div><div class="muted">${x.kind}</div></td><td class="num"><b class="${side === "BUY" ? "pos" : "neg"}">${(x.p * 100).toFixed(0)}%</b><div class="muted">past wins</div></td></tr>`).join("")}</table>`
@@ -283,16 +286,39 @@ function summaryPanel(P) {
       <br><b>हिंदी:</b> "पिछली जीत" = पिछले 5 साल में इस नियम की असली जीत दर (ख़र्च के बाद)। यह गारंटी नहीं है। बाज़ार ऊपर हो तो गिरावट पर BUY, नीचे हो तो सिर्फ परखा हुआ gap-down SELL नियम। स्टॉप-लॉस हमेशा लगाएँ।</p></div>`;
 }
 
+
+function intradayLab() {
+  const L = DATA.intraday_lab;
+  if (!L) return "";
+  if (L.error) return `<div class="note warnbox">${esc(L.error)}</div>`;
+  const pc = x => x == null ? "–" : (x * 100).toFixed(1) + "%";
+  const av = x => x == null ? "–" : `<span class="${cls(x)}">${(x >= 0 ? "+" : "") + (x * 100).toFixed(2)}%</span>`;
+  const badge = s => s === "PROMOTED" ? `<span class="pill" style="background:#1a7f37;color:#fff">✅ passed live test</span>` : s === "TESTING" ? `<span class="pill" style="background:#9a6700;color:#fff">🧪 testing, not advice</span>` : `<span class="pill" style="background:#cf222e;color:#fff">❌ failed live test</span>`;
+  const rows = L.setups.map(x => `<tr><td><b>${x.side === "BUY" ? "🟢 LONG" : "🔴 SHORT"}</b> ${esc(x.name)}<div class="muted">${esc(x.rule)} Target ${(x.target * 100).toFixed(2)}%, stop ${(x.stop * 100).toFixed(1)}%, else square off at 3:15.</div><div class="muted">Study: ${esc(x.study)}</div></td>
+      <td class="num">${x.bt_n}<div class="muted">${pc(x.bt_win)}</div>${av(x.bt_avg)}</td><td class="num">${x.live_n} / ${L.min_live}<div class="muted">${pc(x.live_win)}</div>${av(x.live_avg)}</td><td>${badge(x.status)}</td></tr>`).join("");
+  const live = (L.live || []).map(v => { const st = L.setups.find(x => x.key === v.setup);
+    return `<tr><td><b>${v.side === "BUY" ? "🟢 LONG" : "🔴 SHORT"} ${esc(v.sym)}</b><div class="muted">${esc(st ? st.name : v.setup)}</div></td><td class="num">₹${fmt(v.entry)} <span class="muted">at ${esc(v.entry_time)}+1h</span></td><td class="num">₹${fmt(v.target)} / ₹${fmt(v.stop)}</td><td>${v.result == null ? "open" : av(v.result)} ${st ? badge(st.status) : ""}</td></tr>`; }).join("");
+  const recent = (L.recent || []).slice().reverse().map(r => `${esc(r.date.slice(5))} ${r.side === "BUY" ? "L" : "S"} ${esc(r.sym)} ${av(r.ret)}`).join(" · ");
+  return `<div class="card tablewrap" style="margin-top:10px"><h3>🧪 Intraday lab: same-day LONG &amp; SHORT, tested live</h3>
+      <p class="muted">The four intraday setups that came closest are run every day on 72 stocks. Each signal is logged at entry and checked against the real price by the close (cost ${(L.cost * 100).toFixed(2)}%). A setup becomes a suggestion only after <b>${L.min_live}+ live trades</b> with <b>${(L.min_win * 100).toFixed(0)}%+ wins and a positive average</b>. Until then its signals are <b>test signals, not advice</b>.<br>
+      <b>हिंदी:</b> ये चार इंट्राडे पैटर्न रोज़ लाइव परखे जाते हैं। कोई पैटर्न 100+ असली ट्रेड में 75%+ जीत और फ़ायदा दिखाए, तभी वह सुझाव बनेगा। तब तक ये सिर्फ़ परख के संकेत हैं, सलाह नहीं।</p>
+      <table><tr><th>Setup</th><th class="num">Last ~2 yrs (backtest): trades, win, avg</th><th class="num">Live: trades, win, avg</th><th>Status</th></tr>${rows}</table>
+      <h3 style="margin-top:14px">Today's intraday signals (${(L.live || []).length})</h3>
+      ${live ? `<table><tr><th>Stock</th><th class="num">Entry</th><th class="num">Target / stop</th><th>Result</th></tr>${live}</table>` : `<p class="muted">No intraday setup has triggered today. Signals appear from about 10:15–11:15 AM IST on trading days.</p>`}
+      ${recent ? `<p class="muted"><b>Latest live results:</b> ${recent}</p>` : ""}</div>`;
+}
+
 function intradaySection(P) {
   const X = P.intraday;
   if (!X) return "";
   const tbl = (rows) => `<table><tr><th>Setup</th><th>Design period: win / avg</th><th>Test period: win / avg</th></tr>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("")}</table>`;
-  return `<h2>⏱️ Intraday (same-day, MIS): BUY &amp; SELL</h2>
+  return `<h2>⏱️ Intraday (same-day, MIS): LONG (buy) &amp; SHORT (sell)</h2>
     <div class="note warnbox"><b>No intraday BUY or SELL setup passed the 75%+ test, so the app gives no intraday calls.</b> ${X.buy.variants + X.sell.variants} intraday variants were tested on 150 stocks (${esc(X.period)}; cost ${esc(X.cost)}).
       The only intraday "75%+" results came from a tiny target with a wide stop (e.g. +0.5% / −3%). Those win often but still <b>lose money</b> after costs. The few variants that crossed 75% in the test period had lost money in the design period, which is what chance would produce.<br>
       <b>हिंदी:</b> इंट्राडे (उसी दिन ख़रीद-बिक्री) में ख़रीद या बिक्री, किसी का भी 75%+ जीत वाला भरोसेमंद नियम नहीं मिला, इसलिए ऐप इंट्राडे सुझाव नहीं देता। छोटे टारगेट और बड़े स्टॉप से जीत ज़्यादा दिखती है, पर ख़र्च के बाद नुकसान होता है।</div>
     <div class="grid2"><div class="card tablewrap"><h3>Intraday BUY: ${X.buy.variants} variants, ${X.buy.qualified} qualified</h3>${tbl(X.buy.rows)}</div>
       <div class="card tablewrap"><h3>Intraday SELL: ${X.sell.variants} variants, ${X.sell.qualified} qualified</h3>${tbl(X.sell.rows)}</div></div>
+    ${intradayLab()}
     <div class="card" style="margin-top:10px"><h3>If you still trade intraday: the rules</h3><ul class="list">
       <li><b>Intraday short selling</b> is allowed in the cash market for <b>any</b> stock (not only F&amp;O), but it must be squared off the same day. Brokers auto square-off around 3:15–3:20 PM. A short that can't be covered goes to the exchange auction, which can cost up to 20% above the close.</li>
       <li><b>Leverage</b>: SEBI's peak-margin rules cap intraday leverage at about 5× (20% margin). Leverage multiplies losses as much as gains.</li>

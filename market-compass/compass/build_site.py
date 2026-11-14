@@ -29,6 +29,7 @@ from . import picks as PK
 from . import crossasset as XA
 from . import news as NW
 from . import history as HL
+from . import intraday as INT
 from .universe import NAMES, fetch_index_list
 
 HORIZONS = [1, 2, 3, "close"]
@@ -265,6 +266,16 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
     track = update_track(load_previous_track(previous_track), stocks, frames, now, is_open)
 
     try:
+        ibt, ilive = INT.scan(frames, now)
+        track = INT.update_track(track, ilive, ibt, now)
+        intraday_lab = {"setups": INT.stats(ibt, track, PK.MIN_WIN), "live": ilive, "cost": INT.COST,
+                        "min_live": INT.MIN_LIVE_TRADES, "min_win": PK.MIN_WIN,
+                        "recent": track.get("intraday", {}).get("resolved", [])[-25:],
+                        "open": len(track.get("intraday", {}).get("open", []))}
+    except Exception as exc:
+        intraday_lab = {"error": f"Intraday lab unavailable this refresh: {exc}"}
+
+    try:
         global_view = XA.build(now, snap)
     except Exception as exc:
         global_view = {"error": f"Global view unavailable this refresh: {exc}"}
@@ -309,6 +320,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "global": global_view,
         "news": news,
         "history": hist_lab,
+        "intraday_lab": intraday_lab,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "data.json").write_text(json.dumps(payload, separators=(",", ":")))
