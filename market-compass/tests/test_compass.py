@@ -242,3 +242,14 @@ def test_intraday_scan_waits_for_completed_entry_bar():
     later = pd.Timestamp("2026-11-13 11:20", tz="Asia/Kolkata").to_pydatetime()
     assert not [v for v in I.scan(frames, early)[1] if v["setup"] == "S_GAPDN"]      # 10:15 bar not closed yet
     assert [v for v in I.scan(frames, later)[1] if v["setup"] == "S_GAPDN"]
+
+
+def test_hindi_headlines_tone():
+    from compass import news as N
+
+    assert N.score_headline("सेंसेक्स 800 अंक लुढ़का, निफ्टी में भारी बिकवाली")[0] == -1
+    assert N.score_headline("शेयर बाजार में तेजी, सेंसेक्स रिकॉर्ड ऊंचाई पर")[0] == 1
+    assert N.score_headline("कच्चे तेल में उछाल से बाजार पर दबाव")[0] == -1
+    assert N.score_headline("कच्चे तेल की कीमतों में गिरावट, बाजार को राहत")[0] == 1
+    t, topics = N.score_headline("आरबीआई ने रेपो रेट घटाया")
+    assert t == 1 and "rbi" in topics

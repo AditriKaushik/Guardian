@@ -43,7 +43,7 @@ function isMarketHoursNow() {
   return d >= 1 && d <= 5 && m >= 9 * 60 + 15 && m <= 15 * 60 + 30;
 }
 
-function renderAll() { renderCompass(); renderPicks(); renderNews(); renderHistory(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
+function renderAll() { renderCompass(); renderPicks(); renderNews(); renderHistory(); renderEstimate(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
 
 /* ---------------------------------------------------------------- compass */
 const MACRO_ORDER = ["nifty", "banknifty", "vix", "usdinr", "dxy", "us10y", "brent", "gold", "sp500", "nikkei", "hangseng"];
@@ -198,6 +198,7 @@ function renderNews() {
   el.innerHTML = `<h2>📰 What happened since the last close</h2>
     <div class="stance" style="background:${moodColor}"><div class="sm">News from ${esc(N.since)} to ${esc(N.until)} IST · ${N.n_headlines} headlines · ${N.n_filings} NSE filings (Nifty 50 / Next 50 / Midcap 50)</div>
       <div class="big">Overnight mood: ${N.mood.toUpperCase()}</div><div>Net tone ${N.score > 0 ? "+" : ""}${N.score} (−1 = all bad, +1 = all good for Indian stocks)</div></div>
+    ${N.local && N.global ? `<div class="grid2">${[["🇮🇳 Dalal Street mood (Indian + Hindi business news)", N.local], ["🌍 Global mood (world economy, oil, geopolitics)", N.global]].map(([lbl, m]) => `<div class="card tile"><div class="lbl">${lbl}</div><div class="val ${m.mood === "positive" ? "pos" : m.mood === "negative" ? "neg" : ""}">${m.mood.toUpperCase()} <span style="font-size:15px">(${m.score > 0 ? "+" : ""}${m.score})</span></div><div class="chg muted">${m.n} headlines with a clear tone: ${m.pos} good, ${m.neg} bad</div></div>`).join("")}</div>` : ""}
     <div class="note warnbox"><b>How to use it:</b> research and our own tests agree that overnight news is mostly priced in at the 9:15 AM open, so use it to understand the opening gap (see 🔮 on the Compass tab), not to chase the open.
       The useful part is <b>company-specific news and filings</b>: a negative item (auditor resignation, default, downgrade, pledge, raid, FDA warning…) automatically blocks that stock from ⭐ Daily picks.</div>
     <div class="card"><h3>🎯 Live check: does the morning news mood call the day?</h3>
@@ -208,7 +209,7 @@ function renderNews() {
     <div class="card tablewrap"><table><tr><th>Stock</th><th>Tone</th><th>Latest items</th></tr>${stocks.map(([s, v]) => `<tr><td><b>${esc(s)}</b>${v.negative ? ' <span class="pill" style="background:#cf222e;color:#fff">blocks picks</span>' : ""}</td><td>${tone(v.tone)}</td><td>${v.items.slice(0, 3).map(x => `<div>${tone(x.tone)} <a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title.slice(0, 140))}</a> <span class="muted">${timeShort(x.time)}</span></div>`).join("")}</td></tr>`).join("") || `<tr><td colspan=3 class="muted">No company news since the last close.</td></tr>`}</table></div>
     <h3>All latest headlines</h3>
     <div class="card"><ul class="list">${(N.latest || []).map(h => `<li>${tone(h.tone)} <a href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.title)}</a> <span class="muted">${esc(h.source)} · ${timeShort(h.time)}${h.topics.length ? " · " + h.topics.join(", ") : ""}</span></li>`).join("") || "<li class='muted'>None this refresh.</li>"}</ul>
-      <p class="muted">Sources: Google News, Economic Times, Moneycontrol, Livemint, BBC, CNBC, NSE announcements (${feedsOk}/${(N.feeds || []).length} feeds answered on this refresh). Tone is a simple finance-phrase reading of each headline (e.g. "crude jumps" = bad for India, "rate cut" = good), so it can be wrong. Open the story before acting.</p></div>`;
+      <p class="muted">Sources: Google News (English and Hindi, which carries Dainik Bhaskar, Amar Ujala, Navbharat Times, Zee Business and others), Business Standard, Economic Times, Moneycontrol, Livemint, BBC, CNBC, NSE announcements (${feedsOk}/${(N.feeds || []).length} feeds answered on this refresh). Tone is a simple finance-phrase reading of each headline (e.g. "crude jumps" = bad for India, "rate cut" = good), so it can be wrong. Open the story before acting.</p></div>`;
 }
 
 
@@ -352,6 +353,7 @@ function sellSection(P, cap) {
         <div class="tile"><div class="lbl">Stop-loss (+${(S.rule.stop * 100).toFixed(0)}%)</div><div class="val neg">₹${fmt(p.stop)}</div><div class="chg muted">exit anyway by ${esc(p.exit_by)}</div></div>
       </div>
       <p><b>Why:</b> ${p.why.map(esc).join("; ")}.</p>
+      ${(p.insider_flags || []).length ? `<p class="muted">🕵️ <b>Public insider/governance info:</b> ${p.insider_flags.map(esc).join(" · ")}</p>` : ""}
       <p>${p.lot ? `<b>F&amp;O:</b> 1 lot = ${p.lot} shares ≈ ₹${fmt(p.contract_value, 0)} exposure; margin roughly ₹${fmt(p.margin_est, 0)} (~20%). If target: +₹${fmt(p.lot * (p.price - p.target), 0)} per lot; if stop: −₹${fmt(p.lot * (p.stop - p.price), 0)} per lot (more on a gap up).${p.contract_value > cap ? ` <span class="neg">One lot is larger than your capital of ₹${fmt(cap, 0)}.</span>` : ""}` : "Not in F&amp;O: you cannot short it overnight. If you hold it, consider exiting."}</p>
       <details><summary>All ${p.checks.length} SELL checks</summary><ul class="list">${p.checks.map(c => `<li>${ok(c.ok)} ${esc(c.name)}: <span class="muted">${esc(c.detail)}</span></li>`).join("")}</ul></details></div>`;
   return `<h2>🔴 SELL picks today (${S.picks.length}) <span class="pill" style="background:#9a6700;color:#fff">experimental</span></h2>
@@ -367,6 +369,50 @@ function sellSection(P, cap) {
       <table><tr><th></th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg per trade</th><th class="num">Avg win / avg loss</th></tr>
       ${[["Last 5 years", r5], ["Last 12 months", r12]].map(([n, x]) => `<tr><td>${n}</td><td class="num">${x.n ?? 0}</td><td class="num">${pc(x.win)}</td><td class="num ${cls(x.avg)}">${x.avg == null ? "n/a" : (x.avg * 100).toFixed(2) + "%"}</td><td class="num">${x.avg_win == null ? "" : "+" + (x.avg_win * 100).toFixed(1) + "% / " + (x.avg_loss * 100).toFixed(1) + "%"}</td></tr>`).join("")}</table>
       <p class="muted">Why "experimental": 675 short setups were tested on 10 years of data. Only this one kept 75%+ wins with a positive average on 2021–2026 data. It trades rarely, and the result is not statistically proven (t ≈ 1.4). The plain mirror of the BUY rule (shorting rallies in weak stocks) won 73% of the time but <b>lost money</b> (−0.38% per trade), because short losses (−7% to −14% on gaps) are much bigger than the +2% wins.</p></div>`;
+}
+
+
+/* ---------------------------------------------------------------- estimation engine */
+function renderEstimate() {
+  const el = $("#estimate"), E = DATA.estimator;
+  if (!E || E.error) { el.innerHTML = `<h2>📐 Estimation engine</h2><div class="note warnbox">${esc(E ? E.error : "Not available yet: appears after the next refresh.")}</div>`; return; }
+  const pc = x => x == null ? "–" : (x * 100).toFixed(1) + "%";
+  const N = E.nifty || {}, S = E.stocks || {};
+  const hName = { "1": "Next day", "5": "Next 5 days", "20": "Next 20 days" };
+  const nCards = N.error ? `<div class="note warnbox">${esc(N.error)}</div>` : Object.entries(N.horizons || {}).map(([h, v]) => {
+    const c = v.card.all, l3 = v.card.last3y || {};
+    const skill = c.bss > 0 && c.dm_p != null && c.dm_p < 0.05;
+    const sel = c.selective["0.15"] || {};
+    return `<div class="card"><h3>${hName[h]} (Nifty ${fmt(N.close, 0)})</h3>
+      <div class="grid"><div class="tile"><div class="lbl">Climatology (headline)</div><div class="val">${pc(v.p_clim)} up</div><div class="chg muted">how often Nifty rose over ${h} day(s) historically</div></div>
+        <div class="tile"><div class="lbl">Model estimate (tilt only)</div><div class="val ${v.p_up > v.p_clim ? "pos" : "neg"}">${pc(v.p_up)} up</div><div class="chg muted">${v.p_up > v.p_clim ? "a bit above" : "a bit below"} normal</div></div>
+        <div class="tile"><div class="lbl">Likely range (80%)</div><div class="val">${fmt(v.level80[0], 0)} – ${fmt(v.level80[1], 0)}</div><div class="chg muted">${pct(v.interval80[0], 1)} to ${pct(v.interval80[1], 1)}</div></div></div>
+      <p class="muted"><b>Biggest factors today:</b> ${v.drivers.map(d => `${esc(d[0])} (${d[1] > 0 ? "▲" : "▼"})`).join(", ")}</p>
+      <table><tr><th>Report card (walk-forward, ${esc(v.period[0])} → ${esc(v.period[1])})</th><th class="num">All years</th><th class="num">Last 3 years</th></tr>
+        <tr><td>Direction right</td><td class="num">${pc(c.accuracy)}</td><td class="num">${pc(l3.accuracy)}</td></tr>
+        <tr><td>…vs simply "always up"</td><td class="num">${pc(c.always_up)}</td><td class="num">${pc(l3.always_up)}</td></tr>
+        <tr><td>Skill score vs climatology (BSS, &gt;0 = skill)</td><td class="num ${cls(c.bss)}">${c.bss}</td><td class="num ${cls(l3.bss)}">${l3.bss}</td></tr>
+        <tr><td>When confident (|p−50%| ≥ 15): right / how often</td><td class="num">${pc(sel.accuracy)} / ${pc(sel.coverage)}</td><td class="num">${pc((l3.selective || {})["0.15"]?.accuracy)} / ${pc((l3.selective || {})["0.15"]?.coverage)}</td></tr>
+        <tr><td>…base rate on those same days</td><td class="num">${pc(sel.base)}</td><td class="num">${pc((l3.selective || {})["0.15"]?.base)}</td></tr></table>
+      <p>${skill ? "✅ Statistically real skill." : "⚠️ <b>No proven skill:</b> the model did not beat climatology on unseen years, so the climatology figure is the honest estimate."}</p></div>`; }).join("");
+  const R = (S.report || {}).periods || {}, U = R["unseen_2021+"] || {}, TB = ((S.report || {}).top_bottom || {})["unseen_2021+"] || {};
+  const FN = { mom_12_1: "12-month momentum", mom_6m: "6-month momentum", mom_3m: "3-month momentum", rev_1m: "1-month reversal", rev_5d: "5-day reversal",
+    dist_sma50: "vs 50-day avg", dist_sma200: "vs 200-day avg", hi52: "near 52-week high", rs_nifty: "strength vs Nifty", rs_sector: "strength vs sector",
+    vol60: "volatility", beta: "beta", vol_trend: "volume trend", rsi14: "RSI", max_ret_1m: "lottery-like spikes", gap_freq: "frequent gaps",
+    sector_mom: "sector momentum", beta_x_trend: "beta × market trend", vol_x_vix: "volatility × VIX" };
+  const sRow = r => `<tr><td><b>${esc(r.symbol)}</b><div class="muted" style="font-size:12px">${(r.top_drivers || []).map(d => esc(FN[d.factor] || d.factor)).join(" · ")}</div></td><td class="num">${pc(r.p_outperform_5d)}</td><td class="num">${pc(r.p_up_20d)}</td><td class="num">${pct(r.expected_20d_return, 1)}</td></tr>`;
+  const sTable = arr => `<table><tr><th>Stock</th><th class="num">Beat Nifty in 5d</th><th class="num">Up in 20d</th><th class="num">Exp. 20d</th></tr>${(arr || []).map(sRow).join("")}</table>`;
+  el.innerHTML = `<h2>📐 Estimation engine: weather-forecast style</h2>
+    <div class="note">Like a weather forecast ("70% chance of rain"), this gives a <b>probability</b>, then checks how often such probabilities came true. It uses correlation and regression on ${N.horizons ? "40" : ""} factors (momentum, volatility, India/US VIX, world markets, dollar, rupee, crude, gold, copper, US rates, calendar), hypothesis tests with a multiple-testing correction, and a year-by-year walk-forward test on data the model had not seen.<br>
+      <b>हिंदी:</b> यह मौसम विभाग की तरह संभावना (%) बताता है और फिर नापता है कि ऐसी संभावनाएँ कितनी बार सच निकलीं। हर अनुमान के साथ उसका रिपोर्ट-कार्ड है।</div>
+    <h2>Nifty 50</h2>${nCards}
+    <div class="note warnbox"><b>Honest result:</b> none of the 40 factors passed the multiple-testing check on 2008–2016 data. No horizon beat climatology on 2014–2026. The model's "confident" days were right about as often as the market's normal up-rate on those days. Accuracy near 100% is not achievable this way. Even weather forecasts are only reliable a few days ahead, and markets react to forecasts in a way weather doesn't.</div>
+    <h2>Stocks: ranking, not certainty</h2>
+    ${S.error ? `<div class="note warnbox">${esc(S.error)}</div>` : `
+    <div class="note">Verified on 2021–2026 (unseen): AUC ${U.out_5d ? U.out_5d.auc.toFixed(3) : "–"} (0.5 = coin flip). Confident calls (70%+) almost never occur. What does work is a <b>ranking</b>: the top and bottom 10% beat or trailed Nifty over 5 days about 53% of the time (statistically significant). The top-10 minus bottom-10 spread averaged <b>${pct(TB.spread_avg, 2)}</b> a week after costs (positive in ${pc(TB.spread_hit)} of ${TB.weeks || "–"} weeks). Factors that held up: <b>12-month momentum</b> (winners keep winning) and <b>5-day reversal</b> (last week's big losers bounce a little). Use it as a ranking or "avoid" list.</div>
+    <div class="grid2"><div class="card tablewrap"><h3>🟢 Top-ranked 10 (most likely to beat Nifty)</h3>${sTable(S.top)}</div>
+      <div class="card tablewrap"><h3>🔴 Bottom-ranked 10 (most likely to lag)</h3>${sTable(S.bottom)}</div></div>`}
+    <p class="muted">Computed ${esc(E.computed_at || "")}${E.reused ? " (models refresh hourly)" : ""}. Educational only, not investment advice.</p>`;
 }
 
 /* ---------------------------------------------------------------- daily picks */
@@ -391,6 +437,7 @@ function renderPicks() {
         <div class="tile"><div class="lbl">Stop-loss (−${(R.stop * 100).toFixed(0)}%)</div><div class="val neg">₹${fmt(p.stop)}</div><div class="chg muted">exit anyway by ${esc(p.exit_by)}</div></div>
       </div>
       <p><b>Why:</b> ${p.why.map(esc).join("; ")}. Strong uptrend (above 200-day average) with a short dip.</p>
+      ${(p.insider_flags || []).length ? `<p class="muted">🕵️ <b>Public insider/governance info:</b> ${p.insider_flags.map(esc).join(" · ")}</p>` : ""}
       <p><b>For ₹${fmt(cap, 0)}:</b> buy <b>${z.q}</b> shares ≈ ₹${fmt(z.amt, 0)} (risking 1% of capital) → if target: +₹${fmt(z.gain, 0)}, if stop: −₹${fmt(z.maxLoss, 0)} (before charges).</p>
       <details><summary>All ${p.checks.length} stock checks ✅</summary><ul class="list">${p.checks.map(c => `<li>${ok(c.ok)} ${esc(c.name)}: <span class="muted">${esc(c.detail)}</span></li>`).join("")}</ul></details></div>`;
   };
@@ -563,11 +610,32 @@ function renderMoney() {
       ${f.DII != null ? `<div class="card tile"><div class="lbl">DII net (${esc(f.date)})</div><div class="val ${cls(f.DII)}">₹${fmt(f.DII, 0)} cr</div><div class="chg muted">source: NSE</div></div>` : ""}</div>`
       : `<div class="note warnbox">NSE didn't return FII/DII data on the last refresh. Open the NSE link below and set the FII factor on the Compass tab by hand.</div>`}
     <div class="note"><b>How to read it:</b> 5+ days of FII selling above ₹3,000 cr/day = pressure. The first days FIIs turn buyers after a long selling streak often mark a bottom. Strong DII buying cushions falls. NSE publishes the day's figures after about 6 PM IST.</div>
+    ${insiderPanel()}
     <h3>Sector rotation: where money is moving</h3>
     <div class="card tablewrap"><table><tr><th>Sector index</th><th class="num">1 day</th><th class="num">5 days</th><th class="num">1 month</th></tr>${secRows}</table></div>
     <h3>Daily checklist (official NSE pages)</h3>
     <div class="card tablewrap"><table>${L.map(([a, b, u]) => `<tr><td><a href="${u}" target="_blank" rel="noopener">${a}</a></td><td class="muted">${b}</td></tr>`).join("")}</table></div>
     <p class="muted">Delivery % (each stock's NSE page → Trade info): price up with delivery > 60% = genuine buying; price up with low delivery = speculation.</p>`;
+}
+
+
+function insiderPanel() {
+  const I = DATA.insiders;
+  if (!I) return "";
+  if (I.error) return `<div class="note warnbox">${esc(I.error)}</div>`;
+  const ins = Object.entries(I.insider || {}).sort((a, b) => b[1].net_cr - a[1].net_cr);
+  const buys = ins.filter(([, v]) => v.net_cr > 0).slice(0, 10), sells = ins.filter(([, v]) => v.net_cr < 0).slice(-10).reverse();
+  const row = ([s, v]) => `<tr><td><b>${esc(s)}</b><div class="muted">${v.people.map(esc).join(", ")}</div></td><td class="num pos">₹${fmt(v.buy_cr, 1)} cr</td><td class="num neg">₹${fmt(v.sell_cr, 1)} cr</td><td class="num ${cls(v.net_cr)}">₹${fmt(v.net_cr, 1)} cr</td></tr>`;
+  const pl = Object.entries(I.pledge || {}).filter(([, v]) => v.pledged_pct_of_promoter >= 10).sort((a, b) => b[1].pledged_pct_of_promoter - a[1].pledged_pct_of_promoter).slice(0, 12);
+  const ck = I.checked || {};
+  return `<h3>🕵️ Insider &amp; governance tracker (public NSE disclosures only)</h3>
+    <div class="note">Promoters, directors and key managers must disclose their trades in their own company's shares (SEBI insider-trading rules). Open-market <b>buying</b> by insiders is widely studied as a confidence signal; heavy selling or a high/rising promoter <b>pledge</b> is a caution sign. Bulk and block deals show large investors.
+      Not tracked on purpose: bookie / "dabba" trading tips (illegal off-exchange trading, often rumours or manipulation) and any non-public information (trading on it is insider trading). This is context only, not yet a trading rule: it is logged live and will be tested before it ever blocks or adds a pick.<br>
+      <b>हिंदी:</b> यहाँ सिर्फ़ NSE पर सार्वजनिक जानकारी है: प्रमोटर/डायरेक्टर की ख़रीद-बिक्री, गिरवी शेयर, बड़े सौदे। बुकी/डब्बा ट्रेडिंग की ख़बरें जानबूझकर शामिल नहीं हैं (ग़ैरक़ानूनी और अक्सर अफ़वाह)।</div>
+    <div class="grid2"><div class="card tablewrap"><h3>Insider buying, last 30 days (open market)</h3>${ck.insider ? (buys.length ? `<table><tr><th>Stock</th><th class="num">Bought</th><th class="num">Sold</th><th class="num">Net</th></tr>${buys.map(row).join("")}</table>` : `<p class="muted">No open-market insider buying in the 150 stocks.</p>`) : `<p class="muted">NSE insider data not available on this refresh.</p>`}</div>
+      <div class="card tablewrap"><h3>Insider selling, last 30 days (open market)</h3>${ck.insider ? (sells.length ? `<table><tr><th>Stock</th><th class="num">Bought</th><th class="num">Sold</th><th class="num">Net</th></tr>${sells.map(row).join("")}</table>` : `<p class="muted">No open-market insider selling in the 150 stocks.</p>`) : `<p class="muted">NSE insider data not available on this refresh.</p>`}</div></div>
+    <div class="grid2" style="margin-top:10px"><div class="card tablewrap"><h3>Promoter pledge ≥ 10%</h3>${ck.pledge ? (pl.length ? `<table>${pl.map(([s, v]) => `<tr><td><b>${esc(s)}</b></td><td class="num neg">${v.pledged_pct_of_promoter.toFixed(1)}%</td></tr>`).join("")}</table>` : `<p class="muted">None of the 150 stocks above 10%.</p>`) : `<p class="muted">NSE pledge data not available on this refresh.</p>`}</div>
+      <div class="card tablewrap"><h3>Bulk &amp; block deals (latest session)</h3>${ck.deals ? ((I.deals || []).length ? `<table>${I.deals.slice(0, 12).map(d => `<tr><td><b>${esc(d.sym)}</b> <span class="muted">${esc(d.kind)}</span><div class="muted">${esc(d.client)}</div></td><td class="${d.side.startsWith("B") ? "pos" : "neg"}">${esc(d.side)}</td><td class="num">₹${fmt(d.value_cr, 1)} cr</td></tr>`).join("")}</table>` : `<p class="muted">No bulk/block deals in the 150 stocks.</p>`) : `<p class="muted">NSE deal data not available on this refresh.</p>`}</div></div>`;
 }
 
 /* ---------------------------------------------------------------- calendar */
