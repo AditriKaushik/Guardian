@@ -46,6 +46,30 @@ def _get_json(s, path: str, params: dict | None = None):
     return None
 
 
+def _shape(obj) -> str:
+    if obj is None:
+        return "none"
+    if isinstance(obj, list):
+        return f"list[{len(obj)}]"
+    if isinstance(obj, dict):
+        return "dict{" + ", ".join(f"{k}:{type(v).__name__}{'['+str(len(v))+']' if isinstance(v, (list, dict)) else ''}" for k, v in list(obj.items())[:8]) + "}"
+    return type(obj).__name__
+
+
+def _rows(obj) -> list:
+    """Find the list of records in an NSE response, whatever key it sits under."""
+    if isinstance(obj, list):
+        return [r for r in obj if isinstance(r, dict)]
+    if isinstance(obj, dict):
+        for k in ("data", "Data", "rows", "records"):
+            if isinstance(obj.get(k), list):
+                return [r for r in obj[k] if isinstance(r, dict)]
+        lists = [v for v in obj.values() if isinstance(v, list) and v and isinstance(v[0], dict)]
+        if lists:
+            return max(lists, key=len)
+    return []
+
+
 def _num(x) -> float:
     try:
         return float(str(x).replace(",", "").strip() or 0)
@@ -69,7 +93,8 @@ def build(now: datetime, universe: set) -> dict:
 
     # ---- insider trades (PIT)
     pit = _get_json(s, "/api/corporates-pit", {"index": "equities", "from_date": frm, "to_date": to})
-    rows = pit.get("data", []) if isinstance(pit, dict) else (pit if isinstance(pit, list) else [])
+    diag["pit_shape"] = _shape(pit)
+    rows = _rows(pit)
     diag["pit_rows"] = len(rows)
     diag["pit_keys"] = sorted(rows[0].keys())[:25] if rows else []
     insider: dict[str, dict] = {}
@@ -102,7 +127,8 @@ def build(now: datetime, universe: set) -> dict:
 
     # ---- promoter pledges
     pl = _get_json(s, "/api/corporate-pledgedata", {"index": "equities"})
-    prow = pl.get("data", []) if isinstance(pl, dict) else (pl if isinstance(pl, list) else [])
+    diag["pledge_shape"] = _shape(pl)
+    prow = _rows(pl)
     diag["pledge_rows"] = len(prow)
     diag["pledge_keys"] = sorted(prow[0].keys())[:25] if prow else []
     pledge = {}
@@ -130,6 +156,9 @@ def build(now: datetime, universe: set) -> dict:
                               "client": str(_pick(r, "clientName", "client", default="?"))[:60],
                               "value_cr": round(qty * px / 1e7, 2), "date": str(_pick(r, "date", default=""))})
         diag["deal_keys"] = sorted(ld.keys())[:10]
+        diag["deal_counts"] = {k: len(v) for k, v in ld.items() if isinstance(v, list)}
+        first = next((v[0] for v in ld.values() if isinstance(v, list) and v), None)
+        diag["deal_row_keys"] = sorted(first.keys())[:20] if isinstance(first, dict) else []
     diag["deals"] = len(deals)
     deals.sort(key=lambda d: -d["value_cr"])
 
