@@ -353,6 +353,7 @@ function sellSection(P, cap) {
         <div class="tile"><div class="lbl">Stop-loss (+${(S.rule.stop * 100).toFixed(0)}%)</div><div class="val neg">₹${fmt(p.stop)}</div><div class="chg muted">exit anyway by ${esc(p.exit_by)}</div></div>
       </div>
       <p><b>Why:</b> ${p.why.map(esc).join("; ")}.</p>
+      ${(p.insider_flags || []).length ? `<p class="muted">🕵️ <b>Public insider/governance info:</b> ${p.insider_flags.map(esc).join(" · ")}</p>` : ""}
       <p>${p.lot ? `<b>F&amp;O:</b> 1 lot = ${p.lot} shares ≈ ₹${fmt(p.contract_value, 0)} exposure; margin roughly ₹${fmt(p.margin_est, 0)} (~20%). If target: +₹${fmt(p.lot * (p.price - p.target), 0)} per lot; if stop: −₹${fmt(p.lot * (p.stop - p.price), 0)} per lot (more on a gap up).${p.contract_value > cap ? ` <span class="neg">One lot is larger than your capital of ₹${fmt(cap, 0)}.</span>` : ""}` : "Not in F&amp;O: you cannot short it overnight. If you hold it, consider exiting."}</p>
       <details><summary>All ${p.checks.length} SELL checks</summary><ul class="list">${p.checks.map(c => `<li>${ok(c.ok)} ${esc(c.name)}: <span class="muted">${esc(c.detail)}</span></li>`).join("")}</ul></details></div>`;
   return `<h2>🔴 SELL picks today (${S.picks.length}) <span class="pill" style="background:#9a6700;color:#fff">experimental</span></h2>
@@ -392,6 +393,7 @@ function renderPicks() {
         <div class="tile"><div class="lbl">Stop-loss (−${(R.stop * 100).toFixed(0)}%)</div><div class="val neg">₹${fmt(p.stop)}</div><div class="chg muted">exit anyway by ${esc(p.exit_by)}</div></div>
       </div>
       <p><b>Why:</b> ${p.why.map(esc).join("; ")}. Strong uptrend (above 200-day average) with a short dip.</p>
+      ${(p.insider_flags || []).length ? `<p class="muted">🕵️ <b>Public insider/governance info:</b> ${p.insider_flags.map(esc).join(" · ")}</p>` : ""}
       <p><b>For ₹${fmt(cap, 0)}:</b> buy <b>${z.q}</b> shares ≈ ₹${fmt(z.amt, 0)} (risking 1% of capital) → if target: +₹${fmt(z.gain, 0)}, if stop: −₹${fmt(z.maxLoss, 0)} (before charges).</p>
       <details><summary>All ${p.checks.length} stock checks ✅</summary><ul class="list">${p.checks.map(c => `<li>${ok(c.ok)} ${esc(c.name)}: <span class="muted">${esc(c.detail)}</span></li>`).join("")}</ul></details></div>`;
   };
@@ -564,11 +566,32 @@ function renderMoney() {
       ${f.DII != null ? `<div class="card tile"><div class="lbl">DII net (${esc(f.date)})</div><div class="val ${cls(f.DII)}">₹${fmt(f.DII, 0)} cr</div><div class="chg muted">source: NSE</div></div>` : ""}</div>`
       : `<div class="note warnbox">NSE didn't return FII/DII data on the last refresh. Open the NSE link below and set the FII factor on the Compass tab by hand.</div>`}
     <div class="note"><b>How to read it:</b> 5+ days of FII selling above ₹3,000 cr/day = pressure. The first days FIIs turn buyers after a long selling streak often mark a bottom. Strong DII buying cushions falls. NSE publishes the day's figures after about 6 PM IST.</div>
+    ${insiderPanel()}
     <h3>Sector rotation: where money is moving</h3>
     <div class="card tablewrap"><table><tr><th>Sector index</th><th class="num">1 day</th><th class="num">5 days</th><th class="num">1 month</th></tr>${secRows}</table></div>
     <h3>Daily checklist (official NSE pages)</h3>
     <div class="card tablewrap"><table>${L.map(([a, b, u]) => `<tr><td><a href="${u}" target="_blank" rel="noopener">${a}</a></td><td class="muted">${b}</td></tr>`).join("")}</table></div>
     <p class="muted">Delivery % (each stock's NSE page → Trade info): price up with delivery > 60% = genuine buying; price up with low delivery = speculation.</p>`;
+}
+
+
+function insiderPanel() {
+  const I = DATA.insiders;
+  if (!I) return "";
+  if (I.error) return `<div class="note warnbox">${esc(I.error)}</div>`;
+  const ins = Object.entries(I.insider || {}).sort((a, b) => b[1].net_cr - a[1].net_cr);
+  const buys = ins.filter(([, v]) => v.net_cr > 0).slice(0, 10), sells = ins.filter(([, v]) => v.net_cr < 0).slice(-10).reverse();
+  const row = ([s, v]) => `<tr><td><b>${esc(s)}</b><div class="muted">${v.people.map(esc).join(", ")}</div></td><td class="num pos">₹${fmt(v.buy_cr, 1)} cr</td><td class="num neg">₹${fmt(v.sell_cr, 1)} cr</td><td class="num ${cls(v.net_cr)}">₹${fmt(v.net_cr, 1)} cr</td></tr>`;
+  const pl = Object.entries(I.pledge || {}).filter(([, v]) => v.pledged_pct_of_promoter >= 10).sort((a, b) => b[1].pledged_pct_of_promoter - a[1].pledged_pct_of_promoter).slice(0, 12);
+  const ck = I.checked || {};
+  return `<h3>🕵️ Insider &amp; governance tracker (public NSE disclosures only)</h3>
+    <div class="note">Promoters, directors and key managers must disclose their trades in their own company's shares (SEBI insider-trading rules). Open-market <b>buying</b> by insiders is widely studied as a confidence signal; heavy selling or a high/rising promoter <b>pledge</b> is a caution sign. Bulk and block deals show large investors.
+      Not tracked on purpose: bookie / "dabba" trading tips (illegal off-exchange trading, often rumours or manipulation) and any non-public information (trading on it is insider trading). This is context only, not yet a trading rule: it is logged live and will be tested before it ever blocks or adds a pick.<br>
+      <b>हिंदी:</b> यहाँ सिर्फ़ NSE पर सार्वजनिक जानकारी है: प्रमोटर/डायरेक्टर की ख़रीद-बिक्री, गिरवी शेयर, बड़े सौदे। बुकी/डब्बा ट्रेडिंग की ख़बरें जानबूझकर शामिल नहीं हैं (ग़ैरक़ानूनी और अक्सर अफ़वाह)।</div>
+    <div class="grid2"><div class="card tablewrap"><h3>Insider buying, last 30 days (open market)</h3>${ck.insider ? (buys.length ? `<table><tr><th>Stock</th><th class="num">Bought</th><th class="num">Sold</th><th class="num">Net</th></tr>${buys.map(row).join("")}</table>` : `<p class="muted">No open-market insider buying in the 150 stocks.</p>`) : `<p class="muted">NSE insider data not available on this refresh.</p>`}</div>
+      <div class="card tablewrap"><h3>Insider selling, last 30 days (open market)</h3>${ck.insider ? (sells.length ? `<table><tr><th>Stock</th><th class="num">Bought</th><th class="num">Sold</th><th class="num">Net</th></tr>${sells.map(row).join("")}</table>` : `<p class="muted">No open-market insider selling in the 150 stocks.</p>`) : `<p class="muted">NSE insider data not available on this refresh.</p>`}</div></div>
+    <div class="grid2" style="margin-top:10px"><div class="card tablewrap"><h3>Promoter pledge ≥ 10%</h3>${ck.pledge ? (pl.length ? `<table>${pl.map(([s, v]) => `<tr><td><b>${esc(s)}</b></td><td class="num neg">${v.pledged_pct_of_promoter.toFixed(1)}%</td></tr>`).join("")}</table>` : `<p class="muted">None of the 150 stocks above 10%.</p>`) : `<p class="muted">NSE pledge data not available on this refresh.</p>`}</div>
+      <div class="card tablewrap"><h3>Bulk &amp; block deals (latest session)</h3>${ck.deals ? ((I.deals || []).length ? `<table>${I.deals.slice(0, 12).map(d => `<tr><td><b>${esc(d.sym)}</b> <span class="muted">${esc(d.kind)}</span><div class="muted">${esc(d.client)}</div></td><td class="${d.side.startsWith("B") ? "pos" : "neg"}">${esc(d.side)}</td><td class="num">₹${fmt(d.value_cr, 1)} cr</td></tr>`).join("")}</table>` : `<p class="muted">No bulk/block deals in the 150 stocks.</p>`) : `<p class="muted">NSE deal data not available on this refresh.</p>`}</div></div>`;
 }
 
 /* ---------------------------------------------------------------- calendar */

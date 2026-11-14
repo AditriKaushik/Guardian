@@ -30,6 +30,7 @@ from . import crossasset as XA
 from . import news as NW
 from . import history as HL
 from . import intraday as INT
+from . import insiders as INS
 from .universe import NAMES, fetch_index_list
 
 HORIZONS = [1, 2, 3, "close"]
@@ -280,12 +281,17 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
     except Exception as exc:
         global_view = {"error": f"Global view unavailable this refresh: {exc}"}
 
+    insiders = {"error": "Insider data not built this refresh"}
     try:
         news_uni = {}
         for lst in ("ind_nifty50list", "ind_niftynext50list", "ind_niftymidcap50list"):
             for sym, ind in fetch_index_list(lst).items():
                 news_uni[sym] = {"name": NAMES.get(sym, sym), "industry": ind}
         news = NW.build(now, news_uni)
+        try:
+            insiders = INS.build(now, set(news_uni))
+        except Exception as exc:
+            insiders = {"error": f"Insider data unavailable this refresh: {exc}"}
         track = NW.update_news_log(track, news, D.history("^NSEI", "3mo", "1d"), now)
         news["live_check"] = track.get("news_summary", {})
     except Exception as exc:
@@ -302,6 +308,8 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
                                              None if "error" in news else news.get("stocks", {}))
         track = PK.update_pick_track(track, picks, daily_frames, now, is_open)
         picks["track"] = track.get("picks", {}).get("summary", {})
+        for p_ in picks.get("picks", []) + picks.get("sell", {}).get("picks", []):
+            p_["insider_flags"] = INS.flags_for(p_["sym"], insiders if "error" not in insiders else {})
         picks["track_sell"] = track.get("picks", {}).get("summary_sell", {})
     except Exception as exc:  # never let the picks page break the rest of the app
         picks = {"error": f"Daily picks unavailable this refresh: {exc}"}
@@ -319,6 +327,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "daily_picks": picks,
         "global": global_view,
         "news": news,
+        "insiders": insiders,
         "history": hist_lab,
         "intraday_lab": intraday_lab,
     }
