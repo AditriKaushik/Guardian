@@ -1,5 +1,5 @@
 // Market Compass service worker: network first for everything (live data), cached copy only when offline.
-const CACHE = "market-compass-v9";
+const CACHE = "market-compass-v10";
 const SHELL = ["./", "index.html", "app.js", "style.css", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

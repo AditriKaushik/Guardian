@@ -253,6 +253,36 @@ function renderHistory() {
 
 
 
+
+function summaryPanel(P) {
+  const minWin = store.get("mc_min_win", 0.75);
+  const D = P.direction || {};
+  const S = P.sell || {}, I = P.index || {};
+  const buyP = (P.stats && P.stats.recent5y) ? P.stats.recent5y.win : null;
+  const sellP = (S.stats && S.stats.recent5y) ? S.stats.recent5y.win : null;
+  const ixP = I.stats && I.stats.all ? I.stats.all.win : null;
+  const ok = p => p != null && p >= minWin;
+  const buys = [], sells = [];
+  if (ok(buyP)) (P.picks || []).forEach(p => buys.push({ name: p.sym, what: `${esc(p.industry)} · ₹${fmt(p.price)} → target ₹${fmt(p.target)}, stop ₹${fmt(p.stop)}`, p: buyP, kind: "Stock, delivery, multi-day" }));
+  if (I.signal === "BUY" && ok(ixP)) buys.push({ name: "NIFTY 50", what: `${fmt(I.price, 1)} → target ${fmt(I.target, 1)}, stop ${fmt(I.stop, 1)}`, p: ixP, kind: "Index, up to 10 days" });
+  if (ok(sellP) && S.ok) (S.picks || []).forEach(p => sells.push({ name: p.sym, what: `${esc(p.industry)} · ₹${fmt(p.price)} → cover ₹${fmt(p.target)}, stop ₹${fmt(p.stop)}${p.lot ? ` · lot ${p.lot}` : ""}`, p: sellP, kind: "Stock futures (F&amp;O), multi-day" }));
+  const dirColor = D.name === "UP" ? "#1a7f37" : D.name === "DOWN" ? "#cf222e" : "#9a6700";
+  const dirIcon = D.name === "UP" ? "⬆️" : D.name === "DOWN" ? "⬇️" : "↔️";
+  const list = (arr, side) => arr.length ? `<table>${arr.map(x => `<tr><td><b>${side === "BUY" ? "🟢 BUY" : "🔴 SELL"} ${esc(x.name)}</b><div class="muted">${x.what}</div><div class="muted">${x.kind}</div></td><td class="num"><b class="${side === "BUY" ? "pos" : "neg"}">${(x.p * 100).toFixed(0)}%</b><div class="muted">past wins</div></td></tr>`).join("")}</table>`
+    : `<p class="muted">No ${side} suggestion meets ${(minWin * 100).toFixed(0)}%+ today.</p>`;
+  const watch = (arr, side) => arr && arr.length ? `<p class="muted"><b>Watch (close to a ${side} trigger, no win claim yet):</b> ${arr.map(w => side === "BUY" ? `${esc(w.sym)} (RSI2 ${w.rsi2})` : `${esc(w.sym)} (gap ${pct(w.gap, 1)})`).join(", ")}</p>` : "";
+  const rateLine = (lbl, p) => `<span class="pill" style="background:${ok(p) ? "#1a7f37" : "#9a6700"};color:#fff">${lbl}: ${p == null ? "n/a" : (p * 100).toFixed(1) + "%"} ${ok(p) ? "✓" : "below your minimum"}</span>`;
+  return `<div class="stance" style="background:${dirColor}"><div class="sm">Market direction today · Nifty ${fmt(D.nifty, 1)} · ${pct(D.vs_200dma, 1)} vs 200-day average · ${pct(D.r20, 1)} in a month</div>
+      <div class="big">${dirIcon} ${esc(D.name || "")}</div><div>${esc(D.note || "")}</div></div>
+    <div class="card"><div class="controls" style="justify-content:space-between"><h3 style="margin:0">🎯 Today's suggestions: win history ${(minWin * 100).toFixed(0)}% or more</h3>
+      <label>Minimum win chance <select id="minWin">${[0.70, 0.75, 0.80, 0.85].map(v => `<option value="${v}" ${v === minWin ? "selected" : ""}>${(v * 100).toFixed(0)}%</option>`).join("")}</select></label></div>
+      <p>${rateLine("BUY rule", buyP)} ${rateLine("SELL rule", sellP)} ${rateLine("Nifty BUY rule", ixP)}</p>
+      <div class="grid2"><div><h3>🟢 BUY these (${buys.length})</h3>${list(buys, "BUY")}${watch(P.watch_buy, "BUY")}</div>
+        <div><h3>🔴 SELL these (${sells.length})</h3>${list(sells, "SELL")}${watch(P.watch_sell, "SELL")}</div></div>
+      <p class="muted">"Past wins" = the rule's real win rate on the last 5 years (Nifty: the last 10 years) after costs. It is not a guarantee. Wins are small and losses bigger, so always keep the stop-loss. When the market is rising, suggestions come mostly from BUY on dips. When it is falling, only the tested gap-down SELL rule applies. Educational only, not investment advice.
+      <br><b>हिंदी:</b> "पिछली जीत" = पिछले 5 साल में इस नियम की असली जीत दर (ख़र्च के बाद)। यह गारंटी नहीं है। बाज़ार ऊपर हो तो गिरावट पर BUY, नीचे हो तो सिर्फ परखा हुआ gap-down SELL नियम। स्टॉप-लॉस हमेशा लगाएँ।</p></div>`;
+}
+
 function intradaySection(P) {
   const X = P.intraday;
   if (!X) return "";
@@ -340,7 +370,8 @@ function renderPicks() {
   };
   const yrs = S.years.map(y => `<tr><td>${y.year}</td><td class="num">${y.n}</td><td class="num ${y.win >= R.min_win ? "pos" : "neg"}">${pc(y.win)}</td><td class="num ${cls(y.avg)}">${y.avg == null ? "" : (y.avg >= 0 ? "+" : "") + (y.avg * 100).toFixed(2) + "%"}</td></tr>`).join("");
   const T = P.track || {};
-  el.innerHTML = `<h2>⭐ Daily picks: BUY &amp; SELL suggestions that pass every condition</h2>
+  el.innerHTML = `${summaryPanel(P)}
+    <h2>⭐ Daily picks: BUY &amp; SELL suggestions that pass every condition</h2>
     <div class="note">${P.provisional ? "🟡 <b>Provisional</b> (market open): the list can change until 3:30 PM. Final picks are fixed after the close. The rule enters near the close (3:15–3:25 PM)." : "🟢 <b>Final for " + esc(P.as_of) + "</b>: based on the closing price."}
       Checked ${P.universe_n} stocks (Nifty 50 + Next 50 + Midcap 50) against 13 conditions (including overnight company news) and SEBI/NSE rules.</div>
     <div class="grid2">
@@ -383,6 +414,7 @@ function renderPicks() {
       <li><b>Avoid</b> tips on WhatsApp/Telegram, "guaranteed return" schemes and pump-and-dump stocks. SEBI warns against unregistered "finfluencers". Report fraud on SEBI SCORES.</li>
     </ul></div>`;
   $("#pickCap").onchange = e => { store.set("mc_pick_cap", Math.max(1000, Number(e.target.value) || 100000)); renderPicks(); };
+  const mw = $("#minWin"); if (mw) mw.onchange = e => { store.set("mc_min_win", Number(e.target.value)); renderPicks(); };
 }
 
 /* ---------------------------------------------------------------- stocks */

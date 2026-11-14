@@ -248,7 +248,8 @@ def index_rule(nifty: pd.DataFrame, ivix: pd.Series, today: pd.Timestamp) -> dic
     last = float(c.iloc[-1])
     active = bool(sig[-1]) and c.index[-1] >= today - pd.Timedelta(days=5)
     st = rule_stats(tr, today) if len(tr) else {}
-    return {"signal": "BUY" if active else None, "price": round(last, 1), "target": round(last * (1 + IX_TARGET), 1),
+    qualifies = bool(st and st["all"]["win"] and st["all"]["win"] >= MIN_WIN and (st["all"]["avg"] or 0) > 0)
+    return {"signal": "BUY" if (active and qualifies) else None, "qualifies": qualifies, "raw_signal": active, "price": round(last, 1), "target": round(last * (1 + IX_TARGET), 1),
             "stop": round(last * (1 - IX_STOP), 1), "days": IX_DAYS,
             "vix": round(float(v.iloc[-1]), 2), "vix_20d_high": round(float(vh.iloc[-1]), 2),
             "above_200dma": bool(c.iloc[-1] > sma.iloc[-1]), "stats": st,
@@ -503,7 +504,7 @@ def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, i
             continue
         per_ind_s[r["industry"]] = per_ind_s.get(r["industry"], 0) + 1
         sell_picks.append(r)
-    sell = {"rule": {"target": S_TARGET, "stop": S_STOP, "max_days": S_MAX_DAYS, "cost": S_COST, "gap": S_GAP,
+    sell = {"ok": s_ok, "rule": {"target": S_TARGET, "stop": S_STOP, "max_days": S_MAX_DAYS, "cost": S_COST, "gap": S_GAP,
                      "vol": S_VOL, "close_pos": S_CLOSEPOS, "max_picks": MAX_SELL},
             "stats": s_stats, "market": sell_market, "picks": sell_picks, "blocked": sell_blocked[:15],
             "fo_count": len(lots)}
@@ -512,8 +513,41 @@ def build_picks(snap: dict, macro_pct: float, fii: dict | None, now: datetime, i
     except Exception as exc:
         index_sig = {"error": str(exc)}
 
+    # ---------------- market direction + "watch" lists (stocks close to a trigger; no win claim)
+    s200n, s50n = nif.rolling(200).mean(), nif.rolling(50).mean()
+    r20n = float(nif.pct_change(20).iloc[-1])
+    up200, up50 = bool(nif.iloc[-1] > s200n.iloc[-1]), bool(nif.iloc[-1] > s50n.iloc[-1])
+    if up200 and r20n > 0:
+        dname, dnote = "UP", "Nifty is above its 200-day average and higher than a month ago. The tested BUY rule buys short dips in strong stocks."
+    elif (not up200) or (not up50 and r20n < -0.03):
+        dname, dnote = "DOWN", "Nifty is below its long-term average or falling. The BUY rule stays out. Only the gap-down SELL rule is active; no broader 'short the falling market' rule passed testing."
+    else:
+        dname, dnote = "SIDEWAYS", "Mixed trend. Both rules run, but signals are fewer."
+    direction = {"name": dname, "note": dnote, "nifty": round(float(nif.iloc[-1]), 1),
+                 "vs_200dma": round(float(nif.iloc[-1] / s200n.iloc[-1] - 1), 4), "r20": round(r20n, 4), "above_50dma": up50}
+    watch_buy, watch_sell = [], []
+    for sym, df in frames.items():
+        if len(df) < 260 or df.index[-1] < today - pd.Timedelta(days=5):
+            continue
+        c = df["Close"]
+        sf = signal_frame(c)
+        last = sf.iloc[-1]
+        uptrend = c.iloc[-1] > last["s200"] and c.rolling(50).mean().iloc[-1] > last["s200"]
+        if uptrend and not last["sig"] and last["rsi2"] < 20:
+            watch_buy.append({"sym": sym, "industry": uni.get(sym, {}).get("industry", ""), "price": round(float(c.iloc[-1]), 2),
+                              "rsi2": round(float(last["rsi2"]), 1),
+                              "to_lower_bb": round(float(c.iloc[-1] / last["lower_bb"] - 1), 4)})
+        gap = float(df["Open"].iloc[-1] / c.iloc[-2] - 1)
+        volx = float(df["Volume"].iloc[-1] / df["Volume"].rolling(50).mean().shift(1).iloc[-1])
+        if sym in lots and gap <= -0.025 and not bool(short_signal(df).iloc[-1]):
+            watch_sell.append({"sym": sym, "industry": uni.get(sym, {}).get("industry", ""), "price": round(float(c.iloc[-1]), 2),
+                               "gap": round(gap, 4), "vol_x": round(volx, 1)})
+    watch_buy.sort(key=lambda r: r["rsi2"])
+    watch_sell.sort(key=lambda r: r["gap"])
+
     last_bar = max((f.index[-1] for f in frames.values()), default=today)
     payload = {
+        "min_win": MIN_WIN, "direction": direction, "watch_buy": watch_buy[:8], "watch_sell": watch_sell[:8],
         "sell": sell, "index": index_sig, "intraday": INTRADAY_STUDY,
         "rule": {"target": TARGET, "stop": STOP, "max_days": MAX_DAYS, "cost": COST, "min_win": MIN_WIN,
                  "max_picks": max_picks, "max_per_industry": MAX_PER_INDUSTRY},
