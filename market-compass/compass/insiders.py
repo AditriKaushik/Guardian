@@ -168,7 +168,9 @@ def build(now: datetime, universe: set) -> dict:
     diag["deals_in_universe"] = sum(d["in_universe"] for d in deals)
     deals.sort(key=lambda d: (not d["in_universe"], -d["value_cr"]))
 
-    checked = {"insider": pit is not None, "pledge": pl is not None, "deals": ld is not None}
+    # An empty list from NSE is not the same as "no insider trades": NSE has been answering these two APIs with empty
+    # lists for automated requests since its Nov 2026 domain move, so treat empty as "not available".
+    checked = {"insider": bool(rows), "pledge": bool(prow), "deals": ld is not None}
     return {"window": f"{frm} to {to}", "checked": checked, "insider": insider, "pledge": pledge,
             "deals": deals[:40], "diag": diag}
 
