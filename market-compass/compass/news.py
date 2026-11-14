@@ -32,6 +32,10 @@ FEEDS = [
     ("Google News: oil & commodities", GN.format(q=quote_plus("crude oil OR OPEC OR gold price OR copper price when:1d"))),
     ("Google News: geopolitics", GN.format(q=quote_plus("war OR sanctions OR tariffs OR ceasefire when:1d"))),
     ("Google News: RBI & India economy", GN.format(q=quote_plus("RBI OR \"Indian economy\" OR rupee OR inflation India when:1d"))),
+    ("Google News Hindi: शेयर बाजार", "https://news.google.com/rss/search?q=" + quote_plus("शेयर बाजार OR सेंसेक्स OR निफ्टी when:1d") + "&hl=hi&gl=IN&ceid=IN:hi"),
+    ("Google News Hindi: अर्थव्यवस्था", "https://news.google.com/rss/search?q=" + quote_plus("आरबीआई OR महंगाई OR रुपया OR कच्चा तेल when:1d") + "&hl=hi&gl=IN&ceid=IN:hi"),
+    ("Google News: Dalal Street", GN.format(q=quote_plus("\"Dalal Street\" OR \"stocks to watch\" OR \"market outlook\" when:1d"))),
+    ("Business Standard Markets", "https://www.business-standard.com/rss/markets-106.rss"),
     ("Economic Times Markets", "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms"),
     ("Moneycontrol", "https://www.moneycontrol.com/rss/latestnews.xml"),
     ("Livemint Markets", "https://www.livemint.com/rss/markets"),
@@ -39,31 +43,36 @@ FEEDS = [
     ("CNBC World", "https://www.cnbc.com/id/100727362/device/rss/rss.html"),
 ]
 
+# Which feeds describe the local (Dalal Street) mood vs the global mood
+LOCAL_FEEDS = ("Google News: India markets", "Google News: RBI & India economy", "Google News Hindi: शेयर बाजार",
+               "Google News Hindi: अर्थव्यवस्था", "Google News: Dalal Street", "Business Standard Markets",
+               "Economic Times Markets", "Moneycontrol", "Livemint Markets")
+
 # topic: (label, keyword regex, base direction for Indian stocks if the headline itself has no clear tone,
 #         sectors helped (+) / hurt (-) when the news is GOOD for the market)
 TOPICS = {
-    "war": ("War / geopolitics", r"\bwar\b|missile|airstrike|strike on|attack|invasion|troops|military|terror|border clash|escalat|ceasefire|truce|peace talk|sanction",
+    "war": ("War / geopolitics", r"\bwar\b|missile|airstrike|strike on|attack|invasion|troops|military|terror|border clash|escalat|ceasefire|truce|peace talk|sanction|युद्ध|हमला|हमले|मिसाइल|सीमा पर|तनाव|आतंक|प्रतिबंध|युद्धविराम|संघर्ष",
             -1, {"Defence": -1, "Oil upstream": -1, "Aviation": +1, "Paints": +1}),
-    "fed": ("US Fed / US rates", r"\bfed\b|federal reserve|powell|fomc|treasury yield|us yields|us inflation|us cpi|nonfarm|payroll",
+    "fed": ("US Fed / US rates", r"\bfed\b|federal reserve|powell|fomc|treasury yield|us yields|us inflation|us cpi|nonfarm|payroll|फेड|अमेरिकी फेडरल|अमेरिकी ब्याज",
             0, {"Banks": +1, "IT": 0, "Realty": +1}),
-    "rbi": ("RBI / India rates", r"\brbi\b|reserve bank|repo rate|monetary policy|mpc\b|crr\b|liquidity",
+    "rbi": ("RBI / India rates", r"\brbi\b|reserve bank|repo rate|monetary policy|mpc\b|crr\b|liquidity|आरबीआई|रिजर्व बैंक|रेपो|मौद्रिक नीति|ब्याज दर",
             0, {"Banks": +1, "NBFC": +1, "Realty": +1, "Auto": +1}),
-    "inflation": ("Inflation", r"inflation|\bcpi\b|\bwpi\b|price rise|food prices", 0, {"FMCG": +1, "Banks": +1}),
-    "crude": ("Crude oil / OPEC", r"crude|brent|\bwti\b|opec|\boil\b", 0,
+    "inflation": ("Inflation", r"inflation|\bcpi\b|\bwpi\b|price rise|food prices|महंगाई|मुद्रास्फीति", 0, {"FMCG": +1, "Banks": +1}),
+    "crude": ("Crude oil / OPEC", r"crude|brent|\bwti\b|opec|\boil\b|कच्चा तेल|कच्चे तेल|क्रूड|ओपेक", 0,
               {"Oil marketing (OMC)": +1, "Paints": +1, "Aviation": +1, "Oil upstream": -1}),
-    "trade": ("Tariffs / trade", r"tariff|trade war|trade deal|trade talks|export curb|import duty|anti-dumping", 0, {"IT": +1, "Pharma": +1, "Metals": +1}),
-    "china": ("China", r"\bchina\b|chinese|beijing|yuan|hang seng", 0, {"Metals": +1}),
-    "us_mkts": ("Wall Street / global markets", r"wall street|s&p 500|nasdaq|dow jones|global markets|asian markets|global stocks|risk-off|risk-on", 0, {}),
-    "fii": ("FII / FPI flows", r"\bfii|\bfpi|foreign investors|foreign portfolio|outflow|inflow", 0, {"Banks": +1}),
-    "rupee": ("Rupee / dollar", r"rupee|\binr\b|dollar index|greenback|forex", 0, {"IT": -1, "Pharma": -1}),
-    "metals": ("Metals / commodities", r"copper|aluminium|aluminum|steel price|iron ore|zinc|metal prices|lme\b", 0, {"Metals": +1}),
-    "gold": ("Gold / silver", r"\bgold\b|silver|bullion", 0, {"Jewellery": +1, "Gold finance": +1}),
-    "earnings": ("Company results", r"\bq[1-4]\b|quarterly|results|earnings|profit|net income|revenue|guidance|beats estimates|misses estimates", 0, {}),
-    "policy": ("Govt policy / Budget / tax", r"budget|\bgst\b|tax|government policy|cabinet|pli scheme|disinvestment|capex", 0, {"Infra / Capital goods": +1, "PSU": +1}),
-    "elections": ("Elections / politics", r"election|poll result|exit poll|coalition|no-confidence", 0, {}),
-    "sebi": ("SEBI / regulation", r"\bsebi\b|regulator|f&o rule|derivatives rule|margin rule|ban on", 0, {}),
-    "monsoon": ("Monsoon / weather", r"monsoon|rainfall|\bimd\b|drought|flood|heatwave|cyclone", 0, {"FMCG": +1, "Tractors / Rural": +1, "Fertilisers": +1}),
-    "crypto": ("Crypto", r"bitcoin|crypto|ethereum|\bbtc\b", 0, {}),
+    "trade": ("Tariffs / trade", r"tariff|trade war|trade deal|trade talks|export curb|import duty|anti-dumping|टैरिफ|व्यापार युद्ध|व्यापार समझौता|ट्रेड डील", 0, {"IT": +1, "Pharma": +1, "Metals": +1}),
+    "china": ("China", r"\bchina\b|chinese|beijing|yuan|hang seng|चीन", 0, {"Metals": +1}),
+    "us_mkts": ("Wall Street / global markets", r"wall street|s&p 500|nasdaq|dow jones|global markets|asian markets|global stocks|risk-off|risk-on|वॉल स्ट्रीट|अमेरिकी बाजार|एशियाई बाजार|ग्लोबल बाजार|वैश्विक बाजार", 0, {}),
+    "fii": ("FII / FPI flows", r"\bfii|\bfpi|foreign investors|foreign portfolio|outflow|inflow|एफआईआई|एफपीआई|विदेशी निवेशक|विदेशी निवेश", 0, {"Banks": +1}),
+    "rupee": ("Rupee / dollar", r"rupee|\binr\b|dollar index|greenback|forex|रुपया|रुपये|डॉलर", 0, {"IT": -1, "Pharma": -1}),
+    "metals": ("Metals / commodities", r"copper|aluminium|aluminum|steel price|iron ore|zinc|metal prices|lme\b|तांबा|एल्युमिनियम|स्टील|धातु", 0, {"Metals": +1}),
+    "gold": ("Gold / silver", r"\bgold\b|silver|bullion|सोना|सोने|चांदी", 0, {"Jewellery": +1, "Gold finance": +1}),
+    "earnings": ("Company results", r"\bq[1-4]\b|quarterly|results|earnings|profit|net income|revenue|guidance|beats estimates|misses estimates|नतीजे|तिमाही|मुनाफा|मुनाफे|आय", 0, {}),
+    "policy": ("Govt policy / Budget / tax", r"budget|\bgst\b|tax|government policy|cabinet|pli scheme|disinvestment|capex|बजट|जीएसटी|टैक्स|कैबिनेट|सरकार", 0, {"Infra / Capital goods": +1, "PSU": +1}),
+    "elections": ("Elections / politics", r"election|poll result|exit poll|coalition|no-confidence|चुनाव|एग्जिट पोल", 0, {}),
+    "sebi": ("SEBI / regulation", r"\bsebi\b|regulator|f&o rule|derivatives rule|margin rule|ban on|सेबी", 0, {}),
+    "monsoon": ("Monsoon / weather", r"monsoon|rainfall|\bimd\b|drought|flood|heatwave|cyclone|मानसून|बारिश|सूखा|बाढ़", 0, {"FMCG": +1, "Tractors / Rural": +1, "Fertilisers": +1}),
+    "crypto": ("Crypto", r"bitcoin|crypto|ethereum|\bbtc\b|बिटकॉइन|क्रिप्टो", 0, {}),
     "tech_ai": ("Tech / AI / IT services", r"\bai\b|artificial intelligence|nvidia|\bchips?\b|semiconductor|it services|h-1b|outsourcing", 0, {"IT": +1}),
 }
 
@@ -149,15 +158,38 @@ def last_close_time(now: datetime) -> pd.Timestamp:
     return close
 
 
+HI_POS = ("तेजी", "तेज़ी", "उछाल", "उछला", "उछले", "बढ़त", "चढ़ा", "चढ़े", "चढ़ी", "रिकॉर्ड ऊंचाई", "रिकॉर्ड हाई", "मजबूत",
+          "मज़बूत", "खरीदारी", "रैली", "मुनाफा बढ़", "राहत", "सुधार", "युद्धविराम", "रेपो रेट घट", "ब्याज दर घट", "महंगाई घटी", "महंगाई कम")
+HI_NEG = ("गिरावट", "गिरा", "गिरे", "गिरी", "लुढ़क", "टूटा", "टूटे", "टूटी", "फिसल", "कमजोर", "कमज़ोर", "बिकवाली", "नुकसान",
+          "घाटा", "मंदी", "धड़ाम", "दबाव", "डर", "चिंता", "हमला", "महंगाई बढ़", "रेपो रेट बढ़", "ब्याज दर बढ़", "रिकॉर्ड निचले")
+
+
+HI_PHRASES = [  # Hindi context: (subject words, direction words, tone for Indian stocks)
+    (("कच्चा तेल", "कच्चे तेल", "क्रूड"), ("उछाल", "तेजी", "तेज़ी", "बढ़", "महंगा", "चढ़"), -1),
+    (("कच्चा तेल", "कच्चे तेल", "क्रूड"), ("गिरावट", "सस्ता", "नरमी", "घट", "फिसल", "लुढ़क"), +1),
+    (("रुपया", "रुपये"), ("गिरा", "कमजोर", "कमज़ोर", "रिकॉर्ड निचले", "लुढ़क", "टूटा"), -1),
+    (("रुपया", "रुपये"), ("मजबूत", "मज़बूत", "चढ़ा", "उछला", "सुधार"), +1),
+    (("महंगाई",), ("बढ़", "उछल", "पार", "ऊपर"), -1),
+    (("महंगाई",), ("घट", "कम", "नरम", "नीचे"), +1),
+    (("सोना", "सोने", "चांदी"), ("उछाल", "तेजी", "तेज़ी", "बढ़", "गिरावट", "सस्ता"), 0),   # gold moves: no direct read
+]
+
+
 def score_headline(title: str) -> tuple[int, list[str]]:
     t = title.lower()
     topics = [k for k, (_, rx, _, _) in TOPICS.items() if re.search(rx, t)]
     s = 0
+    for subj, dirs, v in HI_PHRASES:
+        if any(w in title for w in subj) and any(d in title for d in dirs):
+            if v == 0:
+                return 0, topics
+            s += v
     for rx, v in PHRASES:
         if re.search(rx, t):
             s += v
     if s == 0:
         s = len(re.findall(rf"\b(?:{POS})\b", t)) - len(re.findall(rf"\b(?:{NEG})\b", t))
+        s += sum(w in title for w in HI_POS) - sum(w in title for w in HI_NEG)
         if s == 0 and topics:
             s = TOPICS[topics[0]][2]
     return (1 if s > 0 else -1 if s < 0 else 0), topics
@@ -250,6 +282,8 @@ def build(now: datetime, universe: dict) -> dict:
     for name, url in FEEDS:
         txt = _get(url)
         got = _parse_rss(txt, name) if txt else []
+        for g_ in got:
+            g_["region"] = "india" if name in LOCAL_FEEDS else "global"
         feed_status.append({"feed": name, "ok": txt is not None, "items": len(got)})
         items += got
     seen, news = set(), []
@@ -266,7 +300,7 @@ def build(now: datetime, universe: dict) -> dict:
     for it in news:
         tone, topics = score_headline(it["title"])
         stocks = [s for s, rx in pats.items() if rx.search(it["title"])]
-        rec = {"title": it["title"], "link": it["link"], "source": it["source"],
+        rec = {"title": it["title"], "link": it["link"], "source": it["source"], "region": it.get("region", "global"),
                "time": it["time"].strftime("%Y-%m-%d %H:%M"), "tone": tone, "topics": topics, "stocks": stocks}
         scored.append(rec)
         for k in topics:
@@ -296,6 +330,13 @@ def build(now: datetime, universe: dict) -> dict:
                        "headlines": a["headlines"]})
     tones = [r["tone"] for r in scored if r["topics"]]
     score = sum(tones) / len(tones) if tones else 0.0
+
+    def mood(region):
+        t = [r["tone"] for r in scored if r["region"] == region and (r["topics"] or r["tone"])]
+        sc = sum(t) / len(t) if t else 0.0
+        return {"score": round(sc, 3), "n": len(t), "pos": sum(x > 0 for x in t), "neg": sum(x < 0 for x in t),
+                "mood": "positive" if sc > 0.1 else "negative" if sc < -0.1 else "mixed"}
+    local_mood, global_mood = mood("india"), mood("global")
     stocks_flag = {}
     for s, lst in stock_news.items():
         t = sum(x["tone"] for x in lst)
@@ -305,6 +346,7 @@ def build(now: datetime, universe: dict) -> dict:
         "since": since.strftime("%Y-%m-%d %H:%M"), "until": pd.Timestamp(now).strftime("%Y-%m-%d %H:%M"),
         "n_headlines": len(scored), "score": round(score, 3),
         "mood": "positive" if score > 0.1 else "negative" if score < -0.1 else "mixed",
+        "local": local_mood, "global": global_mood,
         "topics": topics[:12], "latest": scored[:30], "stocks": stocks_flag,
         "n_filings": len(filings), "feeds": feed_status,
     }
@@ -318,10 +360,12 @@ def update_news_log(track: dict, news: dict, nifty_daily: pd.DataFrame, now: dat
     pre_open = t.weekday() < 5 and (t.hour, t.minute) < (9, 15)
     if pre_open and news.get("n_headlines", 0) >= 5:
         row = next((r for r in log if r["date"] == today), None)
+        vals = {"score": news["score"], "n": news["n_headlines"],
+                "local": news.get("local", {}).get("score"), "global": news.get("global", {}).get("score")}
         if row is None:
-            log.append({"date": today, "score": news["score"], "n": news["n_headlines"]})
+            log.append({"date": today, **vals})
         else:
-            row.update({"score": news["score"], "n": news["n_headlines"]})
+            row.update(vals)
     if not nifty_daily.empty:
         nd = nifty_daily.copy()
         nd.index = pd.to_datetime(nd.index).tz_localize(None).normalize() if nd.index.tz is not None else nd.index
