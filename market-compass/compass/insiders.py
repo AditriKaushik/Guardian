@@ -28,15 +28,19 @@ def _session():
 
     s = requests.Session()
     s.headers.update(UA)
-    try:
-        s.get("https://www.nseindia.com", timeout=12)
-    except Exception:
-        pass
+    # NSE moved its site/API to www.nseindia.in (Nov 2026). Cookies are domain-bound, so warm up both domains
+    # and the disclosure pages; without them the PIT/pledge APIs answer with empty lists.
+    for url in ("https://www.nseindia.in", "https://www.nseindia.in/companies-listing/corporate-filings-insider-trading",
+                "https://www.nseindia.com"):
+        try:
+            s.get(url, timeout=12)
+        except Exception:
+            pass
     return s
 
 
 def _get_json(s, path: str, params: dict | None = None):
-    for base in ("https://www.nseindia.com", "https://www.nseindia.in"):
+    for base in ("https://www.nseindia.in", "https://www.nseindia.com"):
         try:
             r = s.get(base + path, params=params or {}, timeout=25)
             if r.status_code == 200 and r.text.strip()[:1] in "[{":
@@ -93,6 +97,8 @@ def build(now: datetime, universe: set) -> dict:
 
     # ---- insider trades (PIT)
     pit = _get_json(s, "/api/corporates-pit", {"index": "equities", "from_date": frm, "to_date": to})
+    if not _rows(pit):                      # some NSE versions only answer without a date range
+        pit = _get_json(s, "/api/corporates-pit", {"index": "equities"}) or pit
     diag["pit_shape"] = _shape(pit)
     rows = _rows(pit)
     diag["pit_rows"] = len(rows)
@@ -148,19 +154,19 @@ def build(now: datetime, universe: set) -> dict:
         for key, kind in (("BULK_DEALS_DATA", "bulk"), ("BLOCK_DEALS_DATA", "block")):
             for r in ld.get(key, []) or []:
                 sym = str(_pick(r, "symbol")).strip().upper()
-                if sym not in universe:
-                    continue
                 qty = _num(_pick(r, "qty", "quantity", default=0))
                 px = _num(_pick(r, "watp", "price", "tradePrice", default=0))
                 deals.append({"sym": sym, "kind": kind, "side": str(_pick(r, "buySell", "buy_sell", default="?")).upper(),
                               "client": str(_pick(r, "clientName", "client", default="?"))[:60],
-                              "value_cr": round(qty * px / 1e7, 2), "date": str(_pick(r, "date", default=""))})
+                              "value_cr": round(qty * px / 1e7, 2), "date": str(_pick(r, "date", default="")),
+                              "in_universe": sym in universe, "name": str(_pick(r, "name", default=""))[:40]})
         diag["deal_keys"] = sorted(ld.keys())[:10]
         diag["deal_counts"] = {k: len(v) for k, v in ld.items() if isinstance(v, list)}
         first = next((v[0] for v in ld.values() if isinstance(v, list) and v), None)
         diag["deal_row_keys"] = sorted(first.keys())[:20] if isinstance(first, dict) else []
     diag["deals"] = len(deals)
-    deals.sort(key=lambda d: -d["value_cr"])
+    diag["deals_in_universe"] = sum(d["in_universe"] for d in deals)
+    deals.sort(key=lambda d: (not d["in_universe"], -d["value_cr"]))
 
     checked = {"insider": pit is not None, "pledge": pl is not None, "deals": ld is not None}
     return {"window": f"{frm} to {to}", "checked": checked, "insider": insider, "pledge": pledge,
