@@ -39,7 +39,7 @@ themselves are close to real time (usually within a minute or two).
 
 ---
 
-## 1. What's in the app (9 tabs)
+## 1. What's in the app (10 tabs)
 
 1. **🧭 Compass:** live tiles for Nifty, Bank Nifty, India VIX, USD/INR, the US Dollar Index,
    the US 10-year yield, Brent crude, gold, the S&P 500, Nikkei and Hang Seng.
@@ -155,6 +155,17 @@ themselves are close to real time (usually within a minute or two).
        default, rating downgrade, pledge invoked, raid or investigation, FDA warning letter,
        plant shutdown, CFO/CEO resignation.
      - Routine paperwork is filtered out.
+   - **Local vs global mood:** Hindi Google News (Dainik Bhaskar, Amar Ujala, Navbharat Times,
+     Zee Business…), Business Standard and Indian sources give a **🇮🇳 Dalal Street mood**. World
+     feeds give a **🌍 global mood**. Hindi words (तेजी, उछाल, लुढ़का, बिकवाली, महंगाई…) are scored
+     with context, e.g. कच्चे तेल में उछाल = bad.
+   - **🕵️ Insider & governance (in 🐋 Smart money and on pick cards):** this uses public NSE
+     disclosures only.
+     - Open-market buying and selling by promoters, directors and key managers (last 30 days).
+     - Promoter pledges.
+     - Bulk and block deals.
+     - It is context only until tested. Bookie/dabba tips and non-public information are
+       deliberately excluded because they are illegal and often manipulation.
    - **Honest note:** research and our own tests agree that overnight news is mostly priced in at
      the open. So the app saves each morning's mood and compares it with Nifty's real opening and
      day move. The 🎯 live check shows the hit rate once 5 days are logged.
@@ -178,7 +189,25 @@ themselves are close to real time (usually within a minute or two).
    - **Change it caused:** ⭐ Daily picks dropped the old "India VIX ≤ 25" gate, which had never
      been tested; it is now a crash guard at 40. Picks taken with India VIX above 20 won 93%
      vs 85% below it.
-5. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
+5. **📐 Estimation engine** (weather-forecast style): probabilities plus a report card.
+   - **Nifty, next 1 / 5 / 20 days:**
+     - It uses 40 factors: momentum, volatility, India and US VIX, world markets, dollar, rupee,
+       crude, gold, copper, US rates and the calendar.
+     - **Statistics:** correlation and regression with Newey-West t-stats, a Benjamini-Hochberg
+       multiple-testing correction, and a yearly walk-forward test since 2014.
+     - **Verification:** Brier Skill Score vs climatology, a Diebold-Mariano test, and accuracy
+       on confident days.
+     - **Result:** no factor survived and no horizon beat climatology. So the **headline is
+       climatology** (how often Nifty historically rose over that horizon). The model's number is
+       a small tilt, shown with an 80% range and today's main factors.
+   - **Stocks (150), ranking:** 19 cross-sectional factors, walk-forward verified on 2021–26.
+     - Confident 70%+ calls almost never occur and the AUC is about 0.51.
+     - What works is a **ranking**: the top and bottom 10% beat or lagged Nifty about 53% of the
+       time. The top-10 minus bottom-10 spread was about +0.33% a week after costs.
+     - Factors that held up: 12-month momentum and 5-day reversal. The tab shows the top-10 and
+       bottom-10 today.
+   - The models refresh hourly.
+6. **📈 Stocks:** **all 50 Nifty 50 stocks** (NSE's official list, downloaded fresh on every
    refresh, so index changes appear automatically) plus **20 ⭐ top performers** picked fresh
    from Nifty Next 50 and Nifty Midcap 50 by 3-month return (each must also be up over 1 month).
    Nifty and Bank Nifty are included too. A **Today's movers** table shows the live top gainers
@@ -190,16 +219,16 @@ themselves are close to real time (usually within a minute or two).
    - the quantity to buy, with a stop-loss, a target and the rough expected value;
    - a plain-language reading of the chart, and a chart with Bollinger Bands;
    - a ranked list of the stocks where the model has proven some skill today.
-6. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
+7. **🐋 Smart money:** FII and DII net buying/selling (NSE), sector rotation (1 day, 5 days,
    1 month), and links to NSE's big-player pages: bulk/block deals, option chain, FII positions,
    insider trades.
-7. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
+8. **📅 Calendar:** upcoming Indian and US data releases, F&O expiries, your events, and the
    month's seasonal theme (festivals, monsoon, Budget, results season).
-8. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
+9. **🎯 Live track record:** the real-world test. Every prediction made in market hours is logged
    at the live price, then marked ✅ or ❌ against the **actual** price when its horizon ends. It
    shows the live hit rate against simple guessing, overall and for each horizon. It covers the
    last 20 days.
-9. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
+10. **📖 Guide:** install steps, the daily routine, and how to read the numbers.
 
 ---
 
@@ -272,6 +301,8 @@ market-compass/
 │   ├── news.py               ← overnight news: feeds, topics, tone, sectors, NSE filings, live check
 │   ├── crossasset.py         ← opening-gap forecast, metals tilt, tested cause → effect table
 │   ├── picks.py              ← Daily picks: BUY rule, SELL rule, Nifty index rule, backtests, checks
+│   ├── estimation.py         ← Estimation engine wrapper (hourly): nifty_estimator.py + stock_estimator.py
+│   ├── insiders.py           ← public insider trades, promoter pledges, bulk/block deals (NSE)
 │   ├── intraday.py           ← Intraday lab: 4 same-day long/short setups, live forward test
 │   ├── fo.py                 ← NSE F&O lot sizes + F&O ban list (for SELL suggestions)
 │   ├── universe.py           ← which stocks: all Nifty 50 + top performers (auto)

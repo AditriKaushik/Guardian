@@ -43,7 +43,7 @@ function isMarketHoursNow() {
   return d >= 1 && d <= 5 && m >= 9 * 60 + 15 && m <= 15 * 60 + 30;
 }
 
-function renderAll() { renderCompass(); renderPicks(); renderNews(); renderHistory(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
+function renderAll() { renderCompass(); renderPicks(); renderNews(); renderHistory(); renderEstimate(); renderStocks(); renderMoney(); renderCalendar(); renderTrack(); renderGuide(); }
 
 /* ---------------------------------------------------------------- compass */
 const MACRO_ORDER = ["nifty", "banknifty", "vix", "usdinr", "dxy", "us10y", "brent", "gold", "sp500", "nikkei", "hangseng"];
@@ -369,6 +369,50 @@ function sellSection(P, cap) {
       <table><tr><th></th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Avg per trade</th><th class="num">Avg win / avg loss</th></tr>
       ${[["Last 5 years", r5], ["Last 12 months", r12]].map(([n, x]) => `<tr><td>${n}</td><td class="num">${x.n ?? 0}</td><td class="num">${pc(x.win)}</td><td class="num ${cls(x.avg)}">${x.avg == null ? "n/a" : (x.avg * 100).toFixed(2) + "%"}</td><td class="num">${x.avg_win == null ? "" : "+" + (x.avg_win * 100).toFixed(1) + "% / " + (x.avg_loss * 100).toFixed(1) + "%"}</td></tr>`).join("")}</table>
       <p class="muted">Why "experimental": 675 short setups were tested on 10 years of data. Only this one kept 75%+ wins with a positive average on 2021–2026 data. It trades rarely, and the result is not statistically proven (t ≈ 1.4). The plain mirror of the BUY rule (shorting rallies in weak stocks) won 73% of the time but <b>lost money</b> (−0.38% per trade), because short losses (−7% to −14% on gaps) are much bigger than the +2% wins.</p></div>`;
+}
+
+
+/* ---------------------------------------------------------------- estimation engine */
+function renderEstimate() {
+  const el = $("#estimate"), E = DATA.estimator;
+  if (!E || E.error) { el.innerHTML = `<h2>📐 Estimation engine</h2><div class="note warnbox">${esc(E ? E.error : "Not available yet: appears after the next refresh.")}</div>`; return; }
+  const pc = x => x == null ? "–" : (x * 100).toFixed(1) + "%";
+  const N = E.nifty || {}, S = E.stocks || {};
+  const hName = { "1": "Next day", "5": "Next 5 days", "20": "Next 20 days" };
+  const nCards = N.error ? `<div class="note warnbox">${esc(N.error)}</div>` : Object.entries(N.horizons || {}).map(([h, v]) => {
+    const c = v.card.all, l3 = v.card.last3y || {};
+    const skill = c.bss > 0 && c.dm_p != null && c.dm_p < 0.05;
+    const sel = c.selective["0.15"] || {};
+    return `<div class="card"><h3>${hName[h]} (Nifty ${fmt(N.close, 0)})</h3>
+      <div class="grid"><div class="tile"><div class="lbl">Climatology (headline)</div><div class="val">${pc(v.p_clim)} up</div><div class="chg muted">how often Nifty rose over ${h} day(s) historically</div></div>
+        <div class="tile"><div class="lbl">Model estimate (tilt only)</div><div class="val ${v.p_up > v.p_clim ? "pos" : "neg"}">${pc(v.p_up)} up</div><div class="chg muted">${v.p_up > v.p_clim ? "a bit above" : "a bit below"} normal</div></div>
+        <div class="tile"><div class="lbl">Likely range (80%)</div><div class="val">${fmt(v.level80[0], 0)} – ${fmt(v.level80[1], 0)}</div><div class="chg muted">${pct(v.interval80[0], 1)} to ${pct(v.interval80[1], 1)}</div></div></div>
+      <p class="muted"><b>Biggest factors today:</b> ${v.drivers.map(d => `${esc(d[0])} (${d[1] > 0 ? "▲" : "▼"})`).join(", ")}</p>
+      <table><tr><th>Report card (walk-forward, ${esc(v.period[0])} → ${esc(v.period[1])})</th><th class="num">All years</th><th class="num">Last 3 years</th></tr>
+        <tr><td>Direction right</td><td class="num">${pc(c.accuracy)}</td><td class="num">${pc(l3.accuracy)}</td></tr>
+        <tr><td>…vs simply "always up"</td><td class="num">${pc(c.always_up)}</td><td class="num">${pc(l3.always_up)}</td></tr>
+        <tr><td>Skill score vs climatology (BSS, &gt;0 = skill)</td><td class="num ${cls(c.bss)}">${c.bss}</td><td class="num ${cls(l3.bss)}">${l3.bss}</td></tr>
+        <tr><td>When confident (|p−50%| ≥ 15): right / how often</td><td class="num">${pc(sel.accuracy)} / ${pc(sel.coverage)}</td><td class="num">${pc((l3.selective || {})["0.15"]?.accuracy)} / ${pc((l3.selective || {})["0.15"]?.coverage)}</td></tr>
+        <tr><td>…base rate on those same days</td><td class="num">${pc(sel.base)}</td><td class="num">${pc((l3.selective || {})["0.15"]?.base)}</td></tr></table>
+      <p>${skill ? "✅ Statistically real skill." : "⚠️ <b>No proven skill:</b> the model did not beat climatology on unseen years, so the climatology figure is the honest estimate."}</p></div>`; }).join("");
+  const R = (S.report || {}).periods || {}, U = R["unseen_2021+"] || {}, TB = ((S.report || {}).top_bottom || {})["unseen_2021+"] || {};
+  const FN = { mom_12_1: "12-month momentum", mom_6m: "6-month momentum", mom_3m: "3-month momentum", rev_1m: "1-month reversal", rev_5d: "5-day reversal",
+    dist_sma50: "vs 50-day avg", dist_sma200: "vs 200-day avg", hi52: "near 52-week high", rs_nifty: "strength vs Nifty", rs_sector: "strength vs sector",
+    vol60: "volatility", beta: "beta", vol_trend: "volume trend", rsi14: "RSI", max_ret_1m: "lottery-like spikes", gap_freq: "frequent gaps",
+    sector_mom: "sector momentum", beta_x_trend: "beta × market trend", vol_x_vix: "volatility × VIX" };
+  const sRow = r => `<tr><td><b>${esc(r.symbol)}</b><div class="muted" style="font-size:12px">${(r.top_drivers || []).map(d => esc(FN[d.factor] || d.factor)).join(" · ")}</div></td><td class="num">${pc(r.p_outperform_5d)}</td><td class="num">${pc(r.p_up_20d)}</td><td class="num">${pct(r.expected_20d_return, 1)}</td></tr>`;
+  const sTable = arr => `<table><tr><th>Stock</th><th class="num">Beat Nifty in 5d</th><th class="num">Up in 20d</th><th class="num">Exp. 20d</th></tr>${(arr || []).map(sRow).join("")}</table>`;
+  el.innerHTML = `<h2>📐 Estimation engine: weather-forecast style</h2>
+    <div class="note">Like a weather forecast ("70% chance of rain"), this gives a <b>probability</b>, then checks how often such probabilities came true. It uses correlation and regression on ${N.horizons ? "40" : ""} factors (momentum, volatility, India/US VIX, world markets, dollar, rupee, crude, gold, copper, US rates, calendar), hypothesis tests with a multiple-testing correction, and a year-by-year walk-forward test on data the model had not seen.<br>
+      <b>हिंदी:</b> यह मौसम विभाग की तरह संभावना (%) बताता है और फिर नापता है कि ऐसी संभावनाएँ कितनी बार सच निकलीं। हर अनुमान के साथ उसका रिपोर्ट-कार्ड है।</div>
+    <h2>Nifty 50</h2>${nCards}
+    <div class="note warnbox"><b>Honest result:</b> none of the 40 factors passed the multiple-testing check on 2008–2016 data. No horizon beat climatology on 2014–2026. The model's "confident" days were right about as often as the market's normal up-rate on those days. Accuracy near 100% is not achievable this way. Even weather forecasts are only reliable a few days ahead, and markets react to forecasts in a way weather doesn't.</div>
+    <h2>Stocks: ranking, not certainty</h2>
+    ${S.error ? `<div class="note warnbox">${esc(S.error)}</div>` : `
+    <div class="note">Verified on 2021–2026 (unseen): AUC ${U.out_5d ? U.out_5d.auc.toFixed(3) : "–"} (0.5 = coin flip). Confident calls (70%+) almost never occur. What does work is a <b>ranking</b>: the top and bottom 10% beat or trailed Nifty over 5 days about 53% of the time (statistically significant). The top-10 minus bottom-10 spread averaged <b>${pct(TB.spread_avg, 2)}</b> a week after costs (positive in ${pc(TB.spread_hit)} of ${TB.weeks || "–"} weeks). Factors that held up: <b>12-month momentum</b> (winners keep winning) and <b>5-day reversal</b> (last week's big losers bounce a little). Use it as a ranking or "avoid" list.</div>
+    <div class="grid2"><div class="card tablewrap"><h3>🟢 Top-ranked 10 (most likely to beat Nifty)</h3>${sTable(S.top)}</div>
+      <div class="card tablewrap"><h3>🔴 Bottom-ranked 10 (most likely to lag)</h3>${sTable(S.bottom)}</div></div>`}
+    <p class="muted">Computed ${esc(E.computed_at || "")}${E.reused ? " (models refresh hourly)" : ""}. Educational only, not investment advice.</p>`;
 }
 
 /* ---------------------------------------------------------------- daily picks */

@@ -31,6 +31,7 @@ from . import news as NW
 from . import history as HL
 from . import intraday as INT
 from . import insiders as INS
+from . import estimation as EST
 from .universe import NAMES, fetch_index_list
 
 HORIZONS = [1, 2, 3, "close"]
@@ -155,6 +156,19 @@ def build_stocks(universe: dict, now: datetime, is_open: bool) -> tuple[dict, di
 
 
 # ------------------------------------------------------------------ live track record
+def load_previous_data(track_src: str | None) -> dict:
+    """The previously published data.json (same folder as track.json), used to reuse hourly results."""
+    if not track_src or not track_src.startswith("http"):
+        return {}
+    try:
+        import requests
+
+        r = requests.get(track_src.replace("track.json", "data.json"), params={"t": int(time.time())}, timeout=20)
+        return r.json() if r.status_code == 200 else {}
+    except Exception:
+        return {}
+
+
 def load_previous_track(src: str | None) -> dict:
     empty = {"open": [], "resolved": [], "totals": {}, "picks": {"open": [], "resolved": []}}
     if not src:
@@ -282,8 +296,8 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         global_view = {"error": f"Global view unavailable this refresh: {exc}"}
 
     insiders = {"error": "Insider data not built this refresh"}
+    news_uni: dict = {}
     try:
-        news_uni = {}
         for lst in ("ind_nifty50list", "ind_niftynext50list", "ind_niftymidcap50list"):
             for sym, ind in fetch_index_list(lst).items():
                 news_uni[sym] = {"name": NAMES.get(sym, sym), "industry": ind}
@@ -313,6 +327,14 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         picks["track_sell"] = track.get("picks", {}).get("summary_sell", {})
     except Exception as exc:  # never let the picks page break the rest of the app
         picks = {"error": f"Daily picks unavailable this refresh: {exc}"}
+        daily_frames = {}
+
+    try:
+        prev = load_previous_data(previous_track)
+        estimator = EST.build(now, daily_frames, {k: v.get("industry", "") for k, v in news_uni.items()},
+                              prev.get("estimator"))
+    except Exception as exc:
+        estimator = {"error": f"Estimation engine unavailable this refresh: {exc}"}
 
     payload = {
         "version": __version__,
@@ -330,6 +352,7 @@ def build(out_dir: Path, previous_track: str | None) -> dict:
         "insiders": insiders,
         "history": hist_lab,
         "intraday_lab": intraday_lab,
+        "estimator": estimator,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "data.json").write_text(json.dumps(payload, separators=(",", ":")))
