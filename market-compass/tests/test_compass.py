@@ -206,3 +206,39 @@ def test_sell_pick_track_resolves_short():
     res = out["picks"]["resolved"]
     assert len(res) == 1 and res[0]["how"] == "target" and res[0]["ret"] > 0
     assert out["picks"]["summary_sell"]["wins"] == 1
+
+
+def test_intraday_resolve_long_short_and_squareoff():
+    from compass import intraday as I
+
+    t = pd.date_range("2026-11-13 09:15", periods=7, freq="h", tz="Asia/Kolkata")
+    g = pd.DataFrame({"Open": [100, 97, 96.5, 97, 97.5, 97.6, 97.8], "High": [100.5, 97.2, 97.3, 97.6, 97.9, 98, 98],
+                      "Low": [96.8, 96.4, 96.3, 96.8, 97.2, 97.4, 97.5], "Close": [97, 96.6, 97.1, 97.5, 97.7, 97.8, 97.9],
+                      "Volume": [1] * 7}, index=t, dtype=float)
+    # long entered at bar 1 close (96.6) with +0.5% target -> hits 97.08 on bar 2
+    r, how = I._resolve("BUY", g, 1, 0.005, 0.03)
+    assert how == "target" and abs(r - (0.005 - I.COST)) < 1e-12
+    # short entered at bar 1 close, tiny target never hit, wide stop never hit -> squared off at 15:15 close
+    r, how = I._resolve("SELL", g, 1, 0.05, 0.05)
+    assert how.startswith("square-off") and abs(r - (1 - 97.9 / 96.6 - I.COST)) < 1e-12
+    # a day still running (no 15:15 bar) is not resolved yet
+    assert I._resolve("SELL", g.iloc[:4], 1, 0.05, 0.05) is None
+
+
+def test_intraday_scan_waits_for_completed_entry_bar():
+    from compass import intraday as I
+
+    days = pd.bdate_range("2026-09-01", "2026-11-13")
+    rows = []
+    for d in days:
+        for h in range(7):
+            ts = pd.Timestamp(d).tz_localize("Asia/Kolkata") + pd.Timedelta(hours=9 + h, minutes=15)
+            rows.append((ts, 100.0, 100.5, 99.5, 100.0, 1000.0))
+    df = pd.DataFrame(rows, columns=["ts", "Open", "High", "Low", "Close", "Volume"]).set_index("ts")
+    last = df.index.normalize() == df.index[-1].normalize()
+    df.loc[last, ["Open", "High", "Low", "Close"]] = [97.0, 97.2, 96.0, 96.1]   # 3% gap down, weak first hour
+    frames = {"X": df}
+    early = pd.Timestamp("2026-11-13 10:40", tz="Asia/Kolkata").to_pydatetime()
+    later = pd.Timestamp("2026-11-13 11:20", tz="Asia/Kolkata").to_pydatetime()
+    assert not [v for v in I.scan(frames, early)[1] if v["setup"] == "S_GAPDN"]      # 10:15 bar not closed yet
+    assert [v for v in I.scan(frames, later)[1] if v["setup"] == "S_GAPDN"]

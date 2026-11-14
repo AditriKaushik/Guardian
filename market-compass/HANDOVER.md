@@ -121,6 +121,18 @@ themselves are close to real time (usually within a minute or two).
      gives no intraday calls and shows the evidence instead. The tab also lists the intraday rules:
      shorting is allowed for any stock but must be squared off the same day, leverage is about 5×,
      and auto square-off is around 3:15–3:20.
+   - **🧪 Intraday lab (same-day LONG = buy, SHORT = sell):**
+     - **What it does:** the four intraday setups that came closest in the studies run live every
+       day on 72 stocks. Each signal is logged at entry, using completed hourly bars only, and
+       checked against the real price by the close.
+       - LONG: gap-up continuation, morning flush in a strong stock.
+       - SHORT: gap-down continuation, weak stock while Nifty rises.
+     - **Backtest, last ~2 years:** morning-flush long 77% wins / +0.04%; gap-down short
+       73% / −0.04%. Both have high win rates but near-zero profit, so all four are marked
+       **"🧪 testing, not advice"**.
+     - **When a setup becomes a suggestion:** it is promoted automatically into the 🎯 BUY/SELL
+       lists only after **100+ live trades with a 75%+ win rate and a positive average** after
+       0.06% costs.
    - **Live record:** BUY and SELL picks are logged and checked against real prices separately.
    - **Timing:** the list is provisional while the market is open and final after 3:30 PM. The
      rule enters near the close (3:15–3:25 PM). On many days **no stock qualifies**; that is part
@@ -260,6 +272,7 @@ market-compass/
 │   ├── news.py               ← overnight news: feeds, topics, tone, sectors, NSE filings, live check
 │   ├── crossasset.py         ← opening-gap forecast, metals tilt, tested cause → effect table
 │   ├── picks.py              ← Daily picks: BUY rule, SELL rule, Nifty index rule, backtests, checks
+│   ├── intraday.py           ← Intraday lab: 4 same-day long/short setups, live forward test
 │   ├── fo.py                 ← NSE F&O lot sizes + F&O ban list (for SELL suggestions)
 │   ├── universe.py           ← which stocks: all Nifty 50 + top performers (auto)
 │   └── stocks.py             ← stock list for the desktop version
