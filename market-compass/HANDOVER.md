@@ -62,7 +62,17 @@ themselves are close to real time (usually within a minute or two).
        - Gold → Titan ❌
        - Natural gas → GAIL ❌
        - Crypto: adds almost nothing beyond the US market
-2. **⭐ Daily picks:** stocks that pass **every** condition, with a **75%+ historical win rate**.
+2. **⭐ Daily picks:** opens with a **market-direction banner** (⬆️ UP / ↔️ SIDEWAYS / ⬇️ DOWN, from
+   Nifty vs its 200-day average and its 1-month change). Below it is **"🎯 Today's suggestions"**:
+   one list of 🟢 BUY and one of 🔴 SELL, covering stocks and the Nifty signal. Every item has a
+   past win rate of at least your chosen **minimum win chance** (setting: 70 / 75 / 80 / 85%,
+   default **75%**, saved on the device). The same 75% bar applies to BUY and SELL. When nothing
+   qualifies, a **Watch** list shows stocks close to a BUY trigger (RSI(2) under 20 in an uptrend)
+   or a SELL trigger (F&O stock that gapped down 2.5%+), with no win claim.
+   When the market is rising, suggestions come mainly from the BUY-the-dip rule. When it is
+   falling, only the tested gap-down SELL rule applies, because no "short the falling market"
+   rule passed testing.
+   Details of each rule follow: stocks that pass **every** condition, with a **75%+ historical win rate**.
    Checks 150 stocks (Nifty 50 + Next 50 + Midcap 50) every refresh.
    - **Rule:** buy a strong stock (above its 200-day average, 50-day above 200-day) on a short dip
      (below its lower Bollinger Band or RSI(2) under 5), only while Nifty is above its 200-day
